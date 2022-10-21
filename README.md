@@ -1,4 +1,4 @@
-# Stat-o-Sphere-Tutorials-BEM-
+# Stat-o-Sphere-Tutorials BEM
 
 Material that I produced for the editorial collection 'Stat-o-Sphere', published via 'Berlin Exchange Medicine'
 as a project of members of section IV data and statistics. 
