@@ -3,10 +3,10 @@
 Material that I produced for the editorial collection 'Stat-o-Sphere', published via 'Berlin Exchange Medicine'
 as a project of members of section IV data and statistics. 
 
-Collection Page @ BEM:
+## Collection Page @ BEM:
 https://journal.medicine.berlinexchange.de/statosphere
 
-Introduction Article (written together with Raphael Leuner):
+## Introduction Article (written together with Raphael Leuner):
 https://journal.medicine.berlinexchange.de/pub/into-the-stat-o-sphere
 
 ## Inferential Statistics I ─ Hypothesis Testing in the Basic Form of Conditional Probability / Bayes' Rule in R 
