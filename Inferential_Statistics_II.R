@@ -474,13 +474,7 @@
   
   
   
-  
-  
-  
-  
-  
-  
-  
+ 
   
   
   ###############################################
@@ -553,35 +547,3 @@
   
   
   
-  
-  plot(density(y, kernel = "gaussian") )
-  ?density()
-  
-  shapiro.test(y)
-  
-  vec = c(1,3)
-  
-  te=matrix(c(1,2,3,4,5,6,7,8,9), nrow=3)
-  list=list()
-  for(i in seq_along(c(1,3))){
-    list[[i]] = te[,vec[[i]]]
-  }
-  
-  
-  #install.packages("beepr")
-  library("beepr")
-  ?beep()
-  beep()
- 
-  
-  
-  
-  
-  
-  dinoData = read.table(file = "C:/Users/stsch/Desktop/Workingdirec/The Datasaurus Dozen/The Datasaurus Dozen/DatasaurusDozen.tsv", header = TRUE)
-  dinoX = dinoData$x[1:142]
-  dinoY =dinoData$y[1:142]
-  plot(x = dinoX[1:142],y = dinoY[1:142])
-  
-  abline(lm(dinoY~dinoX))
-  linear_least_square(dinoX,dinoY)
