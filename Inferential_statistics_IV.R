@@ -950,21 +950,6 @@ p_value = 1-pnorm(z_value)
 # 6 The Regular T-Test #
 ########################
 
-# Degrees of freedom explained:
-
-# Sample:
-x = c(10,20,30)
-n =  length(x)
-
-sum(c(10,20,30))/n
-# [1] 20
-
-# Alternative sample with equivalent mean,
-# but 20 has to be same:
-mean = sum(c(5,20,35))/n
-# [1] 20
-
-
 # PDF of a T-Distribution:
 # df = n-1 # or 2 for two estimates/relations
 
