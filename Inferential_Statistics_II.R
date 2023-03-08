@@ -375,15 +375,7 @@
   # Go-go-gadgeto linear_least_square!!!!
   # Replication of the lm() function:
   linear_least_square = function (x,y){ ### Start of function
-    # Here we define and operate with our guessed input 
-    # function.
-    lmRandom = function(x) (x) 
-  
     # Linear least square method:
-    
-    # Next up we will optimize our guessed function,
-    # by looking for the minimum of the values of a (α) 
-    # in relation to b (β).
     
     # Our PDE goes as follows:
     # Error2(a,b) = sum(y-f(x))^2 = sum(y-a-bx)^2  
