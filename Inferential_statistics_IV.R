@@ -220,6 +220,34 @@ for (i in 1:n_samp){
 hist(sample_n_5, col = "lightblue")
 
 
+###### Do the same with a log function:
+
+# Plot of our function: 
+plot(x = seq(1,10,by=.0009), y = -log(seq(1,10,by=.0009)))
+
+# We will use y as data, so we do some shuffeling
+# in order to be able to use most of the code above:
+seq = seq(1,10,by=.0009)
+seq = -log(seq)
+data = seq
+
+# We can also plot our data as histogram
+hist(data, col = "lightblue")
+
+# Use a for loop to take 5000 random samples of size n = 5 each:
+n_samp = 5000
+sample_n_5 = c() # create empty vector
+
+# The below function will also take the mean of the sample and 
+# and stores in our vector sample_n_5:
+for (i in 1:n_samp){
+  # Store mean of each sample with length 5:
+  sample_n_5[i] = mean(sample(data, 5, replace=TRUE))
+} # End for i
+
+# Look at the histogram of the sample_n_5:
+hist(sample_n_5, col = "lightblue")
+
 ####################################
 # 4.2 The basic Gaussican function #
 ####################################
@@ -448,7 +476,7 @@ all.equal(gauss_para_integ$value,(a*sqrt(2*pi*c^2)))
 
 
 ###########################################
-# 4.6 integrating the Standard Normal PDF #
+# 4.6 Integrating the Standard Normal PDF #
 ###########################################
 
 # Integrate stand. norm. probability density function:
@@ -537,7 +565,7 @@ z_score = function(x,pop_mean,pop_sd){
 # Say we want to standardize a value of x that is equal
 # to our mean itself:
 
-z_score(pop_cups, pop_mean, pop_sd)
+z_score(pop_mean, pop_mean, pop_sd)
 # [1] 0
 
 # Integrating will reasonably result in
@@ -558,10 +586,6 @@ z_score((pop_mean+2*pop_sd), pop_mean, pop_sd)
 # [1] +2
 # Worked!!
 
-
-# Plot all possible z-scores:
-plot(z_score(pop_cups, pop_mean, sem))
-abline(h=0)
 
 # Plot corresponding normal and standard norm. PDF:
 # Normal PDF of our data:
@@ -927,17 +951,12 @@ p_value = 1-pnorm(z_value)
 ########################
 
 # Degrees of freedom explained:
-# Set of Samples + plot of its PDF:
-seq = seq(-10,50,by=.1)
-density = prob_dens(seq,mean(x),var(x))
-plot(seq,density, typ = "l", xlim = c(-10,20))
-abline(v=mean(x))
 
 # Sample:
 x = c(10,20,30)
 n =  length(x)
 
-  sum(c(13,20,30))/n
+sum(c(10,20,30))/n
 # [1] 20
 
 # Alternative sample with equivalent mean,
@@ -1108,7 +1127,7 @@ t_value = alpha/SE_a
 linear_least_square = function(indep,dep){ # Start of function
   
   # Evaluating coefficients for and optimal linear model
-  # given a set of dependent and independent variabels:
+  # given a set of dependent and independent variables:
   beta  =  cov(indep,dep)/var(indep)
   alpha =  mean(dep)-beta*mean(indep)
   fx = alpha+beta*indep
@@ -1132,8 +1151,8 @@ linear_least_square = function(indep,dep){ # Start of function
   # t-value of the intercept:
   t_value_a = alpha/se_a
   
-  ### p-value slope via integrating an PDF of a t-distribution
-  # up to the t-value:
+  ### p-value of the slope via integrating the PDF of a t-distribution
+  # up to the t-value calculated above:
   
   # Two-Tail P(t=T|H_0):
   p_b_2t = 2*pt(t_value_b, df = length(indep)-2) 
@@ -1142,7 +1161,6 @@ linear_least_square = function(indep,dep){ # Start of function
   
   # Two-Tail P(t=T|H_0):
   p_a_2t = 2*(1-pt(t_value_a,df = length(indep)-2))
-  
   
   # Results for two tail
   Results_a = c(round(alpha,4), round(se_a,4), round(t_value_a,4), p_a_2t)
@@ -1158,8 +1176,8 @@ linear_least_square = function(indep,dep){ # Start of function
       "alpha", "\t",alpha,"\n",
       "beta","\t",beta, "\t","SumR2", "\t", SumR2, "\n","\n")
   print(Res_data)
-  cat("\n","Residual Standard Error:",round(residual_standard_error),"on", (length(indep)-2), 
-      "degrees of freedom","\n","\n") 
+  cat("\n","Residual Standard Error:",round(residual_standard_error),"on",
+      (length(indep)-2), "degrees of freedom","\n","\n") 
   
   # Let us also plot our results:
   # We will also use deparse(substitute(x)) for the 
@@ -1185,4 +1203,3 @@ linear_least_square(indep, dep)
 # Reg. coeff.  -0.2913     2.4116 -0.1208 9.046625e-01
 #
 # Residual Standard Error: 126 on 30 degrees of freedom 
-
