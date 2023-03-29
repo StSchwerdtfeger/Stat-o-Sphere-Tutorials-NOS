@@ -32,7 +32,7 @@
   # adding [] with and without values to the object.
   beta = (cups_of_tea[2]-cups_of_tea[1])/(time_passed[2]-time_passed[1]) 
   
-  # Alternative via defining the points, represented as 
+  # Alternative via defining the points represented as 
   # vectors P = c(x,y), first.           # row x y
   P1 = c(time_passed[1],cups_of_tea[1])  # [1] 0 0
   P2 = c(time_passed[2],cups_of_tea[2])  # [1] 1 1
@@ -60,7 +60,9 @@
   
   # Using lm() to evaluate alpha (intercept) and beta of x.
   # Formula: lm(y~x), saying: a linear model of y (dep.) in 
-  # conditional relation (~) to x (indep.):
+  # conditional relation (~) to x (indep.).Note that ~ can 
+  # also be read as proportional which we will get into in 
+  # Inf. Stat. III:
   lm(cups_of_tea~time_passed)
   
   # The result in the console will look like this:
@@ -216,7 +218,7 @@
   sumErrorRan  = sum(errorRandom)
   sumErrorRan2 = sum(errorRandom^2)
   plot(errorRandom)
-  # adds (h)orizontal line at a-axis = error = 0 (:= no error)
+  # adds (h)orizontal line at y-axis = error = 0 (:= no error)
   abline(h=0)
   
   # This is our fitted model function
@@ -375,6 +377,7 @@
   # Go-go-gadgeto linear_least_square!!!!
   # Replication of the lm() function:
   linear_least_square = function (x,y){ ### Start of function
+  
     # Linear least square method:
     
     # Our PDE goes as follows:
@@ -422,7 +425,7 @@
     
     # In order to get a nice looking output, we will use the cat() function. 
     # The cat() function concatenates elements of any
-    # kind, such as Text and our result values. Use "\n"
+    # kind, such as text and our result values. Use "\n"
     # for a line break, and "\t" for the tab seperator.
     # We also have to apply a trick, to get the
     # name of the input object into our console output
@@ -455,87 +458,12 @@
   #  alpha 	 0.2318182 
   #  beta 	 1.008182 	 SumR2 	 9.703364
   
-  # With our idelaized data set:
+  # With our idealized data set:
   linear_least_square(time_passed, cups_of_tea)
   
   # Compare with the regular old lm() function:
   lm(data_table$cups~data_table$time)
 
-  summary(lm(data_table$cups~data_table$time))
-  
-  
-  
-  
- 
-  
-  
-  ###############################################
-  # Linear regression via gradient descent in R #
-  ###############################################
-  
-  x=data_table$time
-  y=data_table$cups
-  
-  
-  linear_gradient_descent = function (x,y){ 
-    # squared error cost function
-    cost <- function(X, y, theta) {
-      sum( (X %*% theta - y)^2 ) / (2*length(y))
-    }
-    
-    # learning rate and iteration limit
-    alpha <- .01
-    num_iters <- 10000
-    
-    # keep history
-    cost_history <- double(num_iters)
-    theta_history <- list(num_iters)
-    
-    # initialize coefficients
-    theta <- matrix(c(0,0), nrow=2) 
-    
-    # add a column of 1's for the intercept coefficient
-    X <- cbind(1, matrix(x))
-    
-    # gradient descent
-    for (i in 1:num_iters) {
-      error <- (X %*% theta - y)
-      delta <- t(X) %*% error / length(y)
-      theta <- theta - alpha * delta
-      cost_history[i] <- cost(X, y, theta)
-      theta_history[[i]] <- theta
-    }
-    
-    # plot data and converging fit
-    plot(x,y, col=rgb(0.2,0.4,0.6,0.4), main='Linear regression by gradient descent')
-    for (i in c(1,3,6,10,14,seq(20,num_iters,by=10))) {
-      abline(coef=theta_history[[i]], col=rgb(0.8,0,0,0.3))
-    }
-    abline(coef=theta, col='blue')
-    
-    cost_history1 = cost_history[1:20]
-    
-    plot(cost_history1, type='l', col='blue', lwd=2, main='Cost function', ylab='cost', xlab='Iterations')
-    
-    # Console Output:
-    cat("Linear gradient descent method in R","\n","\n",
-        "Independent variable:", "\t", deparse(substitute(x)),"\n", 
-        "Dependent   variable:", "\t", deparse(substitute(y)),"\n","\n",
-        "alpha","\t",theta[1],"\n",
-        "beta","\t",theta[2]) 
-
-  } #### End of function
-  
-  linear_gradient_descent(x = data_table$time,y = data_table$cups)
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   
   
