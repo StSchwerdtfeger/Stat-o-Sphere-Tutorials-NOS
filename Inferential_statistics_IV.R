@@ -3,7 +3,7 @@
 ##                Inferential Statistics IV:               ##
 ##    Probabilistically Evaluating a Linear Model in R ─   ##
 ##            (Standard) Normal Distributions and          ## 
-##           the Z-Test / Gauß-Test and the T-Test         ##
+##           the Z-Test / Gauß-Test and the T-Test         ## 
 ##              by Steffen Schwerdtfeger 01.2023           ##
 ##---------------------------------------------------------##
 #############################################################
@@ -210,7 +210,7 @@ n_samp = 5000
 sample_n_5 = c() # create empty vector
 
 # The below function will also take the mean of the sample and 
-# and stores in our vector sample_n_5:
+# will store the output in our vector sample_n_5:
 for (i in 1:n_samp){
   # Store mean of each sample with length 5:
   sample_n_5[i] = mean(sample(data, 5, replace=TRUE))
@@ -292,6 +292,24 @@ plot(x = x, y = abs(x-mean(x))) # absolute value of x_i-mean(x)
 plot(x = x, y = (x-mean(x))^2)  # plot of squared deviation
 # Recall: summing the squared deviation results in 
 #         the total sum of squares...
+
+# Plot of exp(-abs(x)):
+test_abs = function(x){
+  fx = exp(-abs(x))
+  return(fx)
+} # End of function
+
+# Recall that we will use the absolute value of a sequence
+# consisting of value ranging from -4 to 4 (by a step of .1):
+plot(x = seq, y = test_abs(seq), typ = "l")  
+
+# It does not even matter that we use the number e as base:
+test_gen = function(x){
+  fx = 2^(-x^2)
+  return(fx)
+} # End of function
+
+plot(x = seq, y = test_gen(seq), typ = "l")  
 
 
 ##################################
@@ -955,7 +973,7 @@ p_value = 1-pnorm(z_value)
 
 t_distr = function(x,df){
   t_1 = gamma((df+1)/2)/(sqrt(df*pi)*gamma(df/2))
-  t_2 = (1 + (seq^2/df))^(-(df+1)/2)
+  t_2 = (1 + (x^2/df))^(-(df+1)/2)
   t_distr = t_1*t_2
   return(t_distr)
 } # End of function
@@ -1068,6 +1086,9 @@ t_value = beta/se_slope_t
 # [1] -0.1207903
 
 # p-value for two-tail == to standard output of summary(lm(y~x)):
+2*integrate(t_distr, df = length(indep)-2, lower = -Inf, upper = t_value)$value
+# [1] 0.9046625
+# Alternative via basic R function pt():
 2*pt(t_value, df = length(indep)-2) 
 # [1] 0.9046625
 
@@ -1098,6 +1119,7 @@ t_value = alpha/SE_a
 # [1] 5.165419
 
 # p-value intercept:
+2*(1-(integrate(t_distr, df = length(indep)-2, lower = -Inf, upper = t_value)$value))
 2*(1-pt(t_value,df = length(indep)-2))
 # [1] 1.460149e-05
 
@@ -1138,14 +1160,20 @@ linear_least_square = function(indep,dep){ # Start of function
   
   ### p-value of the slope via integrating the PDF of a t-distribution
   # up to the t-value calculated above:
+  t_distr = function(x,df){
+    t_1 = gamma((df+1)/2)/(sqrt(df*pi)*gamma(df/2))
+    t_2 = (1 + (x^2/df))^(-(df+1)/2)
+    t_distr = t_1*t_2
+    return(t_distr)
+  } # End of function
   
   # Two-Tail P(t=T|H_0):
-  p_b_2t = 2*pt(t_value_b, df = length(indep)-2) 
+  p_b_2t = 2*integrate(t_distr, df = length(indep)-2, lower = -Inf, upper = t_value_b)$value
   
   ### p-value of the intercept:
   
   # Two-Tail P(t=T|H_0):
-  p_a_2t = 2*(1-pt(t_value_a,df = length(indep)-2))
+  p_a_2t = 2*(1-(integrate(t_distr, df = length(indep)-2, lower = -Inf, upper = t_value_a)$value))
   
   # Results for two tail
   Results_a = c(round(alpha,4), round(se_a,4), round(t_value_a,4), p_a_2t)
