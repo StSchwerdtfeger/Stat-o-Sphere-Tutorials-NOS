@@ -3,7 +3,7 @@
 ##                Inferential Statistics IV:               ##
 ##    Probabilistically Evaluating a Linear Model in R ─   ##
 ##            (Standard) Normal Distributions and          ## 
-##           the Z-Test / Gauß-Test and the T-Test         ## 
+##            + Z-Test / Gauß-Test and the T-Test          ## 
 ##              by Steffen Schwerdtfeger 01.2023           ##
 ##---------------------------------------------------------##
 #############################################################
@@ -184,7 +184,6 @@ plot(x = x, y = Fx)
 
 
 
-
 ####################################################
 # 4 The (Standard) Normal Probability Distribution # 
 #           ─  Gaussian PDFs and CDFs              #
@@ -198,7 +197,7 @@ plot(x = x, y = Fx)
 # give us a random but uniformly distributed
 # set of data. Each time you run this line, the result will
 # be another set of data points.
-# Uses set.seed(0) or other values to make results reproducable
+# Uses set.seed(0) or other values to make results reproducible
 # (we will not get further into the the topic here):
 data = runif(n = 1000, min = 1, max = 10)
 
@@ -545,44 +544,32 @@ norm_CDF(seq,0,1)
 #             Z-Tables (Standard Normal Tables)                 #
 #################################################################
 
-# Second synthetic data set:
 
-# Cups of Tea: 
-cups = c(0,  1, 2,   3.5, 4.8, 5.2, 6,   6.9, 8.5, 9.1, 9.9, # run 1
-         0, .6, 2.6, 3.1, 4.8, 6.9, 7.1, 7.5, 8.5, 9.9, 9.9, #     2
-         0, .2, 2.9, 2.9, 4.9, 5.2, 6.9, 7.1, 7.3, 9,   9.8) #     3
-
-# Time passed for each run of measurements (cups), abbreviated:
-time = c(0:10,0:10,0:10)
-
-# Standardizing data:
-
-# Using the measurements of our idelized linear model f(x) = x
-# as population of the amount of cups Lady Meow drinks during 
-# a day:
+###### Special case of pop. mean == sample mean:
 pop_cups = c(0:10)
-plot(pop_cups)
 
 # Population mean, variance and standard deviation:
 # Recall that var() and sd() calculates teh sample var/sd
 # including Bessel's correction, therefore we use
 # the formulas below:
 pop_mean = mean(pop_cups)
+# [1] 5
 pop_var = sum((pop_cups-mean(pop_cups))^2)/length(pop_cups)
+# [1] 10
 pop_sd = sqrt(pop_var)
+# [1] 3.162278
 
-# Function to evaluate the z-value of a 
+# Function for evaluation the z-value of a 
 # non-standardized data set:
 z_score = function(x,pop_mean,pop_sd){
   z = (x-pop_mean)/pop_sd
   return(z)
 } # End of function
 
-
 # Standardized Z-Score for a particular value of x:
 # Say we want to standardize a value of x that is equal
-# to our mean itself:
-
+# to our mean itself as a special where a z-test formula
+# is not needed yet:
 z_score(pop_mean, pop_mean, pop_sd)
 # [1] 0
 
@@ -602,11 +589,24 @@ z_score((pop_mean+pop_sd), pop_mean, pop_sd)
 # [1] +1
 z_score((pop_mean+2*pop_sd), pop_mean, pop_sd)
 # [1] +2
-# Worked!!
+# Worked!
+
+
+#### Plot standardization of the dependent variable of 
+####     second synth. observing Lady Meow
+
+# Second synthetic data set:
+# Cups of Tea: 
+cups = c(0,  1, 2,   3.5, 4.8, 5.2, 6,   6.9, 8.5, 9.1, 9.9, # run 1
+         0, .6, 2.6, 3.1, 4.8, 6.9, 7.1, 7.5, 8.5, 9.9, 9.9, #     2
+         0, .2, 2.9, 2.9, 4.9, 5.2, 6.9, 7.1, 7.3, 9,   9.8) #     3
+
+# Time passed for each run of measurements (cups), abbreviated:
+time = c(0:10,0:10,0:10)
 
 
 # Plot corresponding normal and standard norm. PDF:
-# Normal PDF of our data:
+# Normal PDF (non- standardized) of our data:
 seq = seq(-10,20,by=.1)
 plot(x=seq,y=prob_dens(seq,mean(cups),pop_var),type ="l")
 
@@ -858,7 +858,8 @@ p_val_low < .05
 # P-Value UPPER TAIL:
 # The below is only theoretically the case and we
 # have to pretend to have gotten a positive z-statistics.
-# The below therefore actually argues that sad cats drink 
+# This spares us the time of creating another set of data.
+# This time the below actually argues that sad cats drink 
 # more tea than happy cats (we made thinks up, but just 
 # you know):
 p_val_upper = pnorm(abs(z_stat),mean = 0,sd = 1)
@@ -878,7 +879,7 @@ p_val_two < .05
 
 # We will compare happy cats such as Lady Meow with 
 # unfortunate cats that are evidently sad (inclusion 
-# criterias will left out for now):
+# criteria will left out for now):
 
 # Happy Cats:
 sample_cats = c(0:10)
