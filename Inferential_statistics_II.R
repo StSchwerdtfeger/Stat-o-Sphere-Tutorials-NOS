@@ -464,6 +464,75 @@
   # Compare with the regular old lm() function:
   lm(data_table$cups~data_table$time)
 
+
+
+
+
+
+
+
+
+
+
+  ######################################################
+  # BONUS: Linear regression via gradient descent in R #
+  ######################################################
+  
+  x=data_table$time
+  y=data_table$cups
+  
+  
+  linear_gradient_descent = function (x,y){ 
+    # squared error cost function
+    cost <- function(X, y, theta) {
+      sum( (X %*% theta - y)^2 ) / (2*length(y))
+    }
+    
+    # learning rate and iteration limit
+    alpha <- .01
+    num_iters <- 10000
+    
+    # keep history
+    cost_history <- double(num_iters)
+    theta_history <- list(num_iters)
+    
+    # initialize coefficients
+    theta <- matrix(c(0,0), nrow=2) 
+    
+    # add a column of 1's for the intercept coefficient
+    X <- cbind(1, matrix(x))
+    
+    # gradient descent
+    for (i in 1:num_iters) {
+      error <- (X %*% theta - y)
+      delta <- t(X) %*% error / length(y)
+      theta <- theta - alpha * delta
+      cost_history[i] <- cost(X, y, theta)
+      theta_history[[i]] <- theta
+    }
+    
+    # plot data and converging fit
+    plot(x,y, col=rgb(0.2,0.4,0.6,0.4), main='Linear regression by gradient descent')
+    for (i in c(1,3,6,10,14,seq(20,num_iters,by=10))) {
+      abline(coef=theta_history[[i]], col=rgb(0.8,0,0,0.3))
+    }
+    abline(coef=theta, col='blue')
+    
+    cost_history1 = cost_history[1:20]
+    
+    plot(cost_history1, type='l', col='blue', lwd=2, main='Cost function', ylab='cost', xlab='Iterations')
+    
+    # Console Output:
+    cat("Linear gradient descent method in R","\n","\n",
+        "Independent variable:", "\t", deparse(substitute(x)),"\n", 
+        "Dependent   variable:", "\t", deparse(substitute(y)),"\n","\n",
+        "alpha","\t",theta[1],"\n",
+        "beta","\t",theta[2]) 
+
+  } #### End of function
+  
+  linear_gradient_descent(x = data_table$time,y = data_table$cups)
+  
   
   
   
