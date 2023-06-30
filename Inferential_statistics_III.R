@@ -121,7 +121,6 @@ linear_least_square(time,cups)
 
 
 
-
 ###############################################################
 # 3 Descriptive Statistics and Conditionally Linear Relations #
 #     ─ Mean, Sum of Squares, Variance and Covariance         #
@@ -183,6 +182,8 @@ n_class_1 = length(grades_class_1)
 n_class_2 = length(grades_class_2)
 
 # Numeric example Wikipedia that weights the mean of the samples:
+# (still open question if this is a legit method; comment or contact us,
+# if you have knowledge on this topic!). 
 w_m_numer = (mean_class_1*n_class_1)+(mean_class_2*n_class_2)
 w_m_denom = sum(n_class_1+n_class_2)
 weighted_mean = w_m_numer/w_m_denom
@@ -304,7 +305,7 @@ dev_of_mean_X = x-mean(x)
 plot(x = x, y = dev_of_mean_X) 
 abline(h=0)
 
-# Pure deviation from the mean (without summing!):
+# Pure deviation from the mean (without summing and squaring!):
 dev_of_mean_X = x-mean(x)
 
 # Plot using absolute values via function abs():
