@@ -1,4 +1,4 @@
-## Higher Spheres: Information Theory II: Introduction into the World of Information Processing and its Technological Representation
+## Higher Spheres: Information Theory I: Introduction into the World of Information Processing and its Technological Representation
 https://journal.medicine.berlinexchange.de/pub/info1 
 
 ## Higher Spheres: Information Theory II: The Relation Between Information Theory / Technology and Statistical Thermodynamics
