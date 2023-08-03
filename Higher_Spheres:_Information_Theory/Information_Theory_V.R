@@ -1,8 +1,8 @@
 #####################################################
 #---------------------------------------------------#
 #       Higher Spheres: Information Theory I:       #
-#   Approximate Bayes Inference, Relative Entropy   #
-#             and the KL-Divergence                 #
+#   Approximate Bayes Inference, Relative Entropy,  #
+#     the KL-Divergence and Jensen's Inequality     #
 #           by Steffen Schwerdtfeger                #
 #---------------------------------------------------#
 #####################################################
