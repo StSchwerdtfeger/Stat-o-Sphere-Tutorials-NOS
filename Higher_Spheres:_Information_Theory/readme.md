@@ -7,5 +7,5 @@ https://journal.medicine.berlinexchange.de/pub/dp3uip9w
 ## Higher Spheres: Information Theory III: Using Markov Chains to Describe Language as the Result of a Stochastic Process
 https://journal.medicine.berlinexchange.de/pub/81npwj54
 
-## Higher Spheres: Information Theory V: Approximate Bayes Inference, Relative Entropy, KL-Divergence and Jensen's Inequality
+## Higher Spheres: Information Theory V: Mathematical Basics of Active Inference — Variational Bayes', Relative Entropy / KL-Divergence and Jensen's Inequality
 https://journal.medicine.berlinexchange.de/pub/bi7ccdsa
