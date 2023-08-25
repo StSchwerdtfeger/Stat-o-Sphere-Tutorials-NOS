@@ -1,16 +1,64 @@
 #####################################################
 #---------------------------------------------------#
-#       Higher Spheres: Information Theory I:       #
-#   Approximate Bayes Inference, Relative Entropy,  #
-#     the KL-Divergence and Jensen's Inequality     #
-#           by Steffen Schwerdtfeger                #
+#       Higher Spheres: Information Theory V:       #
+#     Mathematical Basics of Active Inference —     #
+#      Variational Bayes', Relative Entropy /       #
+#      KL-Divergence and Jensen's Inequality        #
 #---------------------------------------------------#
 #####################################################
 
 
-###########################
-# Variational Free Energy #
-###########################
+###################################################################
+# 2.2.1 The Principal of Maximum Entropy and Minimum Inner Energy #
+###################################################################
+
+# Load package 'markovchain':
+library(markovchain)
+
+### We will again use the last Markov chain example from Information Theory III:
+MessageABC = c("A", "B", "C")
+MessageABCTransMatrix = matrix(c(.0,.8,.2,
+                                 .5,.5,.0,
+                                 .5,.4,.1),
+                               nrow = 3,
+                               byrow = TRUE,
+                               dimname = list(MessageABC, MessageABC))
+
+MCmessageABC = new("markovchain", states = MessageABC,
+                   byrow = TRUE,
+                   transitionMatrix = MessageABCTransMatrix,
+                   name = "WritingMessage") 
+markovchainSequence(n = 20, markovchain = MCmessageABC, t0 = "A")
+
+# Joint matrix:
+steady = steadyStates(MCmessageABC)
+trans_mat = as.matrix(MessageABCTransMatrix)
+
+# Initialize empty matrix:
+joint_mat = matrix(0, ncol = ncol(trans_mat), nrow = nrow(trans_mat))
+for (i in 1:length(steady)){ 
+  for (j in 1:ncol(trans_mat)){
+    joint_mat[[i,j]] = steady[[i]]*trans_mat[[i,j]]
+  } # end for j
+} # End for i
+
+# Plot Markov Chain
+plot(MCmessageABC, edge.arrow.size = 0.1) 
+
+# We will quickly write a function adding a tiny
+# value to our inputs:
+bit_log_nonzero = function(x) {
+  nonzerolog = log2(x+2^(-16))
+} # End of function
+
+# CONDITIONAL ENTROPY H(y|x) (AMTC p. 11)
+# Below we will work with the numbers of our last Markov chain example:
+EntropyPOST = -sum(joint_mat*bit_log_nonzero(MessageABCTransMatrix))
+# [1] 0.9340018 = H(y|x)
+
+# ENTROPY OF A SINGLE EVENT OF A JOINT:
+EntropyX = -sum(joint_mat*bit_log_nonzero(rowSums(joint_mat)))
+EntropyY = -sum(joint_mat*bit_log_nonzero(colSums(joint_mat)))
 
 # EntropyY is greater than or equal to H(y)
 EntropyY>=EntropyPOST
@@ -18,7 +66,7 @@ EntropyY>=EntropyPOST
 # EntropyY-EntropyPOST >= 0
 EntropyY-EntropyPOST >= 0
 
-# Generative Model
+#### Generative Model
 prior = c(.5,.5); likelihood = c(.8,.2)
 joint = prior*likelihood
 
@@ -70,14 +118,18 @@ Qs4 = c(.8,.2)
 Energy4 = -sum(Qs4*log(Truepost/Qs4))
 VFE4 = Energy4-(-Temperature*Entropy)
 
+# Plot that makes clear what descending a gradient means conceptually:
+plot(x =c(1:4), y=c(VFE1, VFE2, VFE3, VFE4), typ = "l")
 
-#################
-# KL Divergence #
-#################
 
-# We will use a matrix to express pi:
+#######################################
+# 3 KL Divergence  / Relative Entropy #
+#######################################
+
+# We will use a matrix to express p_i:
 pColor = matrix(c(.5, .5))
 
+# H_before:
 Hbefore =-sum(pColor*(log2(pColor)))
 
 
@@ -122,9 +174,9 @@ Hsplit = .4*0 + .6*.65
 Informationgain = Hbefore - Hsplit
 
 
-#######################
-# Jensen's Inequality #
-#######################
+#########################
+# 3 Jensen's Inequality #
+#########################
 
 # Define function x^2 = g(x) =
 g <- function(x) (x^2)
