@@ -1,7 +1,7 @@
 # Stat-o-Sphere-Tutorials BEM
 
 Material that I produced for the editorial collection 'Stat-o-Sphere', published via 'Berlin Exchange Medicine'
-as a project of members of editor section IV data and statistics. 
+as a project of members of editors of section IV data and statistics. 
 
 ## Collection Page @ BEM:
 https://journal.medicine.berlinexchange.de/statosphere
