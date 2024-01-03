@@ -47,6 +47,23 @@ pop_threshold = qnorm(.05,mean=15,sd=sqrt(12))
 # Add line to mark lower tail threshold of .05 (5%):
 segments(x0=pop_threshold,x1=pop_threshold, y0 = 0, y1 = prob_dens(pop_threshold,mean_pop,var_pop))
 
+# Comparison z-stat and effect size:
+x=c(0:10)
+y=c(0:10)*3
+pop_mean = mean(y)
+pop_sd = sum((y-mean(y))^2)/length(y)
+sem_x = pop_sd/sqrt(length(x))
+z_stat = (mean(x)-mean(y))/sem_x
+effect_size = (mean(x)-mean(y))/pop_sd
+
+# Same with n = 1
+sem_x_2 = pop_sd/sqrt(1)
+z_stat_2 = (mean(x)-mean(y))/sem_x_2
+effect_size_2 = (mean(x)-mean(y))/pop_sd
+
+# Check for equality of z_stat2 and effect_size_2:
+all.equal(z_stat_2,effect_size_2)
+
 
 ##############################################
 # 2.2 Standard Deviation/Error of the Mean #
