@@ -78,7 +78,7 @@ posterior
 # Third iteration - let's say all of the suspects are ruled out:
 joint = c(.5,.5,0,0)*c(0,0,0,0)
 # [1] 0 0 0 0
-model_evidence = sum(c(.5,.5,.33,0)*c(0,0,0,0))
+model_evidence = sum(c(.5,.5,0,0)*c(0,0,0,0))
 # [1] 0 
 posterior = joint/model_evidence # Note that it says: 0 divided by 0!
 posterior
