@@ -1,9 +1,9 @@
-# Stat-o-Sphere-Tutorials BEM
+# Stat-o-Sphere-Tutorials NOS
 
-Material that I produced for the editorial collection 'Stat-o-Sphere', published via 'Berlin Exchange Medicine'
+Material that I produced for the editorial collection 'Stat-o-Sphere', published via the 'Students Network for Open Science'
 as a project of members of editors of section IV data and statistics. 
 
-## Collection Page @ BEM:
+## Collection Page @ NOS:
 https://journal.medicine.berlinexchange.de/statosphere
 
 ## Introduction Article (written together with Raphael Leuner):
