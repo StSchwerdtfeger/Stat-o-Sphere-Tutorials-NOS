@@ -464,19 +464,11 @@
   # Compare with the regular old lm() function:
   lm(data_table$cups~data_table$time)
 
+  
 
-
-
-
-
-
-
-
-
-
-  ######################################################
-  # BONUS: Linear regression via gradient descent in R #
-  ######################################################
+  ###############################################
+  # Linear regression via gradient descent in R #
+  ###############################################
   
   x=data_table$time
   y=data_table$cups
@@ -528,11 +520,11 @@
         "Dependent   variable:", "\t", deparse(substitute(y)),"\n","\n",
         "alpha","\t",theta[1],"\n",
         "beta","\t",theta[2]) 
-
+    
   } #### End of function
   
   linear_gradient_descent(x = data_table$time,y = data_table$cups)
-  
-  
-  
-  
+
+    
+    
+    
