@@ -553,6 +553,3 @@ sdYsamp = sd(y)
 # Sd for y given population variance:
 sdYpop = sqrt((sum((y-mean)^2))/(length(y)))
 sdYpop = sqrt(popVarY)
-
-
-
