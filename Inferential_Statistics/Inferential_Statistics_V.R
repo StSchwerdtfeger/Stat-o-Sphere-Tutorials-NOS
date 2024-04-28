@@ -509,10 +509,10 @@ linear_least_square = function(indep,dep){ # Start of function
   se_a = sqrt(SumR2/(length(indep)-2))*sqrt((1/length(indep))+((mean(indep)^2)/sum((indep-mean(indep))^2)))
   
   # t-value of the slope:
-  t_value_b = beta/se_slope_t 
+  t_value_b = beta/(se_slope_t+exp(-32)) 
   
   # t-value of the intercept:
-  t_value_a = alpha/se_a
+  t_value_a = alpha/(se_a+exp(-32))
   
   ### p-value of the slope via integrating the PDF of a t-distribution
   # up to the t-value calculated above:
@@ -572,3 +572,4 @@ linear_least_square(indep, dep)
 # Reg. coeff.  -0.2913     2.4116 -0.1208 9.046625e-01
 #
 # Residual Standard Error: 126 on 30 degrees of freedom 
+
