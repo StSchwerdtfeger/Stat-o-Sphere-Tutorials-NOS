@@ -285,6 +285,11 @@ for(i in 1:length(object)){
   list_results[i] = object[i]+1
 } # End for i
 
+# Analog: 
+list_results[1] = object[1]+1
+list_results[2] = object[2]+1
+list_results[3] = object[3]+1
+list_results[4] = object[4]+1
 
 #### POSSIBLE SOLUTION II:
 # Filter NA in measurement_sysRRalt
@@ -488,8 +493,8 @@ sum(c(1,2,3)) == sum_alt(c(1,2,3))
 # Go-go-gadgeto linear_least_square!!!!
 linear_least_square = function(indep,dep){ # Start of function
   
-  # Evaluating coefficients for an optimal linear model
-  # given a set of dependent and independent variabels:
+  # Evaluating coefficients for and optimal linear model
+  # given a set of dependent and independent variables:
   beta  =  cov(indep,dep)/var(indep)
   alpha =  mean(dep)-beta*mean(indep)
   fx = alpha+beta*indep
@@ -508,14 +513,13 @@ linear_least_square = function(indep,dep){ # Start of function
   se_a = sqrt(SumR2/(length(indep)-2))*sqrt((1/length(indep))+((mean(indep)^2)/sum((indep-mean(indep))^2)))
   
   # t-value of the slope:
-  t_value_b = beta/se_slope_t 
+  t_value_b = beta/(se_slope_t+exp(-32)) 
   
   # t-value of the intercept:
-  t_value_a = alpha/se_a
+  t_value_a = alpha/(se_a+exp(-32))
   
   ### p-value of the slope via integrating the PDF of a t-distribution
   # up to the t-value calculated above:
-  
   t_distr = function(x,df){
     t_1 = gamma((df+1)/2)/(sqrt(df*pi)*gamma(df/2))
     t_2 = (1 + (x^2/df))^(-(df+1)/2)
@@ -534,19 +538,19 @@ linear_least_square = function(indep,dep){ # Start of function
   # Results for two tail
   Results_a = c(round(alpha,4), round(se_a,4), round(t_value_a,4), p_a_2t)
   Results_b = c(round(beta,4), round(se_slope_t,4), round(t_value_b,4), p_b_2t)
-  Res_data = as.data.frame(cbind(Results_a,Results_b))
-  rownames(Res_data) = c("Estimate","Std. Error","t value","Pr(>|t|)")
-  colnames(Res_data) = c("Intercept", "Reg. coeff.")
+  Res_data = as.data.frame(rbind(Results_a,Results_b))
+  colnames(Res_data) = c("Estimate","Std. Error","t value","Pr(>|t|)")
+  rownames(Res_data) = c("Intercept", "Reg. coeff.")
   
-  # Nice output using cat() function:  
+  # Nice output using cat() function:
   cat(" Linear least square method in R","\n","\n",
       "Independent variable:", "\t", deparse(substitute(indep)),"\n", 
       "Dependent   variable:", "\t", deparse(substitute(dep)),"\n","\n",
       "alpha", "\t",alpha,"\n",
       "beta","\t",beta, "\t","SumR2", "\t", SumR2, "\n","\n")
   print(Res_data)
-  cat("\n","Residual Standard Error:",round(residual_standard_error),
-      "on", (length(indep)-2), "degrees of freedom","\n","\n") 
+  cat("\n","Residual Standard Error:",round(residual_standard_error),"on",
+      (length(indep)-2), "degrees of freedom","\n","\n") 
   
   # Let us also plot our results:
   # We will also use deparse(substitute(x)) for the 
@@ -554,7 +558,6 @@ linear_least_square = function(indep,dep){ # Start of function
   plot(x=indep,y=dep, ylab = deparse(substitute(dep)),       
        xlab = deparse(substitute(indep)))
   abline(a=alpha, b=beta, col = "darkblue")
-  
 } # End of function
 
 
