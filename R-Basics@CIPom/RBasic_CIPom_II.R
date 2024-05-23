@@ -81,6 +81,7 @@ error_alt = residuals(lm(cups~time))
 all.equal(error,as.numeric(error_alt))
 
 # Let us have a look at our dino:
+dino = read.csv("dino_csv.csv")
 plot(x= dino$x, y = dino$y)
 abline(lm(dino$y~dino$x))
 
@@ -91,19 +92,42 @@ cups = c(0, 1, 2, 3.5, 4.8, 5.2, 6, 6.9, 8.5, 9.1, 9.9,
          0, .2, 2.9, 2.9, 4.9, 5.2, 6.9, 7.1, 7.3, 9, 9.8)
 
 # Time passed for each run of measurements (cups), abbreviated:
-time = c(0:10,0:10,0:10)
+time = c(0:10,0:10,0:10) # technically 3 days in the life of Lady Meow
 
 
 # You can add labes to the plot!
 plot(x=time, y=cups,
      ylab = "Cups of Tea", xlab= "Hours passed")
 
+lm(cups~time)
+
+### Variance/SD
+
+x = c(0:10)
+
+# Pure deviation from the mean (without summing and squaring!):
+dev_of_mean_X = x-mean(x)
+
+# Plot of dev_of_mean:
+plot(x = x, y = dev_of_mean_X) 
+abline(h=0) # h = 0 adds horizontal line at y = 0
+
+# Pure deviation from the mean (without summing!):
+dev_of_mean_X = x-mean(x)
+
+# Plot using absolute values via function abs():
+plot(x = x, y = abs(dev_of_mean_X)) 
+# Note: Only 0 deviation given when x_i = 5 = mean(x)
+
+# Plot using the square, which smoothes the graph:
+plot(x = x, y = dev_of_mean_X^2)
 
 
 #### Lin. Reg. via deskript. Parameters:
 
 x = time
 y = cups
+
 
 # SumSqXY = ∑(x_i - E[X])*(y_i - E[y])
 SumSqXY = sum((x-mean(x))*(y-mean(y)))
@@ -121,11 +145,15 @@ covarXYsamp = cov(x,y)                # samp cov := cov(x,y)
 # 10 Z- und T-Test für einfache Verteilung und T-Test für Lineare Regression #
 ##############################################################################
 
-# Our goal:
+# Our goal for linear regression (below we will do a regular t-test first!):
 summary(lm(cups~time))
 
 # Density via density() function:
 plot(density(time))
+
+# Shapiro Wilk Test 
+# p-value GREATER .05 == normally distributed!!!!
+shapiro.test(cups)  # not normally distributed!
 
 
 #### Simulation Central Limit Theorem:
@@ -155,6 +183,10 @@ for (i in 1:n_samp){
 # Look at the histogram of the sample_n_5:
 hist(sample_n_5, col = "lightblue")
 
+
+# Plot norm distribution:
+plot(x = seq(-4, 4, by = .1), y = dnorm(seq(-4, 4, by = .1)))
+     
 
 ### T-Test:
 
@@ -187,7 +219,6 @@ lines(x = seq(-10,35, by=.1), y = dnorm(seq(-10,35, by=.1),mean(y), sd = sd(y)))
 abline(v=mean(y)-(1.05529*sd(y)/2)) # adds a vertical line
 
 # Comparison z-stat and effect size:
-pop_mean = y
 pop_sd = sum((y-mean(y))^2)/length(y)
 sem_x = pop_sd/sqrt(length(x))
 z_stat = (mean(x)-mean(y))/sem_x
@@ -197,7 +228,7 @@ mean(y)-(.35*pop_sd)
 
 # Same with n = 1
 sem_x_2 = pop_sd/sqrt(1)
-z_stat_2 = (mean(x)-mean(y))/sem_x
+z_stat_2 = (mean(x)-mean(y))/sem_x_2
 effect_size_2 = (mean(x)-mean(y))/pop_sd
 
 # Check for equality of z_stat2 and effect_size_2:
@@ -212,43 +243,11 @@ y = c(0:10)+3.5
 # Calculate needed sample size for one sample t-test, given d =.5
 # a power of .8 and a sign.level of .5 == confidence int. of .95:
 pwr.t.test(d = .5, sig.level = .05, power = .8, type = "one.sample") 
+# n = 33.36713 for One-Sample
 # Same for two sample:
 pwr.t.test(d = .5, sig.level = .05, power = .8, type = "two.sample") 
 # we usually assume .5 medium effect a priori
 # n = 63.76561  for each group!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
