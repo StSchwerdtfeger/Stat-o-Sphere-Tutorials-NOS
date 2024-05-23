@@ -26,7 +26,9 @@ vec = c(1,2,3)
 # [1] 1 2 3  # NOTE that an output is also a vector
 #      therefore the [1] at the beginning.
 
-vec[3]  # index 2 == second element 
+
+
+vec[2]  # index 2 == second element 
 # [1] 2 # second element in the vector is also 2
 
 
@@ -56,6 +58,8 @@ mat[2,1]
 
 # Exemplatory array with 
 # dim = c(rows, columns, further_dimension)
+# Below uses a trick: 1 or 0 at the beginning and defining dimension
+# fills up the array with either 1 or 0:
 array(1, dim = c(3,3,3))
 # , , 1
 
@@ -99,7 +103,7 @@ colnames(mat_bind) = c("One", "Two", "Three") # rownames() exists too
 # [3,]   3   3     3
 
 # Columns of that data frame can also be called via $:
-mat_bind$One
+mat_bind$Two
 
 # Character strings:
 string = c("One",2,3)
@@ -162,7 +166,7 @@ measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 # Format into a data frame:
 table = as.data.frame(cbind(patient_id,time,measurement_sysRR,fam))
 
-# install.packages("dplyr")  # install package
+#install.packages("dplyr")  # install package
 library(dplyr)               # load/activate package
 # Filter function: filter(data_object, columnname == "entry") or != for unequal
 t1 = filter(table, time == "t1")
@@ -173,6 +177,8 @@ t2 = filter(table, time == "t2")
 plot(x = t1$patient_id,y = t1$measurement_sysRR, ylim=c(100,150), 
      col = "blue")
 points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
+
+
 
 # SLIGHTLY DIFFERENT, including NA in the measurements:
 patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
@@ -336,6 +342,8 @@ na.omit(test_na_omit)
 
 
 ###### Character string manipulation:
+fin_table_alt = new_table
+
 unique(fin_table_alt$fam)
 # [1] "yes" NA    "no"  "ys" 
 which(fin_table_alt$fam =="ys")
@@ -372,6 +380,8 @@ library(dplyr)            # open/activate/load package
 data(starwars)            # load data set
 View(starwars)            # view via RStudio viewer
 ?starwars                 # view documentation
+
+?lm()
 
 # Another fun and insightful package:
 # install.packages("datasauRus")
@@ -451,8 +461,6 @@ sum_alt(c(1,2,3))
 # Test for equal results:
 sum(c(1,2,3)) == sum_alt(c(1,2,3))
 # [1] TRUE
-
-
 
 
 
