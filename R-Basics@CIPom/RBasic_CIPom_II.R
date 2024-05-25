@@ -26,7 +26,7 @@ posterior = (prior*likelihood)/sum(prior*likelihood)
 ###### Vanessa Holmes example:
 
 # First iteration:
-joint = c(.25,.25,.25,25)*c(.33,.33,.33,0)
+joint = c(.25,.25,.25,.25)*c(.33,.33,.33,0)
 model_evidence = sum(c(.25,.25,.25,.25)*c(.33,.33,.33,0))
 posterior = joint/model_evidence
 posterior
