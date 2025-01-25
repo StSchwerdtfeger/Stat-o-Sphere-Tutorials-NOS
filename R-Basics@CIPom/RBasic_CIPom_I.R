@@ -591,6 +591,38 @@ test_umlaut
 # [1] "ä" "ö" "ü" "Ä" "Ö" "Ü"
 
 
+
+##############################################################################
+##### Working with redundant columns (compelx NOS paper example further below)
+
+# Say, you want to create a column within your data set that entails, e.g., a 
+# binary (yes/no, 0/1, TRUE/FALSE), given a certain entry criteria is fullfilled
+# in the horizontally correspondent entry within another column. This is how:
+
+# Creating a test data frame that entails a column with all zeros at the end
+# Same works with c("")...
+test = as.data.frame(cbind(c(1,2,3),c(1,"certain entry criteria",3),c(0)))
+
+# > test
+#   V1                       V2 V3
+# 1  1                        1  0
+# 2  2   certain entry criteria  0
+# 3  3                        3  0
+
+for(i in 1:length(test$V2)){ # cols have same length, same result with V1 or V3 
+  if(test$V2[i] == "certain entry criteria"){
+    test$V3[i] = "criteria fullfilled"
+  } # End if 
+} # End for i
+test
+# > test
+#   V1                     V2                  V3
+# 1  1                      1                   0
+# 2  2 certain entry criteria criteria fullfilled
+# 3  3                      3                   0
+
+
+
 ##################################################################################
 #### WEITERES Beispiel für einen sogenannte "nested for loop", d.h. for loop, die
 #### eine for loop enthält:
@@ -644,7 +676,6 @@ print(x)
 # 3 3.0  3  3
 
 
-
 ###############################
 ####### Preinstalled data sets:
 data() # offers a variety of data sets
@@ -687,7 +718,10 @@ lm(dino$y~dino$x)
 summary(lm(dino$y~dino$x)) # Slope is not significant...
 
 
-############################################################################### 
+
+###############################################################################
+# WORKING WITH REDUNDANT COLUMNS and DELETING DUPLICATES
+
 # NOS Paper Example (https://github.com/StSchwerdtfeger/Filtering-Duplicates):
 
 # For new release of current preprint by Rico Schmitt:
@@ -701,11 +735,11 @@ summary(lm(dino$y~dino$x)) # Slope is not significant...
 
 # Issue:   duplicated() only solves for a logical with all duplicated values but
 #          does not return a logical that can be related to the original id column,
-#          since it does not entails a TRUE for the value that is duplicated itself as well.
+#          since it does not entail a TRUE for the value that is duplicated itself as well.
 
 # EXAMPLE: In c( 1, 2, 2, 3) duplicated() returns: false, false, true, false. 
 #          We want to delete all 2's in that column vector! I.e., we desire an output of
-#          false true, true, false, in order to use that column vector to identify 
+#          false, true, true, false, in order to use that column vector to identify 
 #          the rows in the data set, which are supposed to be deleted: 
 #          any duplicate id value. 
 
@@ -756,6 +790,32 @@ filtering = function(x,y){ # x = id column vector; y = full data set (i.e., give
 
 
 
+# Test data frame with duplicates in row 1 and 3 (id10):
+test_dup = as.data.frame(cbind(c("id10","id12","id10","id14","id15","id16"),
+                         c("random entry","random entry","random entry"), 
+                         c("random entry","random entry","random entry")))
+# > test_dup
+#     V1           V2            V3
+# 1 id10 random entry random entry
+# 2 id12 random entry random entry
+# 3 id10 random entry random entry
+# 4 id14 random entry random entry
+# 5 id15 random entry random entry
+# 6 id16 random entry random entry
+
+# id10 has a duplicate. We want to delete both, i.d., row 1 and 3:
+filtering(test_dup$V1,test_dup)
+
+# Row 1 and 3, i.e. id10 has been deleted. I was was lazy
+# so the redundant column "blank" remains and only entails  
+# zeros, since all lines that marked duplicate and the value 
+# that was duplicated with a 1 have been deleted...
+
+# V1               V2           V3 blank
+# 1 id12 random entry random entry     0
+# 2 id14 random entry random entry     0
+# 3 id15 random entry random entry     0
+# 4 id16 random entry random entry     0
 
 ########################################################
 # 6 Loading Excel and .CSV Files into the environment: #
