@@ -239,6 +239,28 @@ effect_size_2 = (mean(x)-mean(y))/pop_sd
 all.equal(z_stat_2,effect_size_2)
 
 
+########################
+# Plot of a 3D Gaussian:
+
+# 3D Plot of a Gaussian:
+x = seq(-4,4,by=.1)
+y = x
+
+# We will not go into full detail why we need the outer product for z,
+# but the result is a matrix and z needs to be related to two 
+# coordinates: x and y.
+# However, outer() allows to write the function of our 3D Gaussian 
+# within the outer() function:
+z = outer(x, y, function(x,y)(exp(-(x^2+y^2))))
+
+# The persp() function lets us plot in 3D; adjust theta and phi
+# in order to change perspective:
+persp(x = x,y = y,z = z, theta =20,phi=20)
+
+# From the top:
+persp(x = x,y = y,z = z, theta = 0, phi = 90)
+
+
 ################################################
 # PDF of a T-distribution and stand. normal PDF, 
 # comparing different df:
@@ -312,7 +334,7 @@ n_samp = 10
 conf_int_array = array(0, dim = c(n_sim,2))
 
 for(i in 1:n_sim){
-  sample = rnorm(n_samp, mean=10,sd=1) # 10 set mean of population!
+  sample = rnorm(n_samp, mean=10,sd=1) # 10 is the set mean of the population!
   t_test = t.test(sample)
   conf_int_array[i,] = c(t_test$conf.int[1],t_test$conf.int[2])
 } # End for i
@@ -416,6 +438,19 @@ covarXYpop  = SumSqXY / length(x)     # population covariance
 # [1] 10.08182
 covarXYsamp = cov(x,y)                # samp cov := cov(x,y)
 # [1] 10.39687
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
