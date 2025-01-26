@@ -105,10 +105,6 @@ write.csv(daten, "export_daten.csv")
 
 # WICHTIG HIER: BEISPIEL FÜR TABELLE MIT ZWEI KRITERIEN GELÖST IN EINER 
 # NESTED FOR LOOP (LOOP in einer LOOP): 
-# => Das Beispiel ließe sich auch Schritt für Schritt lösen. Der Code wäre
-#    schlicht länger. Es gib viele Wege zum gleichen Ziel. Wichtig ist,
-#    dass ihr Anwendungen von Funktionen testet und euch dadurch immer 
-#    im Klaren seid, was ihr tut. 
 
 # Data frame
 x = data.frame(cbind(c(1,NA,3),c(1,2,3), c(4,3,3)))
