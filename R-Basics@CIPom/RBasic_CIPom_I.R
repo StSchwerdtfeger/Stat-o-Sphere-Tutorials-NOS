@@ -352,7 +352,7 @@ new_table_alt %>%   # new_table_alt was filtered for NAs already
 # install.packages("tidyverse")
 library("tidyverse")
 
-# Piper operater reads out "and then" (executes more code at once
+# Pipe operator reads out "and then" (executes more code at once
 # and therefore also runs faster, but as mentioned, it is not really
 # noticeable):
 
@@ -364,7 +364,7 @@ test1 = new_table %>%
   # na.omit() # be careful with this function!!!
               # and no %>% at the end, otherwise "+" in console!
 
-test1 
+test1 # for t1 only patient_id 2 has an NA...
 #   patient_id time measurement_sysRRalt
 # 1          1   t2                  122
 # 3          3   t2                  121
@@ -456,6 +456,43 @@ x2 = na.omit(x$measurement_sysRRalt)
 x3 = mean(as.numeric(x2))
 
 
+
+#########################################
+## Rearrange columns and deleting columns
+
+test_re = as.data.frame(cbind(c(1,2,3),c(4,5,6),c(7,8,9)))
+# > test_re
+# V1 V2 V3
+# 1  1  4  7
+# 2  2  5  8
+# 3  3  6  9
+
+rearrange = test_re[,c(3,2,1)]  
+rearrange = test_re[,c("V3","V2","V1")] # same result
+# > rearrange
+# V3 V2 V1
+# 1  7  4  1
+# 2  8  5  2
+# 3  9  6  3
+
+# You can also use cbind() and rearrange a new table calling via $ row by row.
+# Create an object of each row in order to cahnge the names or use the colnames()
+# function to do so. 
+
+# Deleting rows
+del_col = rearrange[,-c(2)]
+del_col = rearrange[,-2]
+# > del_col
+#   V3 V1
+# 1  7  1
+# 2  8  2
+# 3  9  3
+
+# Delete range
+del_col = rearrange[,-2:-3]
+# [1] 7 8 9 # Just a vector remains...
+
+
 #####################################
 ###### Character string manipulation:
 fin_table_alt = new_table
@@ -515,7 +552,7 @@ table[order(as.numeric(table$count), decreasing = TRUE),]
 # 3    a    19
 # 4    c     5
 
-# Decode via loop (overwrites code):
+# Decode via loop (overwrites column "code"):
 for(i in 1:length(table$code)){
     if(table$code[i] == "a"){
       table$code[i] = "Something1"
@@ -537,7 +574,7 @@ print(table)
 # 4 Something3     5
 # 5 Something1    44
 
-# ALTERNATIVE Decode via loop (decodes in extra column code)
+# ALTERNATIVE Decode via loop (decodes in extra/redundant column "code")
 decode = c("") # empty vector
 table_new = as.data.frame(cbind(code,count,decode))
 
@@ -568,7 +605,9 @@ print(table_new)
 # 3    a    19 Something1
 # 4    c     5 Something3
 # 5    a    44 Something1
-#
+
+#### Encoding works the same, just vice-versa - you'll figure it out!!
+
 
 ################################## 
 ### Change ae into ä or vice versa
@@ -621,7 +660,32 @@ test
 # 2  2 certain entry criteria criteria fullfilled
 # 3  3                      3                   0
 
+######## More than one criteria:
+# Creating a test data frame that entails a column with all zeros at the end
+# Same works with c("")...
+test_multi = as.data.frame(cbind(c("criteria","criteria",3),c(1,"criteria",3),c(0)))
 
+# > test_multi
+#         V1       V2 V3
+# 1 criteria        1  0
+# 2 criteria criteria  0
+# 3        3        3  0
+
+# Here V3 now entails the entry "criteria fullfilled" only   
+# when two criterias are fullfilled!! Via the operator & below.
+# You could also use | which functions as "or" if thats what you need...
+for(i in 1:length(test$V2)){ # cols have same length, same result with V1 or V3 
+  if(test_multi$V1[i] == "criteria" & test_multi$V2[i] == "criteria"){
+    test_multi$V3[i] = "criteria fullfilled"
+  } # End if 
+} # End for i
+test_multi
+
+# > test_multi
+#         V1       V2                  V3
+# 1 criteria        1                   0
+# 2 criteria criteria criteria fullfilled
+# 3        3        3                   0
 
 ##################################################################################
 #### WEITERES Beispiel für einen sogenannte "nested for loop", d.h. for loop, die
@@ -662,9 +726,9 @@ for(i in 1:length(x[,1])){
 # Look at result in console:
 print(x)
 
-# In Zeile 2 war ein NA und sonst nur eine 2, sodass der Mittelwert auch 2...
-# Wie man sehen kann wurde das NA mit dem entsprechendem Mittelwert der Zeile 
-# ersetzt. 
+# In Zeile 1 war ein NA, im Rest der Zeile eine 2+3, sodass der Mittelwert 
+# auch 2.5...Wie man sehen kann wurde das NA mit dem entsprechendem 
+# Mittelwert der Zeile ersetzt. 
 # > x
 #    X1 X2 X3
 # 1 1.0  1  4
@@ -715,7 +779,7 @@ summary(lm(dino$y~dino$x)) # Slope is not significant...
 
 
 
-###############################################################################
+########################################################
 # WORKING WITH REDUNDANT COLUMNS and DELETING DUPLICATES
 
 # NOS Paper Example (https://github.com/StSchwerdtfeger/Filtering-Duplicates):
@@ -813,6 +877,7 @@ filtering(test_dup$V1,test_dup)
 # 3 id15 random entry random entry     0
 # 4 id16 random entry random entry     0
 
+
 ########################################################
 # 6 Loading Excel and .CSV Files into the environment: #
 ########################################################
@@ -820,7 +885,7 @@ filtering(test_dup$V1,test_dup)
 # dino = read.csv("YOU FILE PATH")
 
 # Sets a standard path for files, a so-called working directory, which
-# is set when creating a project:
+# is also set when creating a project:
 
 # setwd("YOUR STANDARD FILE PATH") 
 
