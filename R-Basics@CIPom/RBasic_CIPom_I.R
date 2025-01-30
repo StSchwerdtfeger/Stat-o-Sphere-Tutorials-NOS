@@ -9,20 +9,65 @@
 ##################################
 
 
+
+### Script can be executed as a whole (after all packages were installed; in this
+### tutorial scripts the packages are installed somewhere within the script for 
+### educational purposes; usually it is better to load all packages via library()
+### at the beginning of every script).
+
+
+# Random facts to get a grip on the scale of a CPU compared to its small size:
+
+# Let us say your CPU has 9.69 billion (Milliarden) transistors. A transistor
+# is essentially a very tiny switch that can be in two states (0 or 1).
+# Imagine you can walk through a life sized CPU.
+# Say it takes one minute to get from one to another transistor.
+9690000000/60/24/365
+# [1] 18436.07 # years to reach every transistor
+
+# One second to reach each transistor:
+9690000000/60/60/24/365
+# [1] 307.2679 # years to reach each transistor
+
+
+#################################################################################
+# Code benchmarks are not of concern, except for ML/AI or fMRI analysis and such:
+y=c(rnorm(1000000,mean=35,sd=4))
+x=c(rnorm(1000000,mean=22,sd=6))
+
+# linear regression with 1 Million data points:
+lm(y~x) # instant result with my computer...
+
+#y=c(rnorm(100000000,mean=35,sd=4))
+#x=c(rnorm(100000000,mean=22,sd=6))
+# linear regression with 100 Million data points:
+#lm(y~x) # took my computer around 10-12 sec.
+
+
+############################
 ############################
 # 3 New Script and Project #
 ############################
+############################
 
 # Mark line and execute via ALT+ENTER or Cmnd+ENTER (Mac)
-test = 2 + 5  ; test2 = 2 + 3 # ";" is a so-called delimitter...
+test = 2 + 5  ; test2 = 2 + 3 # ";" is a so-called delimiter...
+
+# Code without object name will only be shown in the console and not saved in the
+# work space environment!
+2+4
+# > 2+4
+# [1] 6
 
 
+###################################################################
 ###################################################################
 # 4 Classes of Objects: Vectors, Matrices, Arrays, Lists and More #
 ###################################################################
+###################################################################
 
 # Create a vector using c() i.e. the combine function:
-vec = c(1,2,3)  
+vec = c(1,2,3)
 vec <- c(1,2,3)  
 # [1] 1 2 3  # NOTE that an output is also a vector
 #              therefore the [1] at the beginning.
@@ -36,6 +81,10 @@ vec[2] # index 2 == second element of the vector
 # [1] 2 # second element in the vector is also 2
 
 
+# Change element
+vec[2] = 4
+# [1] 1 4 3
+
 # Typical error:
 # > # Typical Error:
 # > vec = c(
@@ -43,26 +92,31 @@ vec[2] # index 2 == second element of the vector
 
 # SINCE IT SAYS "+" it means that the operation is not finished yet, since
 # the second ")" is missing. In fact, when selecting the whole script, R
-# will "think" that everything after "(" is part of the input inbetween two
-# brackets. IN ANY CASE you have type in the missing ")" and execute that line again.
-# It will then show an error. You can then again execute the line you wanted to run
+# will "think" that everything after "(" is part of the input in between two
+# brackets. IN ANY CASE you have to type in the missing ")" and execute that line again.
+# It will then show an error. You can then again execute the line you wanted to run.
+# If this does not help, clean the environment and restart R!
 # We also recommend using the brush tool in the environment in case you lost track
-# of an error! Restart executing line by line...
+# of an error! Restart executing line by line until you find the errorneous line
+# or look out for the white cross behind a red circle - errors can also of
+# course be code that was just written wrong but otherwise can be executed...
 
 # Check which class our vector is using the class() function:
 class(vec)
 is.numeric(vec)
 
+# Turn vector into a matrix
 mat = as.matrix(vec)
 #      [,1]
 # [1,]    1
-# [2,]    2
+# [2,]    4
 # [3,]    3
 
+# Look at the third element:
 mat[3]
-# or
-mat[,1]
-# [1] 2
+# or, since there is now also an index for the first and only column:
+mat[2,1]
+# [1] 4
 
 # Exemplatory array with 
 # dim = c(rows, columns, further_dimension)
@@ -91,13 +145,18 @@ array(1, dim = c(3,3,3))
 # [3,]    1    1    1
 
 
+# Creating a matrix table via cbind() and c()
+# This method can be used to create quick synthetic data sets in order 
+# to test functions...
 mat_bind = cbind(c(1,2,3),c(1,2,3),c(1,2,3))
 #      [,1] [,2] [,3]
 # [1,]    1    1    1
 # [2,]    2    2    2
 # [3,]    3    3    3
 
-
+# Transforming an atomic matrix table into a "molecular" data table.
+# Here the columns can have different classes, each column for itself
+# though is still atomic in its class!
 mat_bind = as.data.frame(mat_bind) 
 is.data.frame(mat_bind)
 #   V1 V2 V3  # V stands for variable
@@ -105,10 +164,11 @@ is.data.frame(mat_bind)
 # 2  2  2  2
 # 3  3  3  3
 
-# Use brackets and index location:
+# We can still use brackets and index to go to a specific location:
 mat_bind[,2]
-# Or use the dollar sign to call/select a specific row of the table by name:
-mat_bind$Two
+# Or we use the dollar sign to call/select a specific row of the table by name
+# We can then also still use the bracket syntax notation:
+mat_bind$V2[2]
 
 # Column names can be changed via:
 colnames(mat_bind) = c("One", "Two", "Three") # rownames() exists too
@@ -118,7 +178,8 @@ colnames(mat_bind) = c("One", "Two", "Three") # rownames() exists too
 # [3,]   3   3     3
 
 # Columns of that data frame can again be called via $:
-mat_bind$One
+mat_bind$One[1] 
+mat_bind[1,1]
 
 # Character strings:
 string = c("One",2,3) 
@@ -139,12 +200,13 @@ test = c("1","2","3")
 is.character(test)
 # [1] TRUE
 
+# Turn into a numeric vector:
 test = as.numeric(test)
 is.numeric(test)
 # [1] TRUE
 
 # Check what happens if one element is an actual character string
-# not just numbers treated as characters:
+# not just numbers treated as characters when turning that vector into class numeric:
 test = c("test","2","3")
 test = as.numeric(test) 
 # [1] NA  2  3
@@ -152,8 +214,8 @@ test = as.numeric(test)
 # NAs introduced by coercion
 
 
-###########
-#### Lists:
+#####################
+#### Lists (Optional):
 
 # Create a matrix/table:
 table = matrix(1, ncol = 3, nrow = 3)
@@ -182,8 +244,14 @@ test_list[[2]]
 
 
 ########################
+########################
 # 5 Data Cleaning in R #
 ########################
+########################
+
+
+##############################
+######## First trivial example
 
 # Example for the structure of data tables:
 # Creating an examplatory data set with vectors:
@@ -192,11 +260,10 @@ fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
 time = c("t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2")
 measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 
-
-# Format into a data frame:
+# cbind() which concatenates vectors column-wise and format into a data frame:
 table = as.data.frame(cbind(patient_id,time,measurement_sysRR,fam))
 
-
+# Installing a package for the first time:
 # install.packages("dplyr")  # install package
 library(dplyr)               # load/activate package
 # Filter function: filter(data_object, columnname == "entry") or != for unequal
@@ -204,16 +271,21 @@ t1 = filter(table, time == "t1")
 t1 = filter(table, time != "t2") # alternative
 t2 = filter(table, time == "t2")
 
-# Simple example plotting (note that the code is spread over two lines!!!):
+# Simple plotting example (note that the code is spread over two lines!!!):
 plot(x = t1$patient_id,y = t1$measurement_sysRR, ylim=c(100,150), 
      col = "blue", ylab = "sysRR")
 points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
 
 # Perform a paired/dependent t-test):
 # Here using as.numeric() was necessary
-x =t.test(as.numeric(t2$measurement_sysRR), as.numeric(t1$measurement_sysRR), paired  = TRUE)
+result = t.test(as.numeric(t2$measurement_sysRR), as.numeric(t1$measurement_sysRR), paired  = TRUE)
 
 
+
+#############################
+######## Non-Trivial example:
+
+#######################################################
 # SLIGHTLY DIFFERENT, including NA in the measurements:
 patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
 fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
@@ -237,11 +309,60 @@ mean(t1alt$measurement_sysRRalt)
 mean(c(1,NA,3), na.rm = TRUE)
 
 
+####################
+## Example for loop:
+
+# Define an object you want to loop over:
+object = c(1,1,1,1)
+
+# Initilize a list to store the results:
+list_results = c()
+
+# For loop that adds +1 to every element of the above object:
+for(i in 1:length(object)){
+  list_results[i] = object[i]+1
+} # End for i
+list_results
+
+# Analog: 
+list_results[1] = object[1]+1
+list_results[2] = object[2]+1
+list_results[3] = object[3]+1
+list_results[4] = object[4]+1
+
+
+################################################
+### Nested for loop example (loop within a loop) 
+
+object2 = cbind(c(1,1,1),c(1,1,1))
+#      [,1] [,2]
+# [1,]    1    1
+# [2,]    1    1
+# [3,]    1    1
+
+# Create empty matrix with zeros only:
+result = matrix(0,nrow = length(object2[,1]), ncol = length(object2[1,]), byrow = TRUE)
+for(i in 1:length(object2[,1])){    # loop over rows
+  for(j in 1:length(object2[1,])){  # loop over cols
+    result[i,j] = object2[i,j]+1
+  } # End for i
+} # End for j
+
+result
+#      [,1] [,2]
+# [1,]    2    2
+# [2,]    2    2
+# [3,]    2    2
+
+
 #################################################################################
 ### POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
-# In welchen Zeilen sind NA (Zeilennummer, nicht pat. id!)
+# In which lines are NAs (Zeilennummer, nicht pat. id!)
 is.na(new_table$measurement_sysRRalt)
 # [1] FALSE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+
+# Using the which() function linguistically corresponds to our question:
+# In which lines are NAs?
 na_lines = which(is.na(new_table$measurement_sysRRalt) == TRUE)
 # [1] 4 7 # Index of the lines with NA entry
 
@@ -258,6 +379,7 @@ pat_id_na
 new_table$patient_id[4]  # == new_table$patient_id[na_lines[1]]
 new_table$patient_id[7]
 new_table$patient_id[na_lines[1]]
+new_table$patient_id[na_lines[2]]
 
  
 # Initilize table:
@@ -275,26 +397,6 @@ t2 = filter(fin_table, time == "t2")
 # Again perform a dependent t-test:
 t.test(as.numeric(t2$measurement_sysRRalt),as.numeric(t1$measurement_sysRRalt), paired = TRUE)
 
-## Example For loop:
-
-# Define an object you want to loop over:
-object = c(1,1,1,1)
-
-# Initilize a list to store the results:
-list_results = c()
-
-
-# For loop that adds +1 to every element of the above object:
-for(i in 1:length(object)){
-  list_results[i] = object[i]+1
-} # End for i
-list_results
-
-# Analog: 
-list_results[1] = object[1]+1
-list_results[2] = object[2]+1
-list_results[3] = object[3]+1
-list_results[4] = object[4]+1
 
 
 ##########################
@@ -395,8 +497,8 @@ na.omit(test_na_omit)
 # [1] "omit"
 
 
-#####################################################
-# Deleting NAs in a vector of the data format tibble:
+####################################################################
+# Deleting NAs in a vector of the data format tibble and data.frame:
 
 library("tidyverse") # needed to create tibble data tables.
 
@@ -456,7 +558,6 @@ x2 = na.omit(x$measurement_sysRRalt)
 x3 = mean(as.numeric(x2))
 
 
-
 #########################################
 ## Rearrange columns and deleting columns
 
@@ -505,7 +606,6 @@ which(fin_table_alt$fam =="ys")
 # Correct entries e.g. via: The below is a composition of the functions
 # fin_table$fam[]  and  which()  and  is.na()
 fin_table_alt$fam[which(is.na(fin_table_alt$fam) == TRUE)] = "not specified"
-
 fin_table_alt$fam[which(fin_table_alt$fam =="ys")] = "yes"
 fin_table_alt$fam[which(fin_table_alt$fam =="n")] = "no"
 
@@ -516,6 +616,7 @@ unique(fin_table_alt$fam)
 pie(table(fin_table_alt$fam))
 
 
+######################
 # Get first name only!
 name = c("Vorname Nachname","Vorname Nachname","Vorname Nachname")
 last_name = c("","","")
@@ -529,8 +630,11 @@ names = as.data.frame(names)
 first_name = word(names$name,1) # 1 for first word, where a space is the delimiter
 # [1] "Vorname" "Vorname" "Vorname"
 
+# We could now extract the last name and put it into another column...
+# ...We will no go further into here, check ?word() for more information...
 
-##############################
+
+############################
 ####### Decoding and sorting
 code = c("a","b","a","c","a")
 count = c(20,22,19,5,44)
@@ -632,7 +736,7 @@ test_umlaut
 
 
 ##############################################################################
-##### Working with redundant columns (compelx NOS paper example further below)
+##### Working with redundant columns (complex NOS paper example further below)
 
 # Say, you want to create a column within your data set that entails, e.g., a 
 # binary (yes/no, 0/1, TRUE/FALSE), given a certain entry criteria is fullfilled
@@ -727,7 +831,7 @@ for(i in 1:length(x[,1])){
 print(x)
 
 # In Zeile 1 war ein NA, im Rest der Zeile eine 2+3, sodass der Mittelwert 
-# auch 2.5...Wie man sehen kann wurde das NA mit dem entsprechendem 
+# 2.5 ergibt...Wie man sehen kann wurde das NA mit dem entsprechendem 
 # Mittelwert der Zeile ersetzt. 
 # > x
 #    X1 X2 X3
@@ -744,7 +848,7 @@ data() # offers a variety of data sets
 # install.packages("dplyr") # install package (also used for data cleaning)
 library(dplyr)            # open/activate/load package
 data(starwars)            # load data set
-View(starwars)            # view via RStudio viewer
+#View(starwars)           # view via RStudio viewer
 ?starwars                 # view documentation
 
 # Check out the parameters of the lm() linear modelling function:
@@ -879,18 +983,19 @@ filtering(test_dup$V1,test_dup)
 
 
 ########################################################
+########################################################
 # 6 Loading Excel and .CSV Files into the environment: #
 ########################################################
+########################################################
 
+# Formally loading a file can be done via the read.csv() or read.csv2()
 # dino = read.csv("YOU FILE PATH")
 
-# Sets a standard path for files, a so-called working directory, which
+# setwd() sets a standard path for files, a so-called working directory, which
 # is also set when creating a project:
-
 # setwd("YOUR STANDARD FILE PATH") 
 
 # Forgot your wd? Use:
-
 getwd() # shows path assigned, e.g., for a project or standard folder
 
 # In case you set up a project or placed your data files in the folder
@@ -907,15 +1012,15 @@ plot(x = dino$x,y = dino$y)
 library("readxl")
 # dino_excel = read_excel("dino_csv2.xlsx") # activate line when you have a .xlsx Version of the csv
 
-
 library("readr") # also within "tidyverse"
-# write.csv()
-# write.csv2()
-
+# write.csv(object_name, "Path") # NEVER use same name of import object!!! 
+# write.csv2(object_name, "Path")
 
 
 #############################
+#############################
 # 7 Understanding functions #
+#############################
 #############################
 
 # Example Parabola Function:
@@ -952,7 +1057,7 @@ sum(c(1,2,3)) == sum_alt(c(1,2,3))
 
 
 # MORE EXAMPLE FUNCTIONS CAN BE FOUND IN THE R BASIC ARTICLE!
-
+# https://doi.org/10.56776/abbd964d.665f7de5 
 
 
 
