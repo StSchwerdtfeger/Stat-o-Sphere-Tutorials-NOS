@@ -1,24 +1,31 @@
 ##################################
 ##################################
-#       R-Basic Tutorial I       #
-#     CIPom @ Charité Edition    #
+#      R-Basics-I Tutorial       #
 #               by               #
 #     Steffen Schwerdtfeger      # 
-#            10.2023             #
+#            12.2023             #
 ##################################
 ##################################
 
+# UNFOLD CODE of the desired chapter (small arrow at the lower line of #'s).
+
+################################################################
+# 1 What is the Function of a Computer? — A Short Introduction #
+# into the History of Programming Languages                    #
+################################################################
+
+# Example Parabola Function:
+parabola = function(x){
+  fx = x^2
+  return(fx)
+} # End of function parabola
+
+# Example
+x = c(-4:4) # creates vector from -4 to 4, integer steps
+parabola(x)
 
 
-### Script can be executed as a whole (after all packages were installed; in this
-### tutorial scripts the packages are installed somewhere within the script for 
-### educational purposes; usually it is better to load all packages via library()
-### at the beginning of every script).
-
-
-# Random facts to get a grip on the scale of a CPU compared to its small size:
-
-# Let us say your CPU has 9.69 billion (Milliarden) transistors. A transistor
+# Let us say your CPU has 9.69 billion transistors. A transistor
 # is essentially a very tiny switch that can be in two states (0 or 1).
 # Imagine you can walk through a life sized CPU.
 # Say it takes one minute to get from one to another transistor.
@@ -29,41 +36,56 @@
 9690000000/60/60/24/365
 # [1] 307.2679 # years to reach each transistor
 
+# A RTX 4090 GPU has 79 Billion 
+79000000000/60/24/365
+# [1] 150304.4
+79000000000/60/60/24/365
+# [1] 2505.074
 
-#################################################################################
+
 # Code benchmarks are not of concern, except for ML/AI or fMRI analysis and such:
-y=c(rnorm(1000000,mean=35,sd=4))
-x=c(rnorm(1000000,mean=22,sd=6))
+# y=c(rnorm(1000000,mean=35,sd=4))
+# x=c(rnorm(1000000,mean=22,sd=6))
 
 # linear regression with 1 Million data points:
-lm(y~x) # instant result with my computer...
+# lm(y~x) # instant result with my computer...
 
 #y=c(rnorm(100000000,mean=35,sd=4))
 #x=c(rnorm(100000000,mean=22,sd=6))
 # linear regression with 100 Million data points:
 #lm(y~x) # took my computer around 10-12 sec.
+# CLEAR WORKSPACE WHEN EXECUTING THE LAST FEW LINES
+# otherwise it takes a while to save the work space for such large numbers...
 
 
-############################
-############################
-# 3 New Script and Project #
-############################
-############################
+# ------------------------------------- #
+#########################################
+# 3 Open a Script and Execute Test Code #
+#########################################
 
 # Mark line and execute via ALT+ENTER or Cmnd+ENTER (Mac)
-test = 2 + 5  ; test2 = 2 + 3 # ";" is a so-called delimiter...
+test = 2 + 5
+# Console output
+# [1] 7
 
-# Code without object name will only be shown in the console and not saved in the
-# work space environment!
-2+4
-# > 2+4
-# [1] 6
+# Only one object per line!
+# The below will give you an error:
+# test1 = 2 test2 = 3
+# Error: unexpected symbol in "test1 = 2 test2"
 
+# We can use the delimiter ";" within R scripts though:
+test1 = 2; test2 = 3
+# Delimiters are a general concept of demarcation. In R it
+# it demarcates lines. So using ";" is the same as starting a new line!
 
+# The following code duplicates an object, giving it a new name. The blow
+# does not (!) rename an object. Everything that has been executed will stay
+# in the work space; use brush tool to clear environment...
+
+# # # # # # # # # # # # # # # # # # # # # 
+# ------------------------------------- #
 ###################################################################
-###################################################################
-# 4 Classes of Objects: Vectors, Matrices, Arrays, Lists and More #
-###################################################################
+# 5 Classes of Objects: Vectors, Matrices, Arrays, Lists and More #
 ###################################################################
 
 # Create a vector using c() i.e. the combine function:
@@ -80,26 +102,9 @@ vec <- c(1,2,3)
 vec[2] # index 2 == second element of the vector
 # [1] 2 # second element in the vector is also 2
 
-
-# Change element
+# Change element:
 vec[2] = 4
 # [1] 1 4 3
-
-# Typical error:
-# > # Typical Error:
-# > vec = c(
-# + 
-
-# SINCE IT SAYS "+" it means that the operation is not finished yet, since
-# the second ")" is missing. In fact, when selecting the whole script, R
-# will "think" that everything after "(" is part of the input in between two
-# brackets. IN ANY CASE you have to type in the missing ")" and execute that line again.
-# It will then show an error. You can then again execute the line you wanted to run.
-# If this does not help, clean the environment and restart R!
-# We also recommend using the brush tool in the environment in case you lost track
-# of an error! Restart executing line by line until you find the errorneous line
-# or look out for the white cross behind a red circle - errors can also of
-# course be code that was just written wrong but otherwise can be executed...
 
 # Check which class our vector is using the class() function:
 class(vec)
@@ -118,32 +123,10 @@ mat[3]
 mat[2,1]
 # [1] 4
 
-# Exemplatory array with 
-# dim = c(rows, columns, further_dimension)
-# Below uses a trick: 1 or 0 at the beginning and defining dimension
-# fills up the array with either 1 or 0:
-array(1, dim = c(3,3,3))
-# , , 1
-
+mat2 = as.matrix(t(vec))  
+# t() == transpose == tilting a vector (different with matrices!!!)
 #      [,1] [,2] [,3]
-# [1,]    1    1    1
-# [2,]    1    1    1
-# [3,]    1    1    1
-
-# , , 2
-
-#      [,1] [,2] [,3]
-# [1,]    1    1    1
-# [2,]    1    1    1
-# [3,]    1    1    1
-
-# , , 3
-
-#      [,1] [,2] [,3]
-# [1,]    1    1    1
-# [2,]    1    1    1
-# [3,]    1    1    1
-
+# [1,]    1    2    3 
 
 # Creating a matrix table via cbind() and c()
 # This method can be used to create quick synthetic data sets in order 
@@ -158,7 +141,6 @@ mat_bind = cbind(c(1,2,3),c(1,2,3),c(1,2,3))
 # Here the columns can have different classes, each column for itself
 # though is still atomic in its class!
 mat_bind = as.data.frame(mat_bind) 
-is.data.frame(mat_bind)
 #   V1 V2 V3  # V stands for variable
 # 1  1  1  1
 # 2  2  2  2
@@ -177,9 +159,45 @@ colnames(mat_bind) = c("One", "Two", "Three") # rownames() exists too
 # [2,]   2   2     2
 # [3,]   3   3     3
 
-# Columns of that data frame can again be called via $:
-mat_bind$One[1] 
-mat_bind[1,1]
+# Change single column name:
+colnames(mat_bind)[2] = "Second_Col"
+#   One Second_Col Three
+# 1   1          1     1
+# 2   2          2     2
+# 3   3          3     3
+
+# Exemplatory array with 
+# dim = c(rows, columns, further_dimension)
+array(1, dim = c(50,5,5))
+
+# Add a 1 to every entry:
+array(1, dim = c(50,5,5)) + 1
+
+
+# String Example
+string = c("One",2,3)
+# Try to add a 1 to the second element in the string above:
+# string[2]+1
+# Error in string[2] + 1 : non-numeric argument to binary operator
+
+# Character strings have to have ""
+c("object",2,3)
+# [1] "object" "2" "3"
+
+
+# Lists
+test_list = list("test",2,3)
+# [[1]]
+# [1] "test"
+
+# [[2]]
+# [1] 2
+
+# [[3]]
+# [1] 3
+
+test_list[[2]]
+# [1] 2
 
 # Character strings:
 string = c("One",2,3) 
@@ -189,7 +207,6 @@ string = c("One",2,3)
 
 class(string)
 # [1] "character"
-
 
 # Try to add a 1 to the second element in the string above:
 # string[2]+1 # uncomment this line and execute to see effect
@@ -214,44 +231,80 @@ test = as.numeric(test)
 # NAs introduced by coercion
 
 
-#####################
-#### Lists (Optional):
 
-# Create a matrix/table:
-table = matrix(1, ncol = 3, nrow = 3)
+# --------------------------------------------------------------- #
+############################################################################
+# 6 Import and Export of .CSV files, Understanding Delimiters and Packages #
+############################################################################
 
-# A list can store all kinds of formats in a list [[1:n]]
-# without messing up the classes or format in any way:
-test_list = list("test",2,3, table)
-# [[1]]
-# [1] "test"
+# read CSVs, uncomment to use and add your path or file name if file is in your 
+# working directory folder (of a project):
+# read.csv("Your file path")
+# read.csv2("Your file path")
 
-# [[2]]
-# [1] 2
+# Working directory:
+getwd() # no input needed!!
 
-# [[3]]
-# [1] 3
+# url() Function
+# read.csv(url("http://www.website.net/data_file.csv"))
 
-# [[4]]
-#      [,1] [,2] [,3]
-# [1,]    1    1    1
-# [2,]    1    1    1
-# [3,]    1    1    1
-
-test_list[[2]]
-# [1] 2
+# Load Dino Data Set for this!
+# I called the object "dino", such that plotting is done by:
+# plot(x = dino$x,y = dino$y)
 
 
-
-########################
-########################
-# 5 Data Cleaning in R #
-########################
-########################
+# install.packages("readr")
+library("readr") # package also within "tidyverse"
+# write.csv()
+# write.csv2()
 
 
-##############################
-######## First trivial example
+
+# # # # # # # # # # # # # # # # # # # # # # # # 
+# ----------------------------------------- #
+#############################################
+# 7 Example Data sets (DINOSAURS and more!) #
+#############################################
+
+# Install package for further data sets:
+# install.packages("dplyr") # (dplyr also used for data cleaning)
+data()                     # View all available data sets
+library(dplyr)             # open/activate/load package
+#data(starwars)            # load data set
+#View(starwars)            # view via RStudio viewer
+?starwars                  # view documentation
+
+
+# Another fun and insightful package:
+# install.packages("datasauRus")
+library(datasauRus)
+datasaurus_dozen
+
+# Plot using ggplot2:
+#install.packages("ggplot2")
+library(ggplot2)
+
+# Plot all:
+ggplot(datasaurus_dozen, aes(x = x, y = y, colour = dataset))+
+  geom_point()+
+  theme_void()+ # deletes coordinate system
+  theme(legend.position = "none")+
+  facet_wrap(~dataset, ncol = 3)
+
+# Plot only certain set:
+dino = filter(datasaurus_dozen, dataset == "dino")
+ggplot(dino, aes(x = x, y = y, colour = dataset))+
+  geom_point()+
+  theme(legend.position = "none")
+
+
+# --------------------------------------- #
+###########################################
+# 8 Short Introduction into Data Cleaning #
+###########################################
+###############################################################################
+# 8.1 EXAMPLE I: Filtering Rows under the Condition of Certain Column Entries #
+###############################################################################
 
 # Example for the structure of data tables:
 # Creating an examplatory data set with vectors:
@@ -260,32 +313,22 @@ fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
 time = c("t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2")
 measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 
-# cbind() which concatenates vectors column-wise and format into a data frame:
+# Format into a data frame:
 table = as.data.frame(cbind(patient_id,time,measurement_sysRR,fam))
 
-# Installing a package for the first time:
+
 # install.packages("dplyr")  # install package
-library(dplyr)               # load/activate package
+library(dplyr)             # load/activate package
 # Filter function: filter(data_object, columnname == "entry") or != for unequal
 t1 = filter(table, time == "t1")
 t1 = filter(table, time != "t2") # alternative
 t2 = filter(table, time == "t2")
 
-# Simple plotting example (note that the code is spread over two lines!!!):
-plot(x = t1$patient_id,y = t1$measurement_sysRR, ylim=c(100,150), 
-     col = "blue", ylab = "sysRR")
-points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
 
-# Perform a paired/dependent t-test):
-# Here using as.numeric() was necessary
-result = t.test(as.numeric(t2$measurement_sysRR), as.numeric(t1$measurement_sysRR), paired  = TRUE)
+####################################################
+# 8.2 EXAMPLE II: Filtering NAs (Non-Trivial Case) #
+####################################################
 
-
-
-#############################
-######## Non-Trivial example:
-
-#######################################################
 # SLIGHTLY DIFFERENT, including NA in the measurements:
 patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
 fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
@@ -299,71 +342,30 @@ new_table = as.data.frame(cbind(patient_id,time,measurement_sysRRalt,fam))
 t1alt = filter(new_table, time == "t1")
 # Problem with NA
 mean(t1alt$measurement_sysRRalt)
-?mean()
 # [1] NA
 # Warning message:
 # In mean.default(t1alt$measurement_sysRRalt) :
-#  Argument ist weder numerisch noch boolesch: gebe NA zurück
+#  Argument ist weder numerisch noch boolesch: gebe NA zurück 
 
-# mean() also entails parameter that deletes NAs automatically. 
-mean(c(1,NA,3), na.rm = TRUE)
-
-
-####################
-## Example for loop:
-
-# Define an object you want to loop over:
-object = c(1,1,1,1)
-
-# Initilize a list to store the results:
-list_results = c()
-
-# For loop that adds +1 to every element of the above object:
-for(i in 1:length(object)){
-  list_results[i] = object[i]+1
-} # End for i
-list_results
-
-# Analog: 
-list_results[1] = object[1]+1
-list_results[2] = object[2]+1
-list_results[3] = object[3]+1
-list_results[4] = object[4]+1
-
-
-################################################
-### Nested for loop example (loop within a loop) 
-
-object2 = cbind(c(1,1,1),c(1,1,1))
-#      [,1] [,2]
-# [1,]    1    1
-# [2,]    1    1
-# [3,]    1    1
-
-# Create empty matrix with zeros only:
-result = matrix(0,nrow = length(object2[,1]), ncol = length(object2[1,]), byrow = TRUE)
-for(i in 1:length(object2[,1])){    # loop over rows
-  for(j in 1:length(object2[1,])){  # loop over cols
-    result[i,j] = object2[i,j]+1
-  } # End for i
-} # End for j
-
-result
-#      [,1] [,2]
-# [1,]    2    2
-# [2,]    2    2
-# [3,]    2    2
-
-
-#################################################################################
 ### POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
-# In which lines are NAs (Zeilennummer, nicht pat. id!)
+# In which lines are NAs (line numbver, not pat. id!)?
+# The below line of code is not assigned to an object name, so that the output 
+# will directly be returned in the console. The output however can't be called
+# via a name for another process then...
 is.na(new_table$measurement_sysRRalt)
 # [1] FALSE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 
 # Using the which() function linguistically corresponds to our question:
-# In which lines are NAs?
+# In which lines are NAs? Here we execute the is.na() function within which():
 na_lines = which(is.na(new_table$measurement_sysRRalt) == TRUE)
+# [1] 4 7 # Index of the lines with NA entry
+# NOTE: Locating NAs in any context demands using the is.na() function to create
+#       a logical vector, so to speak. From where we can ask in which line == TRUE...
+#       In other words: NA can't be treated as character string, as for most cases using which()
+
+# Alternative without executing a function within a function:
+na = is.na(new_table$measurement_sysRRalt)
+na_lines = which(na == TRUE) # which numeric index position is na?
 # [1] 4 7 # Index of the lines with NA entry
 
 # Initialize vector:
@@ -375,13 +377,15 @@ for(i in 1:length(na_lines)){
 pat_id_na
 #[1] "2" "4" # Patient ids with NA in either t1 or t2
 
-# Analoge:
-new_table$patient_id[4]  # == new_table$patient_id[na_lines[1]]
-new_table$patient_id[7]
-new_table$patient_id[na_lines[1]]
-new_table$patient_id[na_lines[2]]
+# Analoge without loop:               
+pat_id_na[1] = new_table$patient_id[4]  
+pat_id_na[2] = new_table$patient_id[7]  
 
- 
+# Alternative by using na_lines within the brackets of the col patient_id:
+new_table$patient_id[4] == new_table$patient_id[na_lines[1]]
+new_table$patient_id[7] == new_table$patient_id[na_lines[2]]
+
+
 # Initilize table:
 fin_table = new_table
 # Delete every line with the patient_id given in the list
@@ -391,15 +395,25 @@ for(i in 1:length(pat_id_na)){ # or length(na_lines)
 } # End for i
 fin_table 
 
-t1 = filter(fin_table, time == "t1")
-t2 = filter(fin_table, time == "t2")
+# Example for loop:
+# Define a object you want to loop over:
+object = c(1,1,1,1)
 
-# Again perform a dependent t-test:
-t.test(as.numeric(t2$measurement_sysRRalt),as.numeric(t1$measurement_sysRRalt), paired = TRUE)
+# Initilize a list to store the results:
+list_results = c()
+
+# For loop that adds +1 to every element of the above object:
+for(i in 1:length(object)){
+  list_results[i] = object[i]+1
+} # End for i
+
+# Analoge without loop (same code, just each i is written out individually line by line): 
+list_results[1] = object[1]+1
+list_results[2] = object[2]+1
+list_results[3] = object[3]+1
+list_results[4] = object[4]+1
 
 
-
-##########################
 #### POSSIBLE SOLUTION II:
 # Filter NA in measurement_sysRRalt
 new_table_alt = filter(new_table, is.na(measurement_sysRRalt) == FALSE)
@@ -422,7 +436,7 @@ table_num_of_id = as.data.frame(cbind(unique_id,num_of_id))
 colnames(table_num_of_id) = c("unique_id", "num_of_id")
 table_num_of_id = as.data.frame(table_num_of_id)
 
-# Filter all IDs that only occur once:
+# Filter all IDs that only occure once:
 table_single_id = filter(table_num_of_id, num_of_id == "1")
 table_single_id
 
@@ -433,38 +447,116 @@ for(i in 1:length(table_single_id$unique_id)){ # or length(na_lines)
 } # End for i
 fin_table_alt 
 
+which(new_table_alt$patient_id == unique_id[1])
+# [1] 1 2
+
+length(which(new_table_alt$patient_id == unique_id[1]))
+# [1] 2
+
 # Check for equality of both methods:
 fin_table$patient_id == fin_table_alt$patient_id
 # [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 
 
-############################################################
-### POSSIBLE SOLUTION II Simple dplyr/tidyverse alternative:
-new_table_alt = filter(new_table, is.na(measurement_sysRRalt) == FALSE)
-new_table_alt %>%   # new_table_alt was filtered for NAs already 
-  select(patient_id,time,measurement_sysRRalt)%>%
-  group_by(patient_id) %>%  # sorts individ. entries into indiv. groups 
-                            # when executing next line! 
-  filter(n()>1)     # filters if n of each grouped entry is greater 
-                    # than 1 such that all single entries get filtered
+###################################################
+# 8.3 EXAMPLE III: For loops and nested for loops #
+###################################################
 
 
-#######################################
+## Example for loop:
+
+# Define an object you want to loop over:
+object = c(1,1,1,1)
+
+# Initilize a list to store the results:
+list_results = c()
+
+# For loop that adds +1 to every element of the above object:
+for(i in 1:length(object)){ # i = 1 to n = 4; you could also start at i = 2, theoretically!
+  list_results[i] = object[i]+1 # same scheme as repetitive code below, just using i for the indices now
+} # End for i
+list_results
+
+# Analoge without loop (same code, just each i is written out individually line by line)
+list_results[1] = object[1]+1
+list_results[2] = object[2]+1
+list_results[3] = object[3]+1
+list_results[4] = object[4]+1
+
+# A for loop is essentially used to perform a repetitive process with shorter syntax
+
+
+## Nested for loop example (loop within a loop) 
+object2 = cbind(c(1,1,1),c(1,1,1))
+#      [,1] [,2]
+# [1,]    1    1
+# [2,]    1    1
+# [3,]    1    1
+
+# Create empty matrix with zeros only:
+result = matrix(0,nrow = length(object2[,1]), ncol = length(object2[1,]), byrow = TRUE)
+
+# IT WOULD ALSO BE POSSIBLE to first loop over the cols and then the rows... 
+# Here we will do it the other way around (since for this case at least it makes no difference):
+for(i in 1:length(object2[,1])){    # loop over rows; the length of a col tells you number of rows
+  for(j in 1:length(object2[1,])){  # loop over cols; the length of a row tells you number of cols    result[i,j] = object2[i,j]+1
+  } # End for i
+} # End for j
+
+result
+#      [,1] [,2]
+# [1,]    2    2
+# [2,]    2    2
+# [3,]    2    2
+
+
+#########################################
+# 8.4 EXAMPLE IV: Apply Function Family #
+#########################################
+
+# For repetitive action you can also use function of the apply family.
+# The below code performs input+1 column wise for every element (MARGIN = 1 row wise).
+# For apply() functions (also mapply(), lapply() etc.) you have to either call
+# or write a function that does the respective action. Here we just need
+# a function that adds a 1 to the input (here x = input) of the the used apply
+# function.
+apply(result, MARGIN = 2, FUN = function(x){x+1})
+#      [,1] [,2]
+# [1,]    3    3
+# [2,]    3    3
+# [3,]    3    3
+
+# Here sum the cols via calling sum() within apply()
+apply(result, MARGIN = 2, FUN = sum)
+# Here sum the rows
+apply(result, MARGIN = 1, FUN = sum)
+
+
+################################################
+# 8.5 EXAMPLE V: Introduction into “tidyverse” #
+################################################
+
+
 #### Pipe operator %>% using tidyverse:
 # install.packages("tidyverse")
 library("tidyverse")
 
 # Pipe operator reads out "and then" (executes more code at once
-# and therefore also runs faster, but as mentioned, it is not really
-# noticeable):
+# and therefore makes it more convenient, but you may want to execute
+# each of your steps anyways without loop...):
 
-# Test 1 Filter von t2 und Zeilen mit NA löschen
+# Test 1 Filter of t2 and  deleting lines with NAs 
 test1 = new_table %>% 
   select(patient_id,time,measurement_sysRRalt) %>% # select columns like cbind()
   filter(time != "t1")%>%  # Filter for t1
   na.omit()
-  # na.omit() # be careful with this function!!!
-              # and no %>% at the end, otherwise "+" in console!
+# na.omit() # be careful with this function!!!
+# and no %>% at the end, otherwise "+" in console!!!!
+
+# Note that the filter() function here does not need the input for the table,
+# it is already passed on from the previous piped line... This can be 
+# confusing as a beginner, when starting with piped functions and then wanting 
+# to use each function for itself.
 
 test1 # for t1 only patient_id 2 has an NA...
 #   patient_id time measurement_sysRRalt
@@ -476,8 +568,19 @@ test1 # for t1 only patient_id 2 has an NA...
 # 7          7   t2                  125
 
 
-########################################
-# DANGERS of the na.omit() FUNCTION!!!!!
+#######################################################################
+# 8.5.1 Representation of “Solution/Algorithm II” from Example II via # 
+# tidyverse and the Dangers of the na.omit() Function                 #
+#######################################################################
+
+
+### POSSIBLE SOLUTION II Simple dplyr/tidyverse alternative:
+new_table_alt %>%   # new_table_alt was filtered for NAs already 
+  select(patient_id,time,measurement_sysRRalt)%>%
+  group_by(patient_id) %>%  # sorts individ. entries into indiv. groups 
+  # when executing next line!
+  filter(n()>1)     # filters if n of each grouped entry is greater 
+# than 1 such that all single entries get filtered
 
 # Example na.omit()
 test_na_omit = cbind(c(1,NA,3,4), c(1,2,NA,4))
@@ -497,8 +600,44 @@ na.omit(test_na_omit)
 # [1] "omit"
 
 
-####################################################################
-# Deleting NAs in a vector of the data format tibble and data.frame:
+
+######################################################
+# 8.6 EXAMPLE VI: Adjusting Character String Entries #
+######################################################
+
+###### Character string manipulation:
+unique(fin_table_alt$fam)
+# [1] "yes" NA    "no"  "ys" 
+which(fin_table_alt$fam =="ys")
+# [1] 7 8
+
+# Correct entries e.g. via: The below is a composition of the functions
+# fin_table$fam[]  and  which()  and  is.na()
+fin_table$fam[which(is.na(fin_table$fam) == TRUE)] = "not specified"
+fin_table$fam[which(fin_table$fam =="ys")] = "yes"
+unique(fin_table$fam)
+# [1] "yes"           "not specified" "no"  
+
+# Get first name only!
+name = c("Name Surname","Name Surname","Name Surname")
+surname = c("","","")
+names = cbind(name,surname)
+#      name           surname
+# [1,] "Name Surname" ""       
+# [2,] "Name Surname" ""       
+# [3,] "Name Surname" "" 
+
+names = as.data.frame(names)
+first_name = word(names$name,1) # the 1 stands for first word of 
+# the character string; the spacing
+# is targeted like delimiter so to speak 
+# [1] "Name" "Name" "Name"
+
+
+
+##########################################################################################
+# 8.7 EXAMPLE VII: Deleting NAs from a Single Row and Introducing the Tibble Data Format #
+##########################################################################################
 
 library("tidyverse") # needed to create tibble data tables.
 
@@ -557,9 +696,9 @@ x2 = na.omit(x$measurement_sysRRalt)
 # Calculate mean:
 x3 = mean(as.numeric(x2))
 
-
-#########################################
-## Rearrange columns and deleting columns
+######################################################
+# 8.8 EXAMPLE VIII: Rearranging and Deleting Columns #
+######################################################
 
 test_re = as.data.frame(cbind(c(1,2,3),c(4,5,6),c(7,8,9)))
 # > test_re
@@ -594,48 +733,69 @@ del_col = rearrange[,-2:-3]
 # [1] 7 8 9 # Just a vector remains...
 
 
-#####################################
-###### Character string manipulation:
-fin_table_alt = new_table
+##################################################
+# 8.9 EXAMPLE IX: Working with Redundant Columns #
+##################################################
 
-unique(fin_table_alt$fam)
-# [1] "yes" NA    "no"  "ys" 
-which(fin_table_alt$fam =="ys")
-# [1] 11 12
+# Say, you want to create a column within your data set that entails, e.g., a 
+# binary (yes/no, 0/1, TRUE/FALSE), given a certain entry criteria is fulfilled
+# in the horizontally correspondent entry within another column. This is how:
 
-# Correct entries e.g. via: The below is a composition of the functions
-# fin_table$fam[]  and  which()  and  is.na()
-fin_table_alt$fam[which(is.na(fin_table_alt$fam) == TRUE)] = "not specified"
-fin_table_alt$fam[which(fin_table_alt$fam =="ys")] = "yes"
-fin_table_alt$fam[which(fin_table_alt$fam =="n")] = "no"
+# Creating a test data frame that entails a column with all zeros at the end
+# Same works with c("")...
+test = as.data.frame(cbind(c(1,2,3),c(1,"certain entry criteria",3),c(0)))
 
-unique(fin_table_alt$fam)
-# [1] "yes"           "not specified" "no"    
+# > test
+#   V1                       V2 V3
+# 1  1                        1  0
+# 2  2   certain entry criteria  0
+# 3  3                        3  0
 
-# Pie chart (since frequencies are not shown, they do not have to be divided by two):
-pie(table(fin_table_alt$fam))
+for(i in 1:length(test$V2)){ # cols have same length, same result with V1 or V3 
+  if(test$V2[i] == "certain entry criteria"){
+    test$V3[i] = "criteria fulfilled"
+  } # End if 
+} # End for i
+test
+# > test
+#   V1                     V2                  V3
+# 1  1                      1                   0
+# 2  2 certain entry criteria criteria fulfilled
+# 3  3                      3                   0
+
+######## More than one criteria:
+# Creating a test data frame that entails a column with all zeros at the end
+# Same works with c("")...
+test_multi = as.data.frame(cbind(c("criteria","criteria",3),c(1,"criteria",3),c(0)))
+
+# > test_multi
+#         V1       V2 V3
+# 1 criteria        1  0
+# 2 criteria criteria  0
+# 3        3        3  0
+
+# Here V3 now entails the entry "criteria fulfilled" only   
+# when two criterias are fulfilled!! Via the operator & below.
+# You could also use | which functions as "or" if thats what you need...
+for(i in 1:length(test$V2)){ # cols have same length, same result with V1 or V3 
+  if(test_multi$V1[i] == "criteria" & test_multi$V2[i] == "criteria"){
+    test_multi$V3[i] = "criteria fulfilled"
+  } # End if 
+} # End for i
+test_multi
+
+# > test_multi
+#         V1       V2                  V3
+# 1 criteria        1                   0
+# 2 criteria criteria criteria fulfilled
+# 3        3        3                   0
 
 
-######################
-# Get first name only!
-name = c("Vorname Nachname","Vorname Nachname","Vorname Nachname")
-last_name = c("","","")
-names = cbind(name,last_name)
-#      name               last_name
-# [1,] "Vorname Nachname" ""       
-# [2,] "Vorname Nachname" ""       
-# [3,] "Vorname Nachname" "" 
 
-names = as.data.frame(names)
-first_name = word(names$name,1) # 1 for first word, where a space is the delimiter
-# [1] "Vorname" "Vorname" "Vorname"
+########################################
+# 8.10 EXAMPLE X: Decoding and Sorting #
+########################################
 
-# We could now extract the last name and put it into another column...
-# ...We will no go further into here, check ?word() for more information...
-
-
-############################
-####### Decoding and sorting
 code = c("a","b","a","c","a")
 count = c(20,22,19,5,44)
 table = as.data.frame(cbind(code,count))
@@ -656,17 +816,18 @@ table[order(as.numeric(table$count), decreasing = TRUE),]
 # 3    a    19
 # 4    c     5
 
+
 # Decode via loop (overwrites column "code"):
 for(i in 1:length(table$code)){
-    if(table$code[i] == "a"){
-      table$code[i] = "Something1"
-    } # End if "a"
-    else if(table$code[i] == "b"){
-      table$code[i] = "Something2"
-    } # End if "b"
-    else if(table$code[i] == "c"){
-      table$code[i] = "Something3"
-    } # End if "c"
+  if(table$code[i] == "a"){
+    table$code[i] = "Something1"
+  } # End if "a"
+  else if(table$code[i] == "b"){
+    table$code[i] = "Something2"
+  } # End if "b"
+  else if(table$code[i] == "c"){
+    table$code[i] = "Something3"
+  } # End if "c"
 } # End for i
 
 # Check for results
@@ -710,13 +871,61 @@ print(table_new)
 # 4    c     5 Something3
 # 5    a    44 Something1
 
-#### Encoding works the same, just vice-versa - you'll figure it out!!
+# Shorter Version with nested for loop, but more complex: 
+# (at least with a longer decoding list it would be shorter...):
+decode = c("") # empty vector
+table_new = as.data.frame(cbind(code,count,decode))
+
+decode = c("Something1","Something2","Something3")
+codes = c("a","b","c")
+for(i in 1:length(table_new$code)){ # loop over table column
+  for(j in 1:length(codes)){        # then over the possible codes
+    for(k in 1:length(decode)){     # and the possible decoding ("Something")
+      if(j == k & table_new$code[i] == codes[j]){ # makes sure j and k are equal/parallel for decoding!
+        table_new$decode[i] = decode[k]            
+      } # End if
+    } # End for k
+  } # End for j
+} # End for i
+
+table_new
+#   code count     decode
+# 1    a    20 Something1
+# 2    b    22 Something2
+# 3    a    19 Something1
+# 4    c     5 Something3
+# 5    a    44 Something1
 
 
-################################## 
-### Change ae into ä or vice versa
+############### This time only i and j!!!
+decode = c("") # empty vector
+table_new = as.data.frame(cbind(code,count,decode))
 
-# Forgott to finde the source for this one:
+decode = c("Something1","Something2","Something3")
+codes = c("a","b","c")
+de_code = as.data.frame(cbind(decode,codes)) 
+for(i in 1:length(table_new$code)){ # loop over table column
+  for(j in 1:length(de_code$codes)){        # then over the possible codes
+    if(table_new$code[i] == de_code$codes[j]){ # here & argument not necessary anymore!
+      table_new$decode[i] = de_code$decode[j]            
+    } # End if
+  } # End for j
+} # End for i
+
+table_new
+#   code count     decode
+# 1    a    20 Something1
+# 2    b    22 Something2
+# 3    a    19 Something1
+# 4    c     5 Something3
+# 5    a    44 Something1
+
+
+############################################
+# 8.11 EXAMPLE XI: Changing Ä/ä into Ae/ae #
+############################################
+
+# Forgot to find the source for this one:
 # install.package("stringi")
 library(stringi)
 
@@ -734,157 +943,10 @@ test_umlaut
 # [1] "ä" "ö" "ü" "Ä" "Ö" "Ü"
 
 
+##############################################################
+# 8.12 EXAMPLE XII: Deleting Duplicates (NOS Paper Example!) #
+##############################################################
 
-##############################################################################
-##### Working with redundant columns (complex NOS paper example further below)
-
-# Say, you want to create a column within your data set that entails, e.g., a 
-# binary (yes/no, 0/1, TRUE/FALSE), given a certain entry criteria is fullfilled
-# in the horizontally correspondent entry within another column. This is how:
-
-# Creating a test data frame that entails a column with all zeros at the end
-# Same works with c("")...
-test = as.data.frame(cbind(c(1,2,3),c(1,"certain entry criteria",3),c(0)))
-
-# > test
-#   V1                       V2 V3
-# 1  1                        1  0
-# 2  2   certain entry criteria  0
-# 3  3                        3  0
-
-for(i in 1:length(test$V2)){ # cols have same length, same result with V1 or V3 
-  if(test$V2[i] == "certain entry criteria"){
-    test$V3[i] = "criteria fullfilled"
-  } # End if 
-} # End for i
-test
-# > test
-#   V1                     V2                  V3
-# 1  1                      1                   0
-# 2  2 certain entry criteria criteria fullfilled
-# 3  3                      3                   0
-
-######## More than one criteria:
-# Creating a test data frame that entails a column with all zeros at the end
-# Same works with c("")...
-test_multi = as.data.frame(cbind(c("criteria","criteria",3),c(1,"criteria",3),c(0)))
-
-# > test_multi
-#         V1       V2 V3
-# 1 criteria        1  0
-# 2 criteria criteria  0
-# 3        3        3  0
-
-# Here V3 now entails the entry "criteria fullfilled" only   
-# when two criterias are fullfilled!! Via the operator & below.
-# You could also use | which functions as "or" if thats what you need...
-for(i in 1:length(test$V2)){ # cols have same length, same result with V1 or V3 
-  if(test_multi$V1[i] == "criteria" & test_multi$V2[i] == "criteria"){
-    test_multi$V3[i] = "criteria fullfilled"
-  } # End if 
-} # End for i
-test_multi
-
-# > test_multi
-#         V1       V2                  V3
-# 1 criteria        1                   0
-# 2 criteria criteria criteria fullfilled
-# 3        3        3                   0
-
-##################################################################################
-#### WEITERES Beispiel für einen sogenannte "nested for loop", d.h. for loop, die
-#### eine for loop enthält:
-
-# Für die Auswertung eiens Fragebogens ist es Usus fehlende Antworten
-# mit dem Mittelwert aller Antworten des Probanden zu ersetzen.  
-# Antwort = irgendein ausgewählter Skalenwert für eine Frage...
-
-# Warum macht man das? Bisher noch keine Erklärung gefunden/gesucht, aber
-# sehr gutes Beispiel!!
-
-
-# WICHTIG HIER: BEISPIEL FÜR TABELLE MIT ZWEI KRITERIEN GELÖST IN EINER 
-# NESTED FOR LOOP (LOOP in einer LOOP): 
-
-# Data frame
-x = data.frame(cbind(c(1,NA,3),c(1,2,3), c(4,3,3)))
-# > x
-#   X1 X2 X3
-# 1  1  1  4
-# 2 NA  2  3
-# 3  3  3  3
-
-
-# Empty vector for results:
-result = c()
-for(i in 1:length(x[,1])){
-  line = x[i,] 
-  result[i] = mean(line[!is.na(line)]) # Löscht NA aus dem Vektor und errechnet mean.
-  for(j in 1:length(line)){            # (Nested for loop) über die Zeileneinträge
-    if(is.na(line[j])==TRUE){          # und wenn Eintrag ein NA,
-      x[i,j] = result[i]               # dann wird dieser Eintrag durch den mean der Zeile ersetzt
-    } # End if
-  } # End for j
-} # End for i
-
-# Look at result in console:
-print(x)
-
-# In Zeile 1 war ein NA, im Rest der Zeile eine 2+3, sodass der Mittelwert 
-# 2.5 ergibt...Wie man sehen kann wurde das NA mit dem entsprechendem 
-# Mittelwert der Zeile ersetzt. 
-# > x
-#    X1 X2 X3
-# 1 1.0  1  4
-# 2 2.5  2  3
-# 3 3.0  3  3
-
-
-###############################
-####### Preinstalled data sets:
-data() # offers a variety of data sets
-
-# Install package for further data sets:
-# install.packages("dplyr") # install package (also used for data cleaning)
-library(dplyr)            # open/activate/load package
-data(starwars)            # load data set
-#View(starwars)           # view via RStudio viewer
-?starwars                 # view documentation
-
-# Check out the parameters of the lm() linear modelling function:
-?lm()
-
-# Another fun and insightful package:
-# install.packages("datasauRus")
-library(datasauRus)
-datasaurus_dozen
-
-# Plot using ggplot2:
-#install.packages("ggplot2")
-library(ggplot2)
-
-# Plot all:
-ggplot(datasaurus_dozen, aes(x = x, y = y, colour = dataset))+
-  geom_point()+
-  theme_void()+ # deletes coordinate system
-  theme(legend.position = "none")+
-  facet_wrap(~dataset, ncol = 3)
-
-# Plot only certain set:
-dino = filter(datasaurus_dozen, dataset == "dino")
-ggplot(dino, aes(x = x, y = y, colour = dataset))+
-  geom_point()+
-  theme(legend.position = "none")
-
-# Perform a linear regression on the dinsaure data set:
-dino = filter (datasaurus_dozen, dataset == "dino")  # filter dino data set
-lm(dino$y~dino$x)
-summary(lm(dino$y~dino$x)) # Slope is not significant...
-
-
-
-########################################################
-# WORKING WITH REDUNDANT COLUMNS and DELETING DUPLICATES
 
 # NOS Paper Example (https://github.com/StSchwerdtfeger/Filtering-Duplicates):
 
@@ -956,8 +1018,8 @@ filtering = function(x,y){ # x = id column vector; y = full data set (i.e., give
 
 # Test data frame with duplicates in row 1 and 3 (id10):
 test_dup = as.data.frame(cbind(c("id10","id12","id10","id14","id15","id16"),
-                         c("random entry","random entry","random entry"), 
-                         c("random entry","random entry","random entry")))
+                               c("random entry","random entry","random entry"), 
+                               c("random entry","random entry","random entry")))
 # > test_dup
 #     V1           V2            V3
 # 1 id10 random entry random entry
@@ -982,48 +1044,179 @@ filtering(test_dup$V1,test_dup)
 # 4 id16 random entry random entry     0
 
 
-########################################################
-########################################################
-# 6 Loading Excel and .CSV Files into the environment: #
-########################################################
-########################################################
 
-# Formally loading a file can be done via the read.csv() or read.csv2()
-# dino = read.csv("YOU FILE PATH")
+#######################################################
+# 8.13 EXAMPLE XIII: Converting Wide into Long Format #
+#######################################################
 
-# setwd() sets a standard path for files, a so-called working directory, which
-# is also set when creating a project:
-# setwd("YOUR STANDARD FILE PATH") 
+# Creating an example data set with vectors:
+patient_id = c(1:7)
+sysRR_t1 = c(130,132,133,129,135,134,140)
+sysRR_t2 = c(122,123,121,125,119,127,125)
 
-# Forgot your wd? Use:
-getwd() # shows path assigned, e.g., for a project or standard folder
+# cbind() which concatenates vectors column-wise and format into a data frame:
+wide_table = as.data.frame(cbind(patient_id,sysRR_t1,sysRR_t2))
+# > wide_table
+#   patient_id sysRR_t1 sysRR_t2
+# 1          1      130      122
+# 2          2      132      123
+# 3          3      133      121
+# 4          4      129      125
+# 5          5      135      119
+# 6          6      134      127
+# 7          7      140      125
 
-# In case you set up a project or placed your data files in the folder
-# that getwd() shows as output, then you can use a shortcut using the
-# file name only:
-dino = read.csv("dino_csv.csv")
-# dino2 = read.csv2("dino_csv2.csv") # I only have the regular .csv if my project directory (working directory folder)
+# Optionally you can turn the above table into a long format again:
+library(reshape2) # within tidyverse
 
-# I called the object "dino", such that plotting is done by:
-plot(x = dino$x,y = dino$y)
+# Converting data frame into a long format, which some functions such may demand:
+# Here it only makes sense for the columns patient_id and sysRR_t1 and sysRR_t2.
+# Here the parameters variable.name and value.name create new column names for 
+# the reshaped table. Below I chose time for either sysRR_t1 and sysRR_t2 as entry. 
+# Value.names creates a column with the actual values, which are here the actual 
+# sysRRs from t1 and t2, so this column is called sysRR. The melt() function also
+# asks for a column with id's, which can also be just the row index as well, but
+# here we actually have a column with ids.
+long_format = melt(wide_table, id.vars = "patient_id",
+                                  variable.name = "time",
+                                  value.name = "sysRR")
 
-# Load Excel file:
-# install.packages("readxl") # also within "tidyverse"
-library("readxl")
-# dino_excel = read_excel("dino_csv2.xlsx") # activate line when you have a .xlsx Version of the csv
+# > long_format
+#    patient_id     time sysRR
+# 1           1 sysRR_t1   130
+# 2           2 sysRR_t1   132
+# 3           3 sysRR_t1   133
+# 4           4 sysRR_t1   129
+# 5           5 sysRR_t1   135
+# 6           6 sysRR_t1   134
+# 7           7 sysRR_t1   140
+# 8           1 sysRR_t2   122
+# 9           2 sysRR_t2   123
+# 10          3 sysRR_t2   121
+# 11          4 sysRR_t2   125
+# 12          5 sysRR_t2   119
+# 13          6 sysRR_t2   127
+# 14          7 sysRR_t2   125
+ 
+# Alternative via gather() which does not require an id column
+library(tidyr)
+# Here the paramters key and value create new column names for the reshaped table.
+# Below I chose time for either sysRR_t1 and sysRR_t2 as entry. Values creates a
+# column with the actual values, which are here the actual sysRRs from t1 and t2,
+# so this column is calles sysRR.
+data_long <- gather(wide_table, key = "time", value = "sysRR", sysRR_t1:sysRR_t2)
 
-library("readr") # also within "tidyverse"
-# write.csv(object_name, "Path") # NEVER use same name of import object!!! 
-# write.csv2(object_name, "Path")
+# > long_format
+#    patient_id     time sysRR
+# 1           1 sysRR_t1   130
+# 2           2 sysRR_t1   132
+# 3           3 sysRR_t1   133
+# 4           4 sysRR_t1   129
+# 5           5 sysRR_t1   135
+# 6           6 sysRR_t1   134
+# 7           7 sysRR_t1   140
+# 8           1 sysRR_t2   122
+# 9           2 sysRR_t2   123
+# 10          3 sysRR_t2   121
+# 11          4 sysRR_t2   125
+# 12          5 sysRR_t2   119
+# 13          6 sysRR_t2   127
+# 14          7 sysRR_t2   125
 
 
-#############################
-#############################
-# 7 Understanding functions #
-#############################
-#############################
+##### Alternative without fancy functions:
+# Create col with repeating patient_ids:
+patient_id = c(wide_table$patient_id,wide_table$patient_id) 
 
-# Example Parabola Function:
+# Create a col with the info sysRR_t1/sysRR_t2 and a col with the sysRRs
+t1_long = cbind(c("sysRR_t1"),wide_table$sysRR_t1) # "sysRR_t1" will be entailed in the whole column this ways
+t2_long = cbind(c("sysRR_t2"),wide_table$sysRR_t2)
+time_sysRR = rbind(t1_long,t2_long)
+
+# Create long format table:
+long_format = as.data.frame(cbind(patient_id,time_sysRR))
+
+# Rename columns
+colnames(long_format) = c("patient_id", "time", "sysRR")
+
+# Check:
+long_format
+
+# > long_format
+#    patient_id     time sysRR
+# 1           1 sysRR_t1   130
+# 2           2 sysRR_t1   132
+# 3           3 sysRR_t1   133
+# 4           4 sysRR_t1   129
+# 5           5 sysRR_t1   135
+# 6           6 sysRR_t1   134
+# 7           7 sysRR_t1   140
+# 8           1 sysRR_t2   122
+# 9           2 sysRR_t2   123
+# 10          3 sysRR_t2   121
+# 11          4 sysRR_t2   125
+# 12          5 sysRR_t2   119
+# 13          6 sysRR_t2   127
+# 14          7 sysRR_t2   125
+
+
+# Extreme form of long format (here done with a loop; 
+# code below was transformed into a function in the respective chapter on functions below):
+extra_long_format = c()
+for(i in 1:length(long_format[1,])){
+  extra_long_inter  = as.data.frame(cbind(colnames(long_format)[i],long_format[,i]))
+  extra_long_format = rbind(extra_long_format,extra_long_inter) # as.data.frame() not necessary anymore here
+} # End for i
+
+# Rename colnames:
+colnames(extra_long_format) = c("colname","value") 
+
+##### Same with e.g. gather() without extra parameters:
+data_extra_long = gather(long_format)
+
+# Check for equivalence: 
+extra_long_format==data_extra_long # => all TRUE
+
+# Results:
+extra_long_format 
+#       colname    value
+# 1  patient_id        1
+# 2  patient_id        2
+# 3  patient_id        3
+# 4  patient_id        4
+# 5  patient_id        5
+# 6  patient_id        6
+# 7  patient_id        7
+# 8  patient_id        1
+# 9  patient_id        2
+# 10 patient_id        3
+# 11 patient_id        4
+# 12 patient_id        5
+# 13 patient_id        6
+# 14 patient_id        7
+# 15       time sysRR_t1
+# 16       time sysRR_t1
+# 17       time sysRR_t1
+# 18       time sysRR_t1
+# 19       time sysRR_t1
+# 20       time sysRR_t1
+# ...    ...   ...   ...      
+# ...    ...   ...   ...      
+
+# EXECUTE LINES ABOVE TO VIEW FULL OUTPUT IN CONSOLE!
+
+
+
+# # # # # # # # # # # # 
+# ------------------- #
+#######################
+# 9 Writing Functions #
+#######################
+#############################################
+# 9.1 EXAMPLE FUNCTION I: Parabola Function #
+#############################################
+
+# Writing a parabola function:
 parabola = function(x){
   fx = x^2
   return(fx)
@@ -1033,9 +1226,136 @@ parabola = function(x){
 x = c(-4:4) # creates vector from -4 to 4, integer steps
 parabola(x)
 
+############################################################################
+# 9.2 EXAMPLE FUNCTION II: Turning Nested For Loop Example into a Function #
+############################################################################
 
-# Examplatory code for a sum function (do not name it "sum",
-# since it conflicts with the integrated sum() function)
+########## You can turn any code that you would use again just for different variables into
+########## a function that does the same for any kind of input object. We can use our
+########## nested for loop example to demonstrate what this means:
+
+# Nested for loop example from above:
+object2 = cbind(c(1,1,1),c(1,1,1))
+#      [,1] [,2]
+# [1,]    1    1
+# [2,]    1    1
+# [3,]    1    1
+
+# Create empty matrix with zeros only:
+result = matrix(0,nrow = length(object2[,1]), ncol = length(object2[1,]), byrow = TRUE)
+for(i in 1:length(object2[,1])){    # loop over rows
+  for(j in 1:length(object2[1,])){  # loop over cols
+    result[i,j] = object2[i,j]+1
+  } # End for i
+} # End for j
+
+result
+#      [,1] [,2]
+# [1,]    2    2
+# [2,]    2    2
+# [3,]    2    2
+
+# ALTERANTIVE of the above written as a function for any input x
+add_1 = function(x){
+  result = matrix(0,nrow = length(x[,1]), ncol = length(x[1,]), byrow = TRUE)
+  for(i in 1:length(x[,1])){    # loop over rows
+    for(j in 1:length(x[1,])){  # loop over cols
+      result[i,j] = x[i,j]+1
+    } # End for i
+  } # End for j
+  return(result)
+} # End of function
+
+add_1(object2)
+#      [,1] [,2]
+# [1,]    2    2
+# [2,]    2    2
+# [3,]    2    2
+
+###########################################################################################
+# 9.3 EXAMPLE FUNCTION III: Replication of basic gather() Output Without Extra Parameters #
+###########################################################################################
+
+
+###### Replication of basic gather() output without extra parameters as function:
+
+long_form = function(x){
+  extra_long_format = c()
+  for(i in 1:length(x[1,])){
+    extra_long_inter  = as.data.frame(cbind(colnames(x)[i],x[,i]))
+    extra_long_format = rbind(extra_long_format,extra_long_inter) # as.data.frame() not necessary anymore here
+  } # End for i
+  return(extra_long_format)
+} # End of function
+
+long_format # Use object from the previous chapter on long format conversion for testing:
+
+long_form(long_format)
+
+
+######################################################
+# 9.4 EXAMPLE FUNCTION IV: CP / Bayes’ Rule Function #
+######################################################
+
+############# First simple version of our Bayes_Machine() function:
+Bayes_Machine = function (prior,likelihood) {
+  joint = prior*likelihood
+  # na.rm = TRUE in sum() deletes 0 rows if given
+  modelevidence = sum(joint, na.rm = TRUE) 
+  posterior = joint/modelevidence
+  # Needed for console output and adds text to it
+  # using a matrix, which works similar as c()
+  postprint = matrix(c("Posterior",posterior,
+                       "Joint probability", joint,
+                       "Model evidence", modelevidence))
+  print(postprint) 
+}  # end of function
+
+# Give it a try with defined prior and likelihood:
+prior = c(.5,.5)
+likelihood = c(.5,.5)
+Bayes_Machine(prior,likelihood)
+
+# Try these inputs and contemplate the results:
+prior = c(.1,.9)
+likelihood = c(.9,.1)
+Bayes_Machine(prior,likelihood)
+
+
+############## Here is the extended function that can also handle 
+############## the model evidence as input:
+
+Bayes_Machine = function (prior,likelihood,modelevidence) {
+  if (missing(modelevidence)){
+    joint = prior*likelihood
+    # na.rm = TRUE in sum() deletes 0 rows if given
+    modelevidence = sum(joint, na.rm = TRUE) 
+    posterior = joint/modelevidence
+    # Needed for console output
+    postprint = matrix(c("Posterior",posterior,
+                         "Joint probability", joint,
+                         "Model evidence", modelevidence)) 
+    print(postprint)
+  }
+  else {
+    joint = prior*likelihood
+    posterior = joint/modelevidence  
+    postprint = matrix(c("Posterior",posterior,
+                         "Joint probability", joint,
+                         "Model evidence", modelevidence)) 
+    print(postprint)
+  }
+} # End of function
+
+Bayes_Machine(likelihood = likelihood, prior = prior)
+
+
+########################################
+# 9.5 EXAMPLE FUNCTION V: Sum Function #
+########################################
+
+############### Examplatory code for a sum function (do not name it "sum",
+############### since it conflicts with the integrated sum() function)
 sum_alt = function(x){ # Start of function
   result = 0                 # initialize object for recursive addition;
   for(i in 1:length(x)){     # successively add the values of a vector;
@@ -1043,10 +1363,6 @@ sum_alt = function(x){ # Start of function
   } # End for i              # I = {1 to length(vec)}; n = length(vec)
   return(result)             # return result in the console
 } # End of function
-
-# Starting with 0, the result of the line within the loop adds the next
-# element to the previous result and overwrites the object result with the
-# current result (recursive)
 
 # Example:
 sum_alt(c(1,2,3))
@@ -1056,12 +1372,296 @@ sum(c(1,2,3)) == sum_alt(c(1,2,3))
 # [1] TRUE
 
 
-# MORE EXAMPLE FUNCTIONS CAN BE FOUND IN THE R BASIC ARTICLE!
-# https://doi.org/10.56776/abbd964d.665f7de5 
+
+########################################################################
+# 9.6 EXAMPLE FUNCTION VI: Replication of lm(y~x) and summary(lm(y~x)) #
+########################################################################
+
+################ Examplary linear least square function, invluding a t-test:
+
+# Go-go-gadgeto linear_least_square!!!!
+linear_least_square = function(indep,dep){ # Start of function
+  
+  # Evaluating coefficients for and optimal linear model
+  # given a set of dependent and independent variables:
+  beta  =  cov(indep,dep)/var(indep)
+  alpha =  mean(dep)-beta*mean(indep)
+  fx = alpha+beta*indep
+  
+  # Sum of Squared Errors/Residuals:
+  SumR2     = sum((dep-fx)^2)
+  
+  # Residual Standard Error/Deviation:
+  residual_standard_error = sqrt(SumR2/(length(indep)-2)) 
+  
+  # Standard error of the slope for t-distribution:
+  se_denom = sqrt(sum((indep - mean(indep))^2))
+  se_slope_t = residual_standard_error/se_denom
+  
+  # Standard error of the incercept for t-distribution:
+  se_a = sqrt(SumR2/(length(indep)-2))*sqrt((1/length(indep))+((mean(indep)^2)/sum((indep-mean(indep))^2)))
+  
+  # t-value of the slope:
+  t_value_b = beta/(se_slope_t+exp(-32)) 
+  
+  # t-value of the intercept:
+  t_value_a = alpha/(se_a+exp(-32))
+  
+  ### p-value of the slope via integrating the PDF of a t-distribution
+  # up to the t-value calculated above:
+  t_distr = function(x,df){
+    t_1 = gamma((df+1)/2)/(sqrt(df*pi)*gamma(df/2))
+    t_2 = (1 + (x^2/df))^(-(df+1)/2)
+    t_distr = t_1*t_2
+    return(t_distr)
+  } # End of function
+  
+  # Two-Tail P(t=T|H_0):
+  p_b_2t = 2*integrate(t_distr, df = length(indep)-2, lower = -Inf, upper = t_value_b)$value
+  
+  ### p-value of the intercept:
+  
+  # Two-Tail P(t=T|H_0):
+  p_a_2t = 2*(1-(integrate(t_distr, df = length(indep)-2, lower = -Inf, upper = t_value_a)$value))
+  
+  # Results for two tail
+  Results_a = c(round(alpha,4), round(se_a,4), round(t_value_a,4), p_a_2t)
+  Results_b = c(round(beta,4), round(se_slope_t,4), round(t_value_b,4), p_b_2t)
+  Res_data = as.data.frame(rbind(Results_a,Results_b))
+  colnames(Res_data) = c("Estimate","Std. Error","t value","Pr(>|t|)")
+  rownames(Res_data) = c("Intercept", "Reg. coeff.")
+  
+  # Nice output using cat() function:
+  cat(" Linear least square method in R","\n","\n",
+      "Independent variable:", "\t", deparse(substitute(indep)),"\n", 
+      "Dependent   variable:", "\t", deparse(substitute(dep)),"\n","\n",
+      "alpha", "\t",alpha,"\n",
+      "beta","\t",beta, "\t","SumR2", "\t", SumR2, "\n","\n")
+  print(Res_data)
+  cat("\n","Residual Standard Error:",round(residual_standard_error),"on",
+      (length(indep)-2), "degrees of freedom","\n","\n") 
+  
+  # Let us also plot our results:
+  # We will also use deparse(substitute(x)) for the 
+  # labels of our plot axes.
+  plot(x=indep,y=dep, ylab = deparse(substitute(dep)),       
+       xlab = deparse(substitute(indep)))
+  abline(a=alpha, b=beta, col = "darkblue")
+} # End of function
+
+# Test:
+linear_least_square(indep = c(0:10), dep=(c(0:10)*3))
 
 
 
+#####################################################################################
+# 9.7 EXAMPLE FUNCTION VII: Logistic Map and the Mandelbrot Set (Functions for Fun) #
+#####################################################################################
 
+
+############## Logistic Map from https://magesblog.com/post/2012-03-17-logistic-map-feigenbaum-diagram/ 
+logistic.map <- function(r, x, N, M){
+  ## r: bifurcation parameter
+  ## x: initial value
+  ## N: number of iteration
+  ## M: number of iteration points to be returned
+  z <- 1:N
+  z[1] <- x
+  for(i in c(1:(N-1))){
+    z[i+1] <- r *z[i]  * (1 - z[i])
+  }
+  ## Return the last M iterations 
+  z[c((N-M):N)]
+}
+
+# Set scanning range for bifurcation parameter r (caluclation
+# may take a while)
+my.r <- seq(.9, 4, by=0.003)   #!!!! alternative start 2.5, so it may be more vivid
+system.time(Orbit <- sapply(my.r, logistic.map,  x=0.1, N=1000, M=300))
+
+Orbit <- as.vector(Orbit)
+r <- sort(rep(my.r, 301))
+
+plot(Orbit ~ r, pch=".")   ## Execute up to here to plot the logistic map
+
+
+# We are following this great explanation by the youtube channel 
+# Numberphile:
+# https://www.youtube.com/watch?v=ETrYE4MdoLQ 
+
+# Feigenbaumconstant = 4.669... (transc. number like pi or e...)
+
+# Logistic map: simplified without K
+
+# CORRESPONDING TO THE NUMBERPHILE VIDEO:
+# Let's say we are talking about a function for a population, a population
+# of rabbits.
+
+# Population we start with =  x1  = .5 (as in a range of 0-1)
+
+# xn+1        =      LAMBDA     *        xn             *       (1-xn)
+# next year   =      is like          previous year,         part that
+# via +1          the fertility       i.e. existing          died in the
+#                                      population            prev./exist. pop.
+
+#                                       LIFE                    DEATH
+
+#           LAMBDA has to be between 0 and 4 (reasons are 
+#           eventually complicated says the tutorial... so no expl. here
+#           but we will see intuitive reason soon!)
+
+# So let us say LAMBDA is 2.3, x = .5, and the death rate is therefore
+# 1-.5...
+
+# YEAR 2, as x1 = year 1
+xnPLUS1 = 2.3*.5*(1-.5)
+# Result on the upper right as a value or for the console:
+xnPLUS1
+# 0.575  => population has increased!
+
+# So what about year two?
+
+# Year 3
+xnPLUS2 = 2.3*.575*(1-.575)
+xnPLUS2  
+# 0.5620625 => population dropped!
+
+xnPLUS3 = 2.3*.5620625*(1-.5620625)
+xnPLUS3  
+# 0.566141  => population increases again!! 
+
+xnPLUS4 = 2.3*0.566141*(1-0.566141)
+xnPLUS4  
+# 0.5649383 => AWWWW!!! Slightly decreased again!
+
+# We will go on, until something special happens:
+
+xnPLUS5 = 2.3*xnPLUS4*(1-xnPLUS4)
+xnPLUS5  
+# 0.5653009
+
+xnPLUS6 = 2.3*xnPLUS5*(1-xnPLUS5)
+xnPLUS6  
+# 0.5651923
+
+xnPLUS7 = 2.3*xnPLUS6*(1-xnPLUS6)
+xnPLUS7  
+# 0.5652249
+
+xnPLUS8 = 2.3*xnPLUS7*(1-xnPLUS7)
+xnPLUS8  
+# 0.5652151
+
+xnPLUS9 = 2.3*xnPLUS8*(1-xnPLUS8)
+xnPLUS9  
+# 0.5652181
+
+xnPLUS10 = 2.3*xnPLUS9*(1-xnPLUS9)
+xnPLUS10  
+# 0.5652172
+
+# DID YOU SEE IT?
+# It starts stagnating!!! :O So the population starts to egalize
+# which is called a fixed point of iteration.
+
+# NOW lets pick a LAMBDA of .65 this time! Before 2.3 ...
+
+xnPLUS1 = .65*.5*(1-.5)
+xnPLUS1
+# Result is .1625, so the population heavily decreased!!!!
+
+xnPLUS2 = .65*xnPLUS1*(1-xnPLUS1)
+xnPLUS2
+# .08846094 decreasing more and more!
+
+xnPLUS3 = .65*xnPLUS2*(1-xnPLUS2)
+xnPLUS3
+# .05241314 => further decreas!
+
+# If I'd go on with this a couple of years, around 15,
+# the population will die. 
+
+# So eventually, if one plays around with LAMBDA (remeber between 0 and 1)
+# at some values of LAMBDA funky things will happen!
+
+xnPLUS1 = 3.2*.5*(1-.5)
+xnPLUS1 
+# .8, so increase
+
+xnPLUS2 = 3.2*xnPLUS1*(1-xnPLUS1)
+xnPLUS2 
+# .512, so "competintion kicks in", as they put it in the tutorial 
+
+
+xnPLUS3 = 3.2*xnPLUS2*(1-xnPLUS2)
+xnPLUS3 
+# 0.7995392
+xnPLUS4 = 3.2*xnPLUS3*(1-xnPLUS3)
+xnPLUS4 
+# 0.5128841
+xnPLUS5 = 3.2*xnPLUS4*(1-xnPLUS4)
+xnPLUS5 
+# 0.7994688
+xnPLUS6 = 3.2*xnPLUS5*(1-xnPLUS5)
+xnPLUS6 
+# 0.513019
+xnPLUS7 = 3.2*xnPLUS6*(1-xnPLUS6)
+xnPLUS7 
+# 0.7994576
+
+# AS YOU CAN SEE IT STARTS TO BOUNCE and balance between two values :O
+# so we get a MULTIPLE FIXED POINT!!!
+
+# If you do the same thing with LAMBDA being 3.5, then you will get
+# cycle of 4!! What happens when you go roughly above 3.59 for LAMBDA is,
+# that the behaviour gets chaotic!! The further you get to 3.59 the faster 
+# and the more cycles one gets, which are actually doubling!
+# So Feigenbaum got involved in the 70s and wanted to know how
+# far LAMDA has to change for that to happen.
+# When he was looking at the ratio of these changes in X, i.e.
+# values of LAMBDA, he figured out a constant, which is now
+# called, the Feigenbaum constant ..... 4.669...
+# SO WHAT THE NUMBER SAYS is that the length of X/LAMBDA is getting
+# 4.669 times smaller than the previous, i.e. with the previous value
+# of LAMBDA, in case of a doubling, as the length represents a
+# stabilasation of the cylce within that length!!
+
+
+############### Mandel brot set function:
+mandelbrot_generator <- function(
+    p = 2, 
+    q = 1,
+    xmin = -2.1, # minimum x value
+    xmax = 0.8,  # maximum x value
+    nx = 500, 
+    ymin = -1.3, # minimum y value
+    ymax = 1.3,  # maximum y value
+    ny = 500,
+    n = 100, 
+    showplot = TRUE, # If TRUE then display image,
+    showvals = FALSE, # Turn values off/on
+    cols = colorRampPalette(c("black","cyan","cyan3","black"))(11)) 
+{
+  
+  # variables
+  x <- seq(xmin, xmax, length.out=nx)
+  y <- seq(ymin, ymax, length.out=ny)
+  c <- outer(x,y*1i,FUN="+")
+  z <- matrix(0.0, nrow=length(x), ncol=length(y))
+  k <- matrix(0.0, nrow=length(x), ncol=length(y))
+  
+  for (rep in 1:n) { 
+    index <- which(Mod(z) < 2)
+    z[index] <- z[index]^p + c[index]*q
+    k[index] <- k[index] + 1
+  }
+  
+  if (showplot==TRUE) { image(x,y,k,col=cols, xlab="Re(c)", ylab="Im(c)")}
+  if (showvals==TRUE) {return(k)}
+  
+}
+
+mandelbrot_generator(p=2, q=1)
 
 
 
