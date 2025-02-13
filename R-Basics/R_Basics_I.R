@@ -1,13 +1,21 @@
 ##################################
 ##################################
-#      R-Basics-I Tutorial       #
+#           R-Basics I           #
+#        Tutorial  Script        #
 #               by               #
 #     Steffen Schwerdtfeger      # 
 #            12.2023             #
 ##################################
 ##################################
 
-# UNFOLD CODE of the desired chapter (small arrow at the lower line of #'s).
+
+# Corresponding Tutorials and more Educational Resources incl. code can be found here:
+# https://journal.medicine.berlinexchange.de/statosphere 
+# https://journal.medicine.berlinexchange.de/user/steffen-schwerdtfeger-2 
+# https://github.com/StSchwerdtfeger 
+
+
+#### UNFOLD CODE of the desired chapter (small arrow at the lower line of #'s).
 
 ################################################################
 # 1 What is the Function of a Computer? — A Short Introduction #
@@ -54,16 +62,20 @@ parabola(x)
 #x=c(rnorm(100000000,mean=22,sd=6))
 # linear regression with 100 Million data points:
 #lm(y~x) # took my computer around 10-12 sec.
+
 # CLEAR WORKSPACE WHEN EXECUTING THE LAST FEW LINES
 # otherwise it takes a while to save the work space for such large numbers...
 
-
+#########################################
 # ------------------------------------- #
+#########################################
 #########################################
 # 3 Open a Script and Execute Test Code #
 #########################################
 
-# Mark line and execute via ALT+ENTER or Cmnd+ENTER (Mac)
+# Mark line and execute via ALT+ENTER or Cmnd+ENTER (Mac),
+# or make sure that the blinking | courser is in the line you want to execute 
+# and then press ALT+ENTER or Cmd+ENTER for mac users.
 test = 2 + 5
 # Console output
 # [1] 7
@@ -74,7 +86,7 @@ test = 2 + 5
 # Error: unexpected symbol in "test1 = 2 test2"
 
 # We can use the delimiter ";" within R scripts though:
-test1 = 2; test2 = 3
+test1 = 2 ; test2 = 3
 # Delimiters are a general concept of demarcation. In R it
 # it demarcates lines. So using ";" is the same as starting a new line!
 
@@ -83,7 +95,9 @@ test1 = 2; test2 = 3
 # in the work space; use brush tool to clear environment...
 
 # # # # # # # # # # # # # # # # # # # # # 
+#########################################
 # ------------------------------------- #
+#########################################
 ###################################################################
 # 5 Classes of Objects: Vectors, Matrices, Arrays, Lists and More #
 ###################################################################
@@ -232,7 +246,9 @@ test = as.numeric(test)
 
 
 
+###################################################################
 # --------------------------------------------------------------- #
+###################################################################
 ############################################################################
 # 6 Import and Export of .CSV files, Understanding Delimiters and Packages #
 ############################################################################
@@ -261,7 +277,9 @@ library("readr") # package also within "tidyverse"
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # 
+#############################################
 # ----------------------------------------- #
+#############################################
 #############################################
 # 7 Example Data sets (DINOSAURS and more!) #
 #############################################
@@ -297,25 +315,25 @@ ggplot(dino, aes(x = x, y = y, colour = dataset))+
   geom_point()+
   theme(legend.position = "none")
 
-
+###########################################
 # --------------------------------------- #
+###########################################
 ###########################################
 # 8 Short Introduction into Data Cleaning #
 ###########################################
-###############################################################################
-# 8.1 EXAMPLE I: Filtering Rows under the Condition of Certain Column Entries #
-###############################################################################
+#################################################################################
+### 8.1 EXAMPLE I: Filtering Rows under the Condition of Certain Column Entries #
+#################################################################################
 
 # Example for the structure of data tables:
-# Creating an examplatory data set with vectors:
+# Creating an example data set with vectors:
 patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
 fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
 time = c("t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2")
 measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 
-# Format into a data frame:
+# cbind() which concatenates vectors column-wise, then format into a data frame:
 table = as.data.frame(cbind(patient_id,time,measurement_sysRR,fam))
-
 
 # install.packages("dplyr")  # install package
 library(dplyr)             # load/activate package
@@ -325,9 +343,9 @@ t1 = filter(table, time != "t2") # alternative
 t2 = filter(table, time == "t2")
 
 
-####################################################
-# 8.2 EXAMPLE II: Filtering NAs (Non-Trivial Case) #
-####################################################
+######################################################
+### 8.2 EXAMPLE II: Filtering NAs (Non-Trivial Case) #
+######################################################
 
 # SLIGHTLY DIFFERENT, including NA in the measurements:
 patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
@@ -335,7 +353,7 @@ fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
 time = c("t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2")
 measurement_sysRRalt = c(130,122,132,NA,133,121,NA,125,135,119,134,127,140,125)
 
-# Format into a data frame:
+# cbind() and format into a data frame:
 new_table = as.data.frame(cbind(patient_id,time,measurement_sysRRalt,fam))
 
 # Mean sysRR at t1:
@@ -360,7 +378,7 @@ is.na(new_table$measurement_sysRRalt)
 na_lines = which(is.na(new_table$measurement_sysRRalt) == TRUE)
 # [1] 4 7 # Index of the lines with NA entry
 # NOTE: Locating NAs in any context demands using the is.na() function to create
-#       a logical vector, so to speak. From where we can ask in which line == TRUE...
+#       a logical vector, so to speak, from where we can ask in which line == TRUE...
 #       In other words: NA can't be treated as character string, as for most cases using which()
 
 # Alternative without executing a function within a function:
@@ -458,9 +476,9 @@ fin_table$patient_id == fin_table_alt$patient_id
 # [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 
 
-###################################################
-# 8.3 EXAMPLE III: For loops and nested for loops #
-###################################################
+#####################################################
+### 8.3 EXAMPLE III: For loops and nested for loops #
+#####################################################
 
 
 ## Example for loop:
@@ -499,9 +517,10 @@ result = matrix(0,nrow = length(object2[,1]), ncol = length(object2[1,]), byrow 
 # IT WOULD ALSO BE POSSIBLE to first loop over the cols and then the rows... 
 # Here we will do it the other way around (since for this case at least it makes no difference):
 for(i in 1:length(object2[,1])){    # loop over rows; the length of a col tells you number of rows
-  for(j in 1:length(object2[1,])){  # loop over cols; the length of a row tells you number of cols    result[i,j] = object2[i,j]+1
-  } # End for i
-} # End for j
+  for(j in 1:length(object2[1,])){  # loop over cols; the length of a row tells you number of cols    
+    result[i,j] = object2[i,j]+1
+  } # End for j
+} # End for i
 
 result
 #      [,1] [,2]
@@ -510,9 +529,9 @@ result
 # [3,]    2    2
 
 
-#########################################
-# 8.4 EXAMPLE IV: Apply Function Family #
-#########################################
+###########################################
+### 8.4 EXAMPLE IV: Apply Function Family #
+###########################################
 
 # For repetitive action you can also use function of the apply family.
 # The below code performs input+1 column wise for every element (MARGIN = 1 row wise).
@@ -532,9 +551,9 @@ apply(result, MARGIN = 2, FUN = sum)
 apply(result, MARGIN = 1, FUN = sum)
 
 
-################################################
-# 8.5 EXAMPLE V: Introduction into “tidyverse” #
-################################################
+########################################################################
+### 8.5 EXAMPLE V: Introduction into “tidyverse” and the Pipe Operator #
+########################################################################
 
 
 #### Pipe operator %>% using tidyverse:
@@ -567,11 +586,24 @@ test1 # for t1 only patient_id 2 has an NA...
 # 6          6   t2                  127
 # 7          7   t2                  125
 
+# Comparison of piped and unpiped code for selecting columns:
+new_table %>%
+  select(patient_id,time)
 
-#######################################################################
-# 8.5.1 Representation of “Solution/Algorithm II” from Example II via # 
-# tidyverse and the Dangers of the na.omit() Function                 #
-#######################################################################
+# Casual way we have gone through before via $ and cbind()
+new_table2 = cbind(new_table$patient_id,new_table$time)
+
+# Scheme: select(data_table, colname1, colname2) or more columns of course...
+new_table3 = select(new_table, patient_id, time)
+
+# Check for equivalence:
+new_table2 == new_table3 # all TRUE...
+
+
+#########################################################################
+### 8.5.1 Representation of “Solution/Algorithm II” from Example II via # 
+### tidyverse and the Dangers of the na.omit() Function                 #
+#########################################################################
 
 
 ### POSSIBLE SOLUTION II Simple dplyr/tidyverse alternative:
@@ -601,9 +633,9 @@ na.omit(test_na_omit)
 
 
 
-######################################################
-# 8.6 EXAMPLE VI: Adjusting Character String Entries #
-######################################################
+########################################################
+### 8.6 EXAMPLE VI: Adjusting Character String Entries #
+########################################################
 
 ###### Character string manipulation:
 unique(fin_table_alt$fam)
@@ -635,9 +667,9 @@ first_name = word(names$name,1) # the 1 stands for first word of
 
 
 
-##########################################################################################
-# 8.7 EXAMPLE VII: Deleting NAs from a Single Row and Introducing the Tibble Data Format #
-##########################################################################################
+############################################################################################
+### 8.7 EXAMPLE VII: Deleting NAs from a Single Row and Introducing the Tibble Data Format #
+############################################################################################
 
 library("tidyverse") # needed to create tibble data tables.
 
@@ -696,9 +728,9 @@ x2 = na.omit(x$measurement_sysRRalt)
 # Calculate mean:
 x3 = mean(as.numeric(x2))
 
-######################################################
-# 8.8 EXAMPLE VIII: Rearranging and Deleting Columns #
-######################################################
+########################################################
+### 8.8 EXAMPLE VIII: Rearranging and Deleting Columns #
+########################################################
 
 test_re = as.data.frame(cbind(c(1,2,3),c(4,5,6),c(7,8,9)))
 # > test_re
@@ -719,9 +751,11 @@ rearrange = test_re[,c("V3","V2","V1")] # same result
 # Create an object of each row in order to cahnge the names or use the colnames()
 # function to do so. 
 
-# Deleting rows
+# Deleting cols (same works for deleting lines at the 
+# line index position!)
 del_col = rearrange[,-c(2)]
 del_col = rearrange[,-2]
+
 # > del_col
 #   V3 V1
 # 1  7  1
@@ -733,9 +767,9 @@ del_col = rearrange[,-2:-3]
 # [1] 7 8 9 # Just a vector remains...
 
 
-##################################################
-# 8.9 EXAMPLE IX: Working with Redundant Columns #
-##################################################
+####################################################
+### 8.9 EXAMPLE IX: Working with Redundant Columns #
+####################################################
 
 # Say, you want to create a column within your data set that entails, e.g., a 
 # binary (yes/no, 0/1, TRUE/FALSE), given a certain entry criteria is fulfilled
@@ -792,9 +826,9 @@ test_multi
 
 
 
-########################################
-# 8.10 EXAMPLE X: Decoding and Sorting #
-########################################
+##########################################
+### 8.10 EXAMPLE X: Decoding and Sorting #
+##########################################
 
 code = c("a","b","a","c","a")
 count = c(20,22,19,5,44)
@@ -903,7 +937,7 @@ table_new = as.data.frame(cbind(code,count,decode))
 
 decode = c("Something1","Something2","Something3")
 codes = c("a","b","c")
-de_code = as.data.frame(cbind(decode,codes)) 
+de_code = as.data.frame(cbind(decode,codes)) # CODE AND DECODE AS TABLE NOT SINGLE VECTORS!!!
 for(i in 1:length(table_new$code)){ # loop over table column
   for(j in 1:length(de_code$codes)){        # then over the possible codes
     if(table_new$code[i] == de_code$codes[j]){ # here & argument not necessary anymore!
@@ -921,9 +955,9 @@ table_new
 # 5    a    44 Something1
 
 
-############################################
-# 8.11 EXAMPLE XI: Changing Ä/ä into Ae/ae #
-############################################
+##############################################
+### 8.11 EXAMPLE XI: Changing Ä/ä into Ae/ae #
+##############################################
 
 # Forgot to find the source for this one:
 # install.package("stringi")
@@ -943,9 +977,9 @@ test_umlaut
 # [1] "ä" "ö" "ü" "Ä" "Ö" "Ü"
 
 
-##############################################################
-# 8.12 EXAMPLE XII: Deleting Duplicates (NOS Paper Example!) #
-##############################################################
+################################################################
+### 8.12 EXAMPLE XII: Deleting Duplicates (NOS Paper Example!) #
+################################################################
 
 
 # NOS Paper Example (https://github.com/StSchwerdtfeger/Filtering-Duplicates):
@@ -1045,9 +1079,9 @@ filtering(test_dup$V1,test_dup)
 
 
 
-#######################################################
-# 8.13 EXAMPLE XIII: Converting Wide into Long Format #
-#######################################################
+#########################################################
+### 8.13 EXAMPLE XIII: Converting Wide into Long Format #
+#########################################################
 
 # Creating an example data set with vectors:
 patient_id = c(1:7)
@@ -1206,15 +1240,15 @@ extra_long_format
 # EXECUTE LINES ABOVE TO VIEW FULL OUTPUT IN CONSOLE!
 
 
-
-# # # # # # # # # # # # 
+#######################
 # ------------------- #
+#######################
 #######################
 # 9 Writing Functions #
 #######################
-#############################################
-# 9.1 EXAMPLE FUNCTION I: Parabola Function #
-#############################################
+###############################################
+### 9.1 EXAMPLE FUNCTION I: Parabola Function #
+###############################################
 
 # Writing a parabola function:
 parabola = function(x){
@@ -1226,9 +1260,9 @@ parabola = function(x){
 x = c(-4:4) # creates vector from -4 to 4, integer steps
 parabola(x)
 
-############################################################################
-# 9.2 EXAMPLE FUNCTION II: Turning Nested For Loop Example into a Function #
-############################################################################
+##############################################################################
+### 9.2 EXAMPLE FUNCTION II: Turning Nested For Loop Example into a Function #
+##############################################################################
 
 ########## You can turn any code that you would use again just for different variables into
 ########## a function that does the same for any kind of input object. We can use our
@@ -1258,7 +1292,7 @@ result
 # ALTERANTIVE of the above written as a function for any input x
 add_1 = function(x){
   result = matrix(0,nrow = length(x[,1]), ncol = length(x[1,]), byrow = TRUE)
-  for(i in 1:length(x[,1])){    # loop over rows
+  for(i in 1:length(x[,1])){    # loop over rows (looping over cols first also possible in this case!)
     for(j in 1:length(x[1,])){  # loop over cols
       result[i,j] = x[i,j]+1
     } # End for i
@@ -1272,9 +1306,24 @@ add_1(object2)
 # [2,]    2    2
 # [3,]    2    2
 
-###########################################################################################
-# 9.3 EXAMPLE FUNCTION III: Replication of basic gather() Output Without Extra Parameters #
-###########################################################################################
+# TECHNICALLY EVEN SHORTER (ABOVE ONLY EXAMPLES) without initializing empty matrix but
+# just overwriting the initial object elements:
+
+add_1 = function(x){
+  for(i in 1:length(x[,1])){    # loop over rows (looping over cols first also possible in this case!)
+    for(j in 1:length(x[1,])){  # loop over cols
+      x[i,j] = x[i,j]+1
+    } # End for i
+  } # End for j
+  return(x)
+} # End of function
+
+add_1(object2)
+
+
+#############################################################################################
+### 9.3 EXAMPLE FUNCTION III: Replication of basic gather() Output Without Extra Parameters #
+#############################################################################################
 
 
 ###### Replication of basic gather() output without extra parameters as function:
@@ -1293,9 +1342,9 @@ long_format # Use object from the previous chapter on long format conversion for
 long_form(long_format)
 
 
-######################################################
-# 9.4 EXAMPLE FUNCTION IV: CP / Bayes’ Rule Function #
-######################################################
+########################################################
+### 9.4 EXAMPLE FUNCTION IV: CP / Bayes’ Rule Function #
+########################################################
 
 ############# First simple version of our Bayes_Machine() function:
 Bayes_Machine = function (prior,likelihood) {
@@ -1350,9 +1399,9 @@ Bayes_Machine = function (prior,likelihood,modelevidence) {
 Bayes_Machine(likelihood = likelihood, prior = prior)
 
 
-########################################
-# 9.5 EXAMPLE FUNCTION V: Sum Function #
-########################################
+##########################################
+### 9.5 EXAMPLE FUNCTION V: Sum Function #
+##########################################
 
 ############### Examplatory code for a sum function (do not name it "sum",
 ############### since it conflicts with the integrated sum() function)
@@ -1373,9 +1422,69 @@ sum(c(1,2,3)) == sum_alt(c(1,2,3))
 
 
 
-########################################################################
-# 9.6 EXAMPLE FUNCTION VI: Replication of lm(y~x) and summary(lm(y~x)) #
-########################################################################
+############################################################################
+### 9.6 EXAMPLE FUNCTION VI: Filter Function, similar to filter() in dplyr #
+############################################################################
+
+# Example for a filter function, similar to filter() in the dplyr package
+# Criteria means what should be deleted, equivalent to always
+# working with != in the dplyr filter function... 
+filter_alt = function(data_table,criteria_col,criteria){ 
+  lines_to_filter = c()
+  for(i in 1:length(criteria_col)){
+    if(criteria_col[i] == criteria){
+      lines_to_filter[i] = i 
+    } # End if
+  } # End for i
+  # Output of lines_to_filter can look like this:[1]  1 NA  3 NA  5 NA  7 NA  9 NA 11 NA 13
+  # Reason: given that criteria_col[i] == criteria, lines_to_filter[i] = i, ELSE nothing happens
+  #         so in such cases, no i is passed on to lines_of filter on the position for 
+  #         for lines_to_filter[i] - see test code below. However, filtering the NAs is needed
+  #         before deleting the respective lines - at least in this solution...
+  data_table = data_table[-lines_to_filter[!is.na(lines_to_filter)],]
+  return(data_table)
+} # End of function
+
+# Test filter function, using new_table from chapter 8 
+# Again, criteria means what should be deleted, equivalent to always
+# working with != in the dplyr filter function... 
+filter_alt(new_table,new_table$time,"t1")
+
+#     patient_id time measurement_sysRRalt  fam
+#  2           1   t2                  122  yes
+#  4           2   t2                 <NA>   no
+#  6           3   t2                  121 <NA>
+#  8           4   t2                  125    n
+# 10           5   t2                  119   no
+# 12           6   t2                  127   ys
+# 14           7   t2                  125 <NA>
+
+# Check for equivalence with library(dplyr) filter() function (NA values in enw_table remain NA!) 
+filter_alt(new_table,new_table$time,"t1") == filter(new_table,time != "t1")
+
+#    patient_id time measurement_sysRRalt  fam
+# 2        TRUE TRUE                 TRUE TRUE
+# 4        TRUE TRUE                   NA TRUE
+# 6        TRUE TRUE                 TRUE   NA
+# 8        TRUE TRUE                 TRUE TRUE
+# 10       TRUE TRUE                 TRUE TRUE
+# 12       TRUE TRUE                 TRUE TRUE
+# 14       TRUE TRUE                 TRUE   NA
+
+# Test code to understand the loop within the above function
+lines_to_filtertest = c()
+for(i in 1:length(new_table$time)){
+  if(new_table$time[i] == "t1"){
+    lines_to_filtertest[i] = i 
+  } # End if
+} # End for i
+lines_to_filtertest
+#  [1]  1 NA  3 NA  5 NA  7 NA  9 NA 11 NA 13
+
+
+###########################################################################
+### 9.7 EXAMPLE FUNCTION VII: Replication of lm(y~x) and summary(lm(y~x)) #
+###########################################################################
 
 ################ Examplary linear least square function, invluding a t-test:
 
@@ -1454,10 +1563,9 @@ linear_least_square(indep = c(0:10), dep=(c(0:10)*3))
 
 
 
-#####################################################################################
-# 9.7 EXAMPLE FUNCTION VII: Logistic Map and the Mandelbrot Set (Functions for Fun) #
-#####################################################################################
-
+########################################################################################
+### 9.8 EXAMPLE FUNCTION VIII: Logistic Map and the Mandelbrot Set (Functions for Fun) #
+########################################################################################
 
 ############## Logistic Map from https://magesblog.com/post/2012-03-17-logistic-map-feigenbaum-diagram/ 
 logistic.map <- function(r, x, N, M){
@@ -1664,6 +1772,168 @@ mandelbrot_generator <- function(
 mandelbrot_generator(p=2, q=1)
 
 
+###################################################
+# ----------------------------------------------- #
+###################################################
+###################################################
+# 10 Logical Operators and Mathematical Functions #
+###################################################
 
 
+##### LOGICAL OPERATORS
 
+#  ==       equivalent
+1 == 1 # [1] TRUE
+
+#  !=       not equivalent
+1 != 2 # [1] TRUE
+
+# >=       greater-equal (e.g. x is greater than y)
+2 >= 1 # [1] TRUE
+
+# <=       smaller-equal (e.g. x is smaller than y)
+2 <= 3 # [1] TRUE
+
+# >        more/higher than
+2 < 3 # [1] TRUE
+
+# <        less/lower than
+2 < 3 # [1] TRUE
+
+# !=       NOT
+1 != 2 # [1] TRUE
+
+# &        AND
+TRUE & TRUE  # [1] TRUE
+TRUE & FALSE # [1] FALSE
+
+# Either some & operatiorn AND (&&) another & operation
+x = 4
+x > 1 & is.numeric(x) && x > 5 & is.numeric(x) # [1] FALSE
+
+x = 6
+x > 1 & is.numeric(x) && x > 5 & is.numeric(x) # [1] TRUE
+
+# |        # OR
+x = 7
+x > 5 | x < 10 # [1] TRUE
+
+x = -5
+x > 5 | x > 22 # [1] FALSE
+
+# double | for "some operation on one side" OR "some operation on the other side"  
+x = 5
+x > 1 & is.numeric(x) || x > 5 & is.numeric(x) # [1] TRUE
+
+x = -5
+x > 1 & is.numeric(x) || x > 5 & is.numeric(x) # [1] FALSE
+
+# Any function any()
+any(c(1,2,3) > 4) # [1] FALSE
+
+
+##### MATHEMATICAL OPERATORS:
+
+# Addition
+2 + 5 # [1] 7
+
+# Subtraction
+2 - 5 # [1] 3
+
+# Multiplication
+2 * 5 # [1] 15
+
+# Division
+2 / 2 # [1] 1
+
+# Exponents
+2^2 # [1] 4
+
+# Dot product:
+c(2,4,6)*cbind(c(1,1,1),c(2,2,2))
+#      [,1] [,2]
+# [1,]    2    4
+# [2,]    4    8
+# [3,]    6   12
+
+# MAX/MIN
+max(c(1,2,3)) # [1] 3
+min(c(1,2,3)) # [1] 1
+
+# Square root
+sqrt(9) # [1] 3
+
+# Mean
+mean(c(2,3)) # [1] 2.5
+
+# Median
+median(c(1,40,55)) # [1] 40
+
+# Mode (one way to do it...)
+which.max(table(c(20,55, 55, 67))) 
+# 55  # Mode value
+# 2   # Frequency
+
+# Sample SD
+sd(c(0:10)) # [1] 3.316625 
+sd(5.63) # [1] NA == 0 for sample size 1 
+
+# Absolute value
+abs(c(-1)) # [1] 1
+
+# Round
+round(2.9) # [1] 3
+
+# Round upwards
+ceiling(2.1) # [1] 3
+
+# Round downwards
+floor(2.9) # [1] 2
+
+# Sum
+sum(c(1,2,3)) # [1] 6
+
+# Rowsum and more
+test = cbind(c(1,2,3), c(1,2,3))
+#      [,1] [,2]
+# [1,]    1    1
+# [2,]    2    2
+# [3,]    3    3
+rowSums(test)  # [1] 2 4 6
+colSums(test)  # [1] 6 6
+rowMeans(test) # [1] 1 2 3
+colMeans(test) # [1] 2 2
+
+# cos(), sin(), tan() of an angle as input
+cos(45)
+sin(45)
+tan(15)
+
+# Logarithm base 2 = log2(), natural = log(), dec. log. = log10()
+log2(.5)  # [1] -1
+log(.5)   # [1] -0.6931472
+log10(.5) # [1] -0.30103
+
+# Exponential function e to the power of x as input
+exp(1) # [1] 2.718282 # Euler's number
+
+# Random functions
+rnorm(n = 10, mean = 5, sd = 1)
+runif(n = 10, min = 1, max = 10)
+rbinom(n = 10, size = 2, prob = .1)
+rpois(n = 10, lambda = 2)
+
+# Normal distr.
+dnorm(seq(-4,4,by=.1))
+plot(x = seq(-4,4,by=.1), dnorm(seq(-4,4,by=.1)))
+
+# Uniform distr.
+dunif(seq(0,7,by=.1),min=1, max=6)
+plot(seq(0,7,by=.1),dunif(seq(0,7,by=.1),min=1, max=6), type = "l", ylim = c(0,.5))
+
+# and many more...
+
+
+###################################################
+# ----------------------------------------------- #
+###################################################
