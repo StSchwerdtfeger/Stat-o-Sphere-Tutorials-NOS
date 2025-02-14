@@ -40,11 +40,11 @@
 
 #################################################################################
 # Code benchmarks are not of concern, except for ML/AI or fMRI analysis and such:
-y=c(rnorm(1000000,mean=35,sd=4))
-x=c(rnorm(1000000,mean=22,sd=6))
+# y=c(rnorm(1000000,mean=35,sd=4))
+# x=c(rnorm(1000000,mean=22,sd=6))
 
 # linear regression with 1 Million data points:
-lm(y~x) # instant result with my computer...
+# lm(y~x) # instant result with my computer...
 
 #y=c(rnorm(100000000,mean=35,sd=4))
 #x=c(rnorm(100000000,mean=22,sd=6))
@@ -64,7 +64,7 @@ test = 2 + 5  ; test2 = 2 + 3 # ";" is a so-called delimiter...
 
 # Code without object name will only be shown in the console and not saved in the
 # work space environment!
-2+4
+2 + 4
 # > 2+4
 # [1] 6
 
@@ -89,10 +89,10 @@ vec <- c(1,2,3)
 # documentation of how the function works:
 ?c()
 
+
 # Execute line to call a specific element:
 vec[2] # index 2 == second element of the vector
 # [1] 2 # second element in the vector is also 2
-
 
 # Change element:
 vec[2] = 4
@@ -110,7 +110,7 @@ vec[2] = 4
 # It will then show an error. You can then again execute the line you wanted to run.
 # If this does not help, clean the environment and restart R!
 # We also recommend using the brush tool in the environment in case you lost track
-# of an error! Restart executing line by line until you find the errorneous line
+# of an error! Restart executing line by line until you find the erroneous line
 # or look out for the white cross behind a red circle - errors can also of
 # course be code that was just written wrong but otherwise can be executed...
 
@@ -181,7 +181,7 @@ is.data.frame(mat_bind)
 mat_bind[,2]
 # Or we use the dollar sign to call/select a specific row of the table by name
 # We can then also still use the bracket syntax notation:
-mat_bind$V2[2]
+mat_bind$V2
 
 # Column names can be changed via:
 colnames(mat_bind) = c("One", "Two", "Three") # rownames() exists too
@@ -282,7 +282,7 @@ fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
 time = c("t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2")
 measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 
-# cbind() which concatenates vectors column-wise and format into a data frame:
+# cbind() which concatenates vectors column-wise, then format into a data frame:
 table = as.data.frame(cbind(patient_id,time,measurement_sysRR,fam))
 
 # Installing a package for the first time:
@@ -301,7 +301,6 @@ points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
 # Perform a paired/dependent t-test):
 # Here using as.numeric() was necessary
 result = t.test(as.numeric(t2$measurement_sysRR), as.numeric(t1$measurement_sysRR), paired  = TRUE)
-
 
 
 #############################
@@ -372,8 +371,8 @@ result = matrix(0,nrow = length(object2[,1]), ncol = length(object2[1,]), byrow 
 for(i in 1:length(object2[,1])){    # loop over rows; the length of a col tells you number of rows
   for(j in 1:length(object2[1,])){  # loop over cols; the length of a row tells you number of cols
     result[i,j] = object2[i,j]+1
-  } # End for i
-} # End for j
+  } # End for j
+} # End for i
 
 result
 #      [,1] [,2]
@@ -418,7 +417,7 @@ is.na(new_table$measurement_sysRRalt)
 na_lines = which(is.na(new_table$measurement_sysRRalt) == TRUE)
 # [1] 4 7 # Index of the lines with NA entry
 # NOTE: Locating NAs in any context demands using the is.na() function to create
-#       a logical vector, so to speak. From where we can ask in which line == TRUE...
+#       a logical vector, so to speak, from where we can ask in which line == TRUE...
 #       In other words: NA can't be treated as character string, as for most cases using which()
 
 # Alternative without executing a function within a function:
@@ -548,6 +547,13 @@ test1 # for t1 only patient_id 2 has an NA...
 # 5          5   t2                  119
 # 6          6   t2                  127
 # 7          7   t2                  125
+
+# Comparison of piped and unpiped code for selecting columns:
+new_table %>%
+  select(patient_id,time)
+
+# Casual way we have gone through before via $ and cbind()
+new_table2 = cbind(new_table$patient_id,new_table$time)
 
 
 ########################################
@@ -1368,7 +1374,7 @@ object2 = cbind(c(1,1,1),c(1,1,1))
 # Create empty matrix with zeros only:
 result = matrix(0,nrow = length(object2[,1]), ncol = length(object2[1,]), byrow = TRUE)
 for(i in 1:length(object2[,1])){    # loop over rows
-  for(j in 1:length(object2[1,])){  # loop over cols
+  for(j in 1:length(object2[1,])){  # loop over cols (or vice versa - at least in this case!!!)
     result[i,j] = object2[i,j]+1
   } # End for i
 } # End for j
@@ -1383,7 +1389,7 @@ result
 add_1 = function(x){
   result = matrix(0,nrow = length(x[,1]), ncol = length(x[1,]), byrow = TRUE)
   for(i in 1:length(x[,1])){    # loop over rows
-    for(j in 1:length(x[1,])){  # loop over cols
+    for(j in 1:length(x[1,])){  # loop over cols (or vice versa - at least in this case!!!)
       result[i,j] = x[i,j]+1
     } # End for i
   } # End for j
