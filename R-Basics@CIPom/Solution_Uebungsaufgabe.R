@@ -19,23 +19,23 @@
 ### SCRIPT ENTHÄLT EINE WEITERE KURZE ÜBUNGSAUFGABE MIT LÖSUNG!!! 
   
 
-# Load Data:
+# Load Data (a)):
 daten = read.csv("Uebungsaufgabe.csv") # Automatically in format data.frame!!
 daten # execute line or mark name of an object to show content in console,
       # or, recall, use print(daten) to "print" the content of 
       # an object in the console
 
 
-# Add missing measurement value:
+# Add missing measurement value (d)):
 daten$measurement_sysRR[9] = 122
 
 
 # Load dplyr to use its filter() function (another function called filter() is masked):
-# install.packages(dplyr)
+# install.packages(dplyr):
 library(dplyr)
 
 # Filter the table to obtain two tables given either t1 or t2 in the column "time"
-# (from 14x4 to 7x4x2, scheme row x col x number of tables):
+# (from 14x4 to 7x4x2, scheme row x col x number of tables). (preparation for b)):
 t1 = filter(daten, time == "t1")
 t1
 t2 = filter(daten, time == "t2")
@@ -53,7 +53,7 @@ shapiro.test(t2$measurement_sysRR)
 # => if it were non-normal distr., then a non-parametric Wilcoxon signed 
 #    rank test would be the choice in this case... 
 
-# Perform paired/dependent t-test: Note that input is t.test(t2,t1,paired=TRUE):
+# Perform paired/dependent t-test: Note that input is t.test(t2,t1,paired=TRUE) (b)):
 result_t_test = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE)
 result_t_test
 # > result_t_test 
@@ -95,7 +95,7 @@ cohen.d(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE)
 # -2.1005458 -0.9673354 
 
 
-# Power Analysis:
+# Power Analysis (c)):
 # install.packages("pwr")
 library(pwr)
 pwr.t.test(d = .5, sig.level = .05, power = .8, type = "paired") 
@@ -111,7 +111,7 @@ pwr.t.test(d = .5, sig.level = .05, power = .8, type = "paired")
 # NOTE: n is number of *pairs*
 
 
-# Look at the unique values:
+# Look at the unique values (e)):
 unique(daten$fam)
 
 # Change NA to "keine Angabe":
@@ -132,7 +132,7 @@ for(i in 1:length(yes)){
 daten$fam[which(daten$fam == "noo")] = "no"
 daten$fam[which(daten$fam == "n")] = "no"
 
-# Plot pie table of the column "fam":
+# Plot pie table of the column "fam" (f)):
 pie(table(daten$fam)) 
 
 # Frequencies of each option (first filter for either t1 or t2, since entries are redundant
@@ -144,7 +144,7 @@ table(frequencies$fam)
 
 # Check in Console if table is fully cleaned...
 daten 
-# ... if so, then export cleaned data set:
+# ... if so, then export cleaned data set (g)):
 write.csv(daten, "export_daten.csv")
 
 
@@ -180,14 +180,24 @@ write.csv(daten, "export_daten.csv")
 ############################  
 ########### BONUS EXERCISE!
 
-# Reformat the table such that the sysRR for t1 and t2 has an extra column:
+# Synthetic data set to test na.omit() (a))
+test = cbind(c(1,NA,3),c(1,4,NA))
 
+na.omit(test)
+#      [,1] [,2]
+# [1,]    1    1
+# attr(,"na.action")
+# [1] 2 3
+# attr(,"class")
+# [1] "omit"
+
+# Reformat the table such that the sysRR for t1 and t2 has an extra column (b)):
 # Filter now cleaned data set: 
 t1 = filter(daten, time == "t1")
 t2 = filter(daten, time == "t2")
 
 # One way to do so would be cbind() each of the columns of t1 and only sysRR from t2
-# and add an empty row called RRdiff:
+# and add an empty row called RRdiff (c)):
 RRdiff = c(0)
 sysRR_t1 = t1$measurement_sysRR
 sysRR_t2 = t2$measurement_sysRR
@@ -236,7 +246,7 @@ reformat
 # the actions of tha long format function. 
 
 ############################################################
-# Alternative easier way of adding a column with diff values 
+# Alternative easier way of adding a column with diff values (d)):
 RRdiff_alt = as.numeric(reformat$sysRR_t2)-as.numeric(reformat$sysRR_t1)
 cbind(reformat,RRdiff_alt) 
 
@@ -267,6 +277,13 @@ diff_10plus = reformat[abs(as.numeric(reformat$RRdiff)) >= 10,]
 length(diff_10plus[,1])
 # [1] 5
 # => five patient_ids with RR difference >=10
+
+
+
+# Create a nice table for export (e)):
+# install.packages("gt")
+# library(gt)
+# gt(reformat)
 
 
 
@@ -348,13 +365,6 @@ data_long <- gather(long_reformat, key = "time", value = "sysRR", sysRR_t1:sysRR
 # 24         12    sysRR_t2   130
 
 
-
-## OPTIONAL:
-# Create a nice table for export:
-
-# install.packages("gt")
-# library(gt)
-# gt(reformat)
 
 
 
