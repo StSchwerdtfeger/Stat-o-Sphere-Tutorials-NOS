@@ -8,12 +8,10 @@
 ##################################
 ##################################
 
-
-# Corresponding Tutorials and more Educational Resources incl. code can be found here:
+# Corresponding Tutorial and more Educational Resources incl. code can be found here:
 # https://journal.medicine.berlinexchange.de/statosphere 
 # https://journal.medicine.berlinexchange.de/user/steffen-schwerdtfeger-2 
 # https://github.com/StSchwerdtfeger 
-
 
 #### UNFOLD CODE of the desired chapter (small arrow at the lower line of #'s).
 
@@ -22,7 +20,10 @@
 # into the History of Programming Languages                    #
 ################################################################
 
-# Example Parabola Function:
+# BEST START WITH CHAPTER 3 when you are completely new to programming / R, 
+# the below is just some Code upfront that is shown in the introduction. 
+
+#### Example Parabola Function (also found in chapter 9 on functions):
 parabola = function(x){
   fx = x^2
   return(fx)
@@ -32,6 +33,7 @@ parabola = function(x){
 x = c(-4:4) # creates vector from -4 to 4, integer steps
 parabola(x)
 
+#### Random facts to get a grip on the scale of a CPU compared to its small size:
 
 # Let us say your CPU has 9.69 billion transistors. A transistor
 # is essentially a very tiny switch that can be in two states (0 or 1).
@@ -51,7 +53,7 @@ parabola(x)
 # [1] 2505.074
 
 
-# Code benchmarks are not of concern, except for ML/AI or fMRI analysis and such:
+#### Code benchmarks are not of concern, except for ML/AI or fMRI analysis and such:
 # y=c(rnorm(1000000,mean=35,sd=4))
 # x=c(rnorm(1000000,mean=22,sd=6))
 
@@ -77,11 +79,15 @@ parabola(x)
 # or make sure that the blinking | courser is in the line you want to execute 
 # and then press ALT+ENTER or Cmd+ENTER for mac users.
 test = 2 + 5
-# Console output
+
+# View output in console:
+print(test)
+# ...or
+test
 # [1] 7
 
 # Only one object per line!
-# The below will give you an error:
+# The below line will give you an error (uncomment and execute to see effect):
 # test1 = 2 test2 = 3
 # Error: unexpected symbol in "test1 = 2 test2"
 
@@ -90,9 +96,29 @@ test1 = 2 ; test2 = 3
 # Delimiters are a general concept of demarcation. In R it
 # it demarcates lines. So using ";" is the same as starting a new line!
 
+# The following overwrites the content of an object, as mentioned before:
+test = 4 + 4
+# [1] 8
+
 # The following code duplicates an object, giving it a new name. The blow
 # does not (!) rename an object. Everything that has been executed will stay
 # in the work space; use brush tool to clear environment...
+test3 = test
+# > test3
+# [1] 8
+
+# The following uses == (logical operator) to check for equivalence (see Chapter 10 for more 
+# information on logical operators and basic math functions). The output is a logical (see
+# chapter 5 on classes to understand difference between logical, character, numeric...):
+test3 == test
+# [1] TRUE
+
+# The following again overwrites test and hence test and test3 are now 
+# not equivalent anymore:
+test = 2 + 4
+test == test3
+# [1] FALSE
+
 
 # # # # # # # # # # # # # # # # # # # # # 
 #########################################
@@ -111,6 +137,24 @@ vec <- c(1,2,3)
 # Execute the following line to get "Help", i.e., the 
 # documentation of how the function works:
 ?c()
+
+# TYPICAL ERROR, ALWAYS CHECK CONSOLE OUTPUT FOR > ON THE END INDICATING
+# THAT A PROCESS WAS COMPLETED:
+# > # Typical Error:
+# > vec = c(
+# + 
+
+# SINCE IT SAYS "+" in the console it means that the operation is not finished yet, since
+# the second ")" is missing. In fact, when selecting the whole script, R
+# will "think" that everything after "(" is part of the input in between two
+# brackets. IN ANY CASE you have to type in the missing ")" and execute that line again.
+# It will then show an error. You can then again execute the line you wanted to run.
+# If this does not help, clean the environment and restart R!
+# We also recommend using the brush tool in the environment in case you lost track
+# of an error! Restart executing line by line until you find the erroneous line
+# or look out for the white cross behind a red circle - errors can also of
+# course be code that was just written wrong but otherwise can be executed...
+
 
 # Execute line to call a specific element:
 vec[2] # index 2 == second element of the vector
@@ -134,6 +178,7 @@ mat = as.matrix(vec)
 # Look at the third element:
 mat[3]
 # or, since there is now also an index for the first and only column:
+# Scheme = mat[row,column]
 mat[2,1]
 # [1] 4
 
@@ -180,12 +225,34 @@ colnames(mat_bind)[2] = "Second_Col"
 # 2   2          2     2
 # 3   3          3     3
 
-# Exemplatory array with 
-# dim = c(rows, columns, further_dimension)
-array(1, dim = c(50,5,5))
+# Example array with 
+# Below uses a trick: 1 or 0 at the beginning and defining dimension
+# fills up the array with either 1 or 0:
+array(1, dim = c(3,3,3))
+# , , 1
+
+#      [,1] [,2] [,3]
+# [1,]    1    1    1
+# [2,]    1    1    1
+# [3,]    1    1    1
+
+# , , 2
+
+#      [,1] [,2] [,3]
+# [1,]    1    1    1
+# [2,]    1    1    1
+# [3,]    1    1    1
+
+# , , 3
+
+#      [,1] [,2] [,3]
+# [1,]    1    1    1
+# [2,]    1    1    1
+# [3,]    1    1    1
+
 
 # Add a 1 to every entry:
-array(1, dim = c(50,5,5)) + 1
+array(1, dim = c(3,3,3)) + 1
 
 
 # String Example
@@ -253,27 +320,36 @@ test = as.numeric(test)
 # 6 Import and Export of .CSV files, Understanding Delimiters and Packages #
 ############################################################################
 
-# read CSVs, uncomment to use and add your path or file name if file is in your 
-# working directory folder (of a project):
+# Read CSVs, uncomment to use and add your path or file name only, if file is in your 
+# working directory folder (of a project).
+# Formally loading a file can be done via the read.csv() or read.csv2()
 # read.csv("Your file path")
 # read.csv2("Your file path")
 
-# Working directory:
-getwd() # no input needed!!
+# Forgot you Working directory path? check via:
+getwd() # No input needed!! Shows path assigned, e.g., for a project or standard folder
 
-# url() Function
+# url() Function (NO ACTUAL WEBSITE DO NOT EXECUTE!)
 # read.csv(url("http://www.website.net/data_file.csv"))
 
 # Load Dino Data Set for this!
 # I called the object "dino", such that plotting is done by:
-# plot(x = dino$x,y = dino$y)
+# dino = read.csv("Your file path")
+# In case you set up a project or placed your data files in the folder
+# that getwd() shows as output, then you can use a shortcut using the
+# file name only:
+dino = read.csv("dino_csv.csv")
+plot(x = dino$x,y = dino$y)
 
+# Load Excel file:
+# install.packages("readxl") # also within "tidyverse"
+library("readxl")
+# dino_excel = read_excel("dino_csv2.xlsx") # activate line when you have a .xlsx Version of the csv
 
 # install.packages("readr")
 library("readr") # package also within "tidyverse"
 # write.csv()
 # write.csv2()
-
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -290,8 +366,7 @@ data()                     # View all available data sets
 library(dplyr)             # open/activate/load package
 #data(starwars)            # load data set
 #View(starwars)            # view via RStudio viewer
-?starwars                  # view documentation
-
+#?starwars                  # view documentation
 
 # Another fun and insightful package:
 # install.packages("datasauRus")
@@ -314,6 +389,14 @@ dino = filter(datasaurus_dozen, dataset == "dino")
 ggplot(dino, aes(x = x, y = y, colour = dataset))+
   geom_point()+
   theme(legend.position = "none")
+
+# Perform a linear regression on the dinsaure data set:
+dino = filter (datasaurus_dozen, dataset == "dino")  # filter dino data set
+# lm() for slope and intercept  
+lm(dino$y~dino$x)
+# Full output iincl. t-test etc.
+summary(lm(dino$y~dino$x)) # Slope is not significant...
+
 
 ###########################################
 # --------------------------------------- #
@@ -341,6 +424,27 @@ library(dplyr)             # load/activate package
 t1 = filter(table, time == "t1")
 t1 = filter(table, time != "t2") # alternative
 t2 = filter(table, time == "t2")
+
+# From there we could go on an explore the data:
+# Simple plotting example (note that the code is spread over two lines!!!):
+plot(x = t1$patient_id,y = t1$measurement_sysRR, ylim=c(100,150), 
+     col = "blue", ylab = "sysRR")
+points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
+
+# ... and perform a paired/dependent t-test):
+# Here using as.numeric() was necessary...
+result = t.test(as.numeric(t2$measurement_sysRR), as.numeric(t1$measurement_sysRR), paired  = TRUE)
+
+#         Paired t-test
+
+# data:  as.numeric(t2$measurement_sysRR) and as.numeric(t1$measurement_sysRR)
+# t = -6.1335, df = 6, p-value = 0.0008591
+# alternative hypothesis: true mean difference is not equal to 0
+# 95 percent confidence interval:
+#   -14.189293  -6.096421
+# sample estimates:
+#   mean difference 
+#     -10.14286 
 
 
 ######################################################
@@ -480,7 +584,6 @@ fin_table$patient_id == fin_table_alt$patient_id
 ### 8.3 EXAMPLE III: For loops and nested for loops #
 #####################################################
 
-
 ## Example for loop:
 
 # Define an object you want to loop over:
@@ -502,7 +605,6 @@ list_results[3] = object[3]+1
 list_results[4] = object[4]+1
 
 # A for loop is essentially used to perform a repetitive process with shorter syntax
-
 
 ## Nested for loop example (loop within a loop) 
 object2 = cbind(c(1,1,1),c(1,1,1))
@@ -554,7 +656,6 @@ apply(result, MARGIN = 1, FUN = sum)
 ########################################################################
 ### 8.5 EXAMPLE V: Introduction into “tidyverse” and the Pipe Operator #
 ########################################################################
-
 
 #### Pipe operator %>% using tidyverse:
 # install.packages("tidyverse")
@@ -637,20 +738,32 @@ na.omit(test_na_omit)
 ### 8.6 EXAMPLE VI: Adjusting Character String Entries #
 ########################################################
 
-###### Character string manipulation:
+#### Duplicate our previous table:
+fin_table_alt = new_table
+
+# Use the unique() function to show all individual entries (without duplicates so to speak)
 unique(fin_table_alt$fam)
 # [1] "yes" NA    "no"  "ys" 
+
+# Locate all entries of a column matching a specific criteria, here "ys"
 which(fin_table_alt$fam =="ys")
-# [1] 7 8
+# [1] 11 12
 
 # Correct entries e.g. via: The below is a composition of the functions
-# fin_table$fam[]  and  which()  and  is.na()
-fin_table$fam[which(is.na(fin_table$fam) == TRUE)] = "not specified"
-fin_table$fam[which(fin_table$fam =="ys")] = "yes"
-unique(fin_table$fam)
-# [1] "yes"           "not specified" "no"  
+# fin_table$fam[]  and  which()  and  is.na() for renaming NAs. Not
+# Loop is needed when using the which function wihtin the [] of a column...
+fin_table_alt$fam[which(is.na(fin_table_alt$fam) == TRUE)] = "not specified"
+fin_table_alt$fam[which(fin_table_alt$fam =="ys")] = "yes"
+fin_table_alt$fam[which(fin_table_alt$fam =="n")] = "no"
 
-# Get first name only!
+# Check if it worked:
+unique(fin_table_alt$fam)
+# [1] "yes"           "not specified" "no"    
+
+# Pie chart (since frequencies are not shown, they do not have to be divided by two):
+pie(table(fin_table_alt$fam))
+
+#### Get first name only!
 name = c("Name Surname","Name Surname","Name Surname")
 surname = c("","","")
 names = cbind(name,surname)
@@ -1240,6 +1353,100 @@ extra_long_format
 # EXECUTE LINES ABOVE TO VIEW FULL OUTPUT IN CONSOLE!
 
 
+##################################################################################################
+### 8.14 EXAMPLE XIV: Imputation - Dealing with Missing Entries in Surveys via Nested for Loops  #
+##################################################################################################
+
+# This is an example I have encountered during the in-person tutorial series 
+# @CIPOM/Charité (thanks to the participant and Lernzentrum tutor 
+# Yannick Jenke for this example!). It was about the outcome of several 
+# SF-36/RAND-36 Surveys. The SF-36/RAND-36 is a short form survey evaluating 
+# “perceived health or health-related quality of life”. 
+
+# Imputation of missing values in a survey. Thanks to Yannick Jenke for this example!
+
+# Example data frame
+x = data.frame(cbind(c(1,NA,3),c(1,2,3), c(4,3,3)))
+# > x
+#   X1 X2 X3
+# 1  1  1  4
+# 2 NA  2  3 # Missing survey score of the participant in this line!
+# 3  3  3  3
+
+
+# Empty vector for results:
+result = c()
+# For loop calculating mean of each column and then places it in the 
+# nested for loop where NAs had been. 
+for(i in 1:length(x[,1])){ # loop over rows/lines
+  line = x[i,]             # Extract line and call it line
+  result[i] = mean(line[!is.na(line)]) # deletes NA from a row and calculates mean.
+  for(j in 1:length(line)){            # (Nested for loop) over the columns (each survey question)
+    if(is.na(line[j])==TRUE){          # and if an entry == NA
+      x[i,j] = result[i]               # then the entry will be exchanged by the row mean
+    } # End if
+  } # End for j
+} # End for i
+
+# Look at result in console:
+print(x)
+# > x
+#    X1 X2 X3
+# 1 1.0  1  4
+# 2 2.5  2  3
+# 3 3.0  3  3
+
+# Line 1 had an NA entry, the rest of the line was a 2 and a 3, such
+# that mean(2 + 3) = 2.5. As you can see, the missing values was exchanged
+# with the mean of 2.5 in line 2, column 1. 
+
+
+
+
+
+
+
+
+############################################################################
+### 8.15 EXAMPLE XV: Time Difference between Dates in Days and other Units # 
+############################################################################
+
+# Example vectors with dates in the scheme dd.mm.yyyy:
+dates_1 = c("12.02.1998","12.04.2004","04.05.2014")
+dates_2 = c("15.07.2022","01.11.2021","06.06.2016")
+
+# Change into a date object (this is something that can be daunting, since I
+# had the experience that one has to change an object into an date object redundantly 
+# in several processes (e.g. when working with a loop)). The below essentially
+# reformats the dates into YYY-MM-DD:
+dates_1 = as.Date(dates_1, format = "%d.%m.%Y")
+# [1] "1998-02-12" "2004-04-12" "2014-05-04"
+dates_2 = as.Date(dates_2, format = "%d.%m.%Y")
+# [1] "2022-07-15" "2021-11-01" "2016-06-06"
+
+# To calculate the difference use the difftime() function,
+# which has the syntax: difftime(dates_2, dates_1, units = "days"):
+time_diff_days = difftime(dates_2, dates_1, units = "days")
+# Time differences in days
+# [1] 8919 6412  764
+
+# Calculate the mean time difference and sd:
+mean(time_diff_days)
+# Time difference of 5365 days # Mean difference
+sd(time_diff_days)
+# [1] 4177.1 # Quite high in this case...
+
+
+# You can also calculate the difference within the steps of a vector
+# of dates via: difftime(dates_1[-1], dates_1[-length(dates_1)], units = "days"):
+time_diff_days_vector = difftime(dates_1[-1], dates_1[-length(dates_1)], units = "days")
+# Time differences in days
+# [1] 2251 3674
+
+# So from "1998-02-12" to "2004-04-12" = 2251 days and
+#    from "2004-04-12" to "2014-05-04" = 3674 days
+
+
 #######################
 # ------------------- #
 #######################
@@ -1354,10 +1561,10 @@ Bayes_Machine = function (prior,likelihood) {
   posterior = joint/modelevidence
   # Needed for console output and adds text to it
   # using a matrix, which works similar as c()
-  postprint = matrix(c("Posterior",posterior,
-                       "Joint probability", joint,
-                       "Model evidence", modelevidence))
-  print(postprint) 
+  postprint = as.data.frame(matrix(c("Posterior",posterior,
+                                     "Joint probability", joint,
+                                     "Model evidence", modelevidence)))
+  print(postprint) # or use return
 }  # end of function
 
 # Give it a try with defined prior and likelihood:
@@ -1381,19 +1588,19 @@ Bayes_Machine = function (prior,likelihood,modelevidence) {
     modelevidence = sum(joint, na.rm = TRUE) 
     posterior = joint/modelevidence
     # Needed for console output
-    postprint = matrix(c("Posterior",posterior,
-                         "Joint probability", joint,
-                         "Model evidence", modelevidence)) 
+    postprint = as.data.frame(matrix(c("Posterior",posterior,
+                                       "Joint probability", joint,
+                                       "Model evidence", modelevidence))) 
     print(postprint)
-  }
+  } # End if
   else {
     joint = prior*likelihood
     posterior = joint/modelevidence  
-    postprint = matrix(c("Posterior",posterior,
-                         "Joint probability", joint,
-                         "Model evidence", modelevidence)) 
-    print(postprint)
-  }
+    postprint = as.data.frame(matrix(c("Posterior",posterior,
+                                       "Joint probability", joint,
+                                       "Model evidence", modelevidence)))
+    print(postprint) 
+  } # End Else
 } # End of function
 
 Bayes_Machine(likelihood = likelihood, prior = prior)
@@ -1430,10 +1637,10 @@ sum(c(1,2,3)) == sum_alt(c(1,2,3))
 # Criteria means what should be deleted, equivalent to always
 # working with != in the dplyr filter function... 
 filter_alt = function(data_table,criteria_col,criteria){ 
-  lines_to_filter = c()
-  for(i in 1:length(criteria_col)){
-    if(criteria_col[i] == criteria){
-      lines_to_filter[i] = i 
+  lines_to_filter = c()                # empty vector for lines to filter
+  for(i in 1:length(criteria_col)){    # loop over col vector (not the cols!)
+    if(criteria_col[i] == criteria){   # if criteria input is fulfilled
+      lines_to_filter[i] = i           # add index position in col vector to list
     } # End if
   } # End for i
   # Output of lines_to_filter can look like this:[1]  1 NA  3 NA  5 NA  7 NA  9 NA 11 NA 13
@@ -1827,6 +2034,8 @@ x > 1 & is.numeric(x) || x > 5 & is.numeric(x) # [1] TRUE
 
 x = -5
 x > 1 & is.numeric(x) || x > 5 & is.numeric(x) # [1] FALSE
+x > 0 & is.numeric(x) || abs(x) <= 4 & is.numeric(x) # [1] FALSE
+
 
 # Any function any()
 any(c(1,2,3) > 4) # [1] FALSE
@@ -1884,6 +2093,9 @@ abs(c(-1)) # [1] 1
 # Round
 round(2.9) # [1] 3
 
+# Truncate
+trunc(1.8) # [1] 1
+
 # Round upwards
 ceiling(2.1) # [1] 3
 
@@ -1917,19 +2129,36 @@ log10(.5) # [1] -0.30103
 # Exponential function e to the power of x as input
 exp(1) # [1] 2.718282 # Euler's number
 
-# Random functions
+# Random functions (normal, unif, binom, pois)
 rnorm(n = 10, mean = 5, sd = 1)
 runif(n = 10, min = 1, max = 10)
 rbinom(n = 10, size = 2, prob = .1)
 rpois(n = 10, lambda = 2)
 
-# Normal distr.
+# PDF Normal Distr.
 dnorm(seq(-4,4,by=.1))
 plot(x = seq(-4,4,by=.1), dnorm(seq(-4,4,by=.1)))
 
-# Uniform distr.
+# CDF of PDF of Normal Distr. (for two tail)
+pnorm(-1.96, lower.tail = TRUE) # [1] 0.0249979
+
+# Inverese CDF
+qnorm(.5)   # [1] 0
+qnorm(.025) # [1] -1.959964
+ 
+# Uniform PDF
 dunif(seq(0,7,by=.1),min=1, max=6)
 plot(seq(0,7,by=.1),dunif(seq(0,7,by=.1),min=1, max=6), type = "l", ylim = c(0,.5))
+
+# CDF of Unif. 
+punif(3, min = 1, max = 6) # [1] 0.4
+
+# PDF Poisson
+dpois(3, lambda = 3) # [1] 0.2240418
+
+# CDF Poisson
+ppois(q = 0.2240418, lambda = 3) # [1] 0.04978707
+
 
 # and many more...
 
@@ -1937,3 +2166,127 @@ plot(seq(0,7,by=.1),dunif(seq(0,7,by=.1),min=1, max=6), type = "l", ylim = c(0,.
 ###################################################
 # ----------------------------------------------- #
 ###################################################
+###############################################
+# 11 Creating Apps with the Shiny App Package #
+###############################################
+###########################################################################################
+### 11.1 EXAMPLE APP I: Plotting Standardized Difference in Means for a One-Sample Z-Test #
+###########################################################################################
+
+# Install and load shiny package
+# install.packages("shiny")
+library(shiny)
+
+# Writing code for a Shiny app entails three components:
+# The UI, the Server executing the functions etc., and then you have to run 
+# both via the shinyApp(ui,server) function:
+
+
+####### Code for the User Interface (UI):
+ui = fluidPage(
+  
+  # App title banner: 
+  titlePanel("Standardized Difference in Means (One-Sample)"), # End titelPanel()
+  # Sidebar layout function, we choose sidebar for the input fields via:
+  sidebarLayout(  
+    sidebarPanel( 
+      # Numeric input for samp/pop. mean and their respective sd!
+      # numericInput("object input name for server function", "Label Name", standard value)
+      numericInput("sampmean", "Sample Mean:", 
+                   value = 120), 
+      numericInput("sampsd", "Sample SD:", 
+                   value = 5),
+      numericInput("popmean", "Population Mean:", 
+                   value = 130),
+      numericInput("popsd", "Population SD:", 
+                   value = 5)
+    ), # End sidebarPanel()
+    
+    mainPanel( # Main space where the plot will be.
+      # Output Object name for server will be "curves"
+      plotOutput("curves")
+    ) # End mainPanel()
+    
+  ) # End sidebarLayout()
+) # End fluidPage()
+
+
+############ Server entails all the functions and code that is executed in the background
+server = function(input, output) {
+  
+  # Define how the iput is processed and what is plotted: 
+  output$curves = renderPlot({ # THIS IS WHERE WE NEED the output name..
+    
+    # Prob. dens. function (could also use dnorm()):
+    prob_dens = function(x,mean,sd){
+      fx = (1/sqrt(2*pi*(sd^2)))*exp((-((x-mean)^2))/(2*(sd^2)))
+      return(fx)
+    } # End of Function
+    
+    # Effect size diff_mean/po_sd 
+    # RECALL: INPUT NAMES WHERE SET VIA numericInput() in code for UI!
+    effectsize = (input$sampmean-input$popmean)/input$popsd
+    
+    # Create sequence of numbers of x (sd's of the x-axis) which then run through
+    # the prob_dens function above:
+    seq_samp = seq((-abs(effectsize)-3),(abs(effectsize)+3),by =.01) 
+    seq_pop  = seq(-5,5,by =.01)
+    
+    # Check which has the maximum value of prob_dens, to adjust the y-axis limit of the plot:
+    yuplim_samp = max(prob_dens(seq_samp,effectsize,(input$sampsd)/input$popsd))
+    yuplim_pop = max(prob_dens(seq_pop,0,1))
+    yuplim = max(c(yuplim_samp,yuplim_pop))
+    
+    # Plot of standardized sample distribution:
+    plot(x = seq_samp, y = prob_dens(seq_samp,effectsize,(input$sampsd)/input$popsd), 
+         type = "l",  # lines instead of points
+         lty = 2,     # dotted line
+         ylab = "Density",
+         xlab = "Difference in Means in Units of SD of the Population",
+         ylim = c(0,yuplim)) # Uplim adjusted, so it is not cu off for some cases
+    
+    # Adds standard normal distribution to plot:
+    lines(x = seq_pop,y = prob_dens(seq_pop,0,1), type = "l") # full line, not dotted
+    
+    # mean 0 for standard normal distribution (representing population):
+    abline(v=0,col="lightblue") 
+    
+    # Effect size diff_mean/sd_pop:
+    abline(v=effectsize,col="orange")
+    
+    # line for x-axis at y = 0:
+    abline(h=0) 
+    
+    # Add Information on effect size to plot:
+    # Formula:
+    text(grconvertX(0.75, from = "npc", to = "user"), # Makes sure text will always be static!
+         grconvertY(0.60, from = "npc", to = "user"),
+         expression(frac(bar(x)-mu,sigma) == ""))
+    # Result value:
+    effectsize = signif(effectsize, digits = 3) # Round to 2 decimal places
+    text(grconvertX(0.82, from = "npc", to = "user"), # Makes sure text will always be static!
+         grconvertY(0.60, from = "npc", to = "user"),
+         effectsize) # Adds value next to the above formula
+      
+  }) # End renderPlot()
+} # End server
+
+##### RUN THE APP (NOTE: A # WAS SET, since otherwise the RStudio RUN button disappears
+##### and it then says "Run App" (which just executes the whole script). 
+##### Some of you might want to use it, so I set the below as comment...
+
+# shinyApp(ui = ui, server = server)
+
+
+# Consider the following cases:
+
+# Pop_mean = 130 		  Sample_mean = 120 	 Pop und Samp_SD = 5
+# Pop_mean = 130 		  Sample_mean = 120	   Pop und Samp_SD = 20
+# Pop_mean = 129.8  	Sample_mean = 130	   Pop und Samp_SD = 0.1 
+# Pop_mean = 130 		  Sample_mean = 120	   Pop_SD = 5	 	          Samp_SD = 20 (makes clear why CI of effect size is important)
+# Pop_mean = 130 		  Sample_mean = 120	   Pop_SD = 20	 	        Samp_SD = 21
+
+
+###########################################################################################
+# --------------------------------------------------------------------------------------- #
+###########################################################################################
