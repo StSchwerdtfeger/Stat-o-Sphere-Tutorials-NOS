@@ -8,9 +8,9 @@
 ##################################
 ##################################
 
-####################################################################################
-# 8 Introduction into inferential statistics conditional probability / Bayes‘ Rule #
-####################################################################################
+#####################################################################################
+# 8 Introduction into Inferential Statistics: Conditional Probability / Bayes‘ Rule #
+#####################################################################################
 
 ###### Benfords law example, number between 0 and 10: 
 n=seq(0,10,by=.1)
@@ -43,7 +43,7 @@ joint2 = posterior*model_evidence
 
 # Check for equivalence:
 all.equal(prior,likelihood,model_evidence,posterior,joint1,joint2)
-# [1] TRUE
+# [1] TRUE # it says TRUE, even though the joint = [.25 .25] - I can't tell why yet
 
 # Prior and model evidence are also equal from the perspective of the sum rule:
 sum(joint1)==sum(joint2) 
@@ -51,25 +51,28 @@ sum(joint1)==sum(joint2)
 # is not a prob. vector, but of course ex negativo entails 
 # its complement "not-data", as prob. vectors just do by themselves so to speak...
 
-
-###### Vanessa Holmes example:
+###########################
+## Vanessa Holmes Example #
+###########################
 
 # First iteration:
-joint = c(.25,.25,.25,.25)*c(.33,.33,.33,0)
-model_evidence = sum(c(.25,.25,.25,.25)*c(.33,.33,.33,0))
+# joint = prior*likelihood
+joint = c(.25,.25,.25,.25)*c(.33,.33,.33,0) 
+# model_evidence == Sum over A == A and B + not-A and B == sum(joint)
+model_evidence = sum(c(.25,.25,.25,.25)*c(.33,.33,.33,0)) 
 posterior = joint/model_evidence
 posterior
 
 # Second iteration (another suspect ruled out):
-joint = c(.33,.33,.33,0)*c(.5,.5,0,0)
-model_evidence = sum(c(.33,.33,.33,0)*c(.5,.5,0,0))
+joint = c(.33,.33,.33,0)*c(.5,.5,0,0) # prior*likelihood
+model_evidence = sum(c(.33,.33,.33,0)*c(.5,.5,0,0)) # sum(joint)
 posterior = joint/model_evidence
 posterior
 
 # Third iteration - let's say all of the suspects are ruled out:
-joint = c(.5,.5,0,0)*c(0,0,0,0)
+joint = c(.5,.5,0,0)*c(0,0,0,0) # prior*likelihood
 # [1] 0 0 0 0
-model_evidence = sum(c(.5,.5,0,0)*c(0,0,0,0))
+model_evidence = sum(c(.5,.5,0,0)*c(0,0,0,0)) # sum(joint)
 # [1] 0 
 posterior = joint/model_evidence # Note that it says: 0 divided by 0!
 posterior
@@ -78,30 +81,35 @@ posterior
 # NaN = Not a number.
 # This is due to the fact that 0/0 is not defined. At this point
 # Vanessa Holmes would need to find another suspect to be able 
-# to do further inference...
+# to do further inference... 
 
 
 
+###########################
+# ----------------------- #
+###########################
 ##########################################################################
-# 9 Z- and T-Test for simple distributions and Power Analysis for T-Test #
+# 9 Z- and T-Test for Simple Distributions and Power Analysis for T-Test #
 ##########################################################################
+################
+## Variance/SD #
+################
 
-######################
-###### Variance/SD
-
+# Example vector of numbers 0 to 10:
 x = c(0:10)
 
-# Pure deviation from the mean (without summing and squaring!):
+# Pure deviation from the mean (without summing and squaring!), 
+# i.e., centralization:
 dev_of_mean_X = x-mean(x)
+# [1] -5 -4 -3 -2 -1  0  1  2  3  4  5
 
 # Plot of dev_of_mean:
 plot(x = x, y = dev_of_mean_X) 
 abline(h=0) # h = 0 adds horizontal line at y = 0
 
-# Pure deviation from the mean (without summing!):
-dev_of_mean_X = x-mean(x)
 # Sum of de_of_mean_x:
 sum(dev_of_mean_X)
+# [1] 0
 
 # Plot using absolute values via function abs():
 plot(x = x, y = abs(dev_of_mean_X)) 
@@ -110,8 +118,10 @@ plot(x = x, y = abs(dev_of_mean_X))
 # Plot using the square, which smoothes the graph:
 plot(x = x, y = dev_of_mean_X^2)
 
-######################################
-#### Simulation Central Limit Theorem:
+
+#####################################
+## Simulation Central Limit Theorem #
+#####################################
 
 # Initialize data via runif, which will
 # give us a random but uniformly distributed
@@ -173,8 +183,9 @@ hist(sample_n_5, col = "lightblue")
 
 
 
-##################
-### T-Test:
+####################################
+## Z-/T-Test, Shapiro(), density() #
+####################################
 
 # Simple synth. data sets:
 x = c(0:10)
@@ -190,25 +201,147 @@ shapiro.test(y)  # y is normally distributed!
 # Welch test was automatically chosen (t-test for unequal variance)
 t.test(x,y) 
 
+#################################################################################
+## Shiny App: Plotting Standardized Difference in Means for a One-Sample Z-Test #
+#################################################################################
 
-##### Simulation of how adjusting sample size can lead to synthetic p-values
-##### and why Bonferroni / alpha-correction is needed:
+# Install and load shiny package
+# install.packages("shiny")
+library(shiny)
 
+# Writing code for a Shiny app entails three components:
+# The UI, the Server executing the functions etc., and then you have to run 
+# both via the shinyApp(ui,server) function:
+
+
+####### Code for the User Interface (UI):
+ui = fluidPage(
+  
+  # App title banner: 
+  titlePanel("Standardized Difference in Means (One-Sample)"), # End titelPanel()
+  # Sidebar layout function, we choose sidebar for the input fields via:
+  sidebarLayout(  
+    sidebarPanel( 
+      # Numeric input for samp/pop. mean and their respective sd!
+      # numericInput("object input name for server function", "Label Name", standard value)
+      numericInput("sampmean", "Sample Mean:", 
+                   value = 120), 
+      numericInput("sampsd", "Sample SD:", 
+                   value = 5),
+      numericInput("popmean", "Population Mean:", 
+                   value = 130),
+      numericInput("popsd", "Population SD:", 
+                   value = 5)
+    ), # End sidebarPanel()
+    
+    mainPanel( # Main space where the plot will be.
+      # Output Object name for server will be "curves"
+      plotOutput("curves")
+    ) # End mainPanel()
+    
+  ) # End sidebarLayout()
+) # End fluidPage()
+
+
+############ Server entails all the functions and code that is executed in the background
+server = function(input, output) {
+  
+  # Define how the iput is processed and what is plotted: 
+  output$curves = renderPlot({ # THIS IS WHERE WE NEED the output name..
+    
+    # Prob. dens. function (could also use dnorm()):
+    prob_dens = function(x,mean,sd){
+      fx = (1/sqrt(2*pi*(sd^2)))*exp((-((x-mean)^2))/(2*(sd^2)))
+      return(fx)
+    } # End of Function
+    
+    # Effect size diff_mean/po_sd 
+    # RECALL: INPUT NAMES WHERE SET VIA numericInput() in code for UI!
+    effectsize = (input$sampmean-input$popmean)/input$popsd
+    
+    # Create sequence of numbers of x (sd's of the x-axis) which then run through
+    # the prob_dens function above:
+    seq_samp = seq((-abs(effectsize)-3),(abs(effectsize)+3),by =.01) 
+    seq_pop  = seq(-5,5,by =.01)
+    
+    # Check which has the maximum value of prob_dens, to adjust the y-axis limit of the plot:
+    yuplim_samp = max(prob_dens(seq_samp,effectsize,(input$sampsd)/input$popsd))
+    yuplim_pop = max(prob_dens(seq_pop,0,1))
+    yuplim = max(c(yuplim_samp,yuplim_pop))
+    
+    # Plot of standardized sample distribution:
+    plot(x = seq_samp, y = prob_dens(seq_samp,effectsize,(input$sampsd)/input$popsd), 
+         type = "l",  # lines instead of points
+         lty = 2,     # dotted line
+         ylab = "Density",
+         xlab = "Difference in Means in Units of SD of the Population",
+         ylim = c(0,yuplim)) # Uplim adjusted, so it is not cu off for some cases
+    
+    # Adds standard normal distribution to plot:
+    lines(x = seq_pop,y = prob_dens(seq_pop,0,1), type = "l") # full line, not dotted
+    
+    # mean 0 for standard normal distribution (representing population):
+    abline(v=0,col="lightblue") 
+    
+    # Effect size diff_mean/sd_pop:
+    abline(v=effectsize,col="orange")
+    
+    # line for x-axis at y = 0:
+    abline(h=0) 
+    
+    # Add Information on effect size to plot:
+    # Formula:
+    text(grconvertX(0.75, from = "npc", to = "user"), # Makes sure text will always be static!
+         grconvertY(0.60, from = "npc", to = "user"),
+         expression(frac(bar(x)-mu,sigma) == ""))
+    # Result value:
+    effectsize = signif(effectsize, digits = 3) # Round to 2 decimal places
+    text(grconvertX(0.82, from = "npc", to = "user"), # Makes sure text will always be static!
+         grconvertY(0.60, from = "npc", to = "user"),
+         effectsize) # Adds value next to the above formula
+    
+  }) # End renderPlot()
+} # End server
+
+##### RUN THE APP (NOTE: A # WAS SET, since otherwise the RStudio RUN button disappears
+##### and it then says "Run App" (which just executes the whole script). 
+##### Some of you might want to use it, so I set the below as comment...
+
+# shinyApp(ui = ui, server = server) 
+
+
+# Consider the following cases:
+
+# Pop_mean = 130 		  Sample_mean = 120 	 Pop und Samp_SD = 5
+# Pop_mean = 130 		  Sample_mean = 120	   Pop und Samp_SD = 20
+# Pop_mean = 129.8  	Sample_mean = 130	   Pop und Samp_SD = 0.1 
+# Pop_mean = 130 		  Sample_mean = 120	   Pop_SD = 5	 	          Samp_SD = 20 (makes clear why CI of effect size is important)
+# Pop_mean = 130 		  Sample_mean = 120	   Pop_SD = 20	 	        Samp_SD = 21
+
+##############################################################################
+## Simulation of how adjusting sample size can lead to synthetic significant #
+## p-values and why Bonferroni / alpha-correction or effect size is needed   #
+##############################################################################
+
+# Sample sizes from 0 to 1000 in steps of 10:
 n = seq(0,1000, by = 10)
 
+# Initialice empty vector for the different t-/z-values, given different sizes of n
 t_val = c()
 
 # t_values for effect size 0.1 given different sizes of n:
-
+# The below is just a repetitive calculation of t-/z-values, given differnt sample sizes!
 for(i in 1:length(n)){
-  t_val[i] = 0.1*sqrt(n[i])
+  t_val[i] = 0.1*sqrt(n[i]) 
 } # End for i
 
 # Plot result:
 plot(x = n, y = t_val)
 
-#########################
-### Effect size Cohen's d:
+##########################
+## Effect size Cohen's d #
+##########################
+
 # install.packages("effsize")
 library(effsize)
 x = c(0:10)
@@ -239,9 +372,9 @@ effect_size_2 = (mean(x)-mean(y))/pop_sd
 all.equal(z_stat_2,effect_size_2)
 
 
-########################
-# Plot of a 3D Gaussian:
-
+#########################
+# Plot of a 3D Gaussian #
+#########################
 # 3D Plot of a Gaussian:
 x = seq(-4,4,by=.1)
 y = x
@@ -261,19 +394,28 @@ persp(x = x,y = y,z = z, theta =20,phi=20)
 persp(x = x,y = y,z = z, theta = 0, phi = 90)
 
 
-################################################
-# PDF of a T-distribution and stand. normal PDF, 
-# comparing different df:
+###################################################
+## PDF of a T-distribution and stand. normal PDF, #
+## comparing different degrees of freedom (df)    #
+###################################################
+
+# Create sequence to be normalized or turned into t-distribution: 
 seq = seq(-4,4,by=.1)
+
+# Plot standard normald PDF_
 plot(seq,dnorm(seq, mean = 0, sd = 1), type = "l")
+
+# Add t- distributions with different df:
 lines(seq,dt(seq, df = 1), type = "l", col = "green")
 lines(seq,dt(seq, df = 3), type = "l", col = "blue")
 lines(seq,dt(seq, df = 10), type = "l", col = "red")
 lines(seq,dt(seq, df = 30), type = "l", col = "lightblue")
 
 
-#########################################################
-### Caluclating n give a certain power and conf. interval
+#####################################################################
+## Calculating n given a Certain Power and Conf. Interval/Sig.level #
+#####################################################################
+
 # install.packages("pwr")
 library(pwr)
 
@@ -281,12 +423,18 @@ library(pwr)
 # a power of .8 and a sign.level of .5 == confidence int. of .95:
 pwr.t.test(d = .5, sig.level = .05, power = .8, type = "one.sample") 
 # n = 33.36713 for One-Sample
+pwr.t.test(d = .5, sig.level = .01, power = .9, type = "one.sample") 
+# n = 62.87021 for One-Sample with power .9 and sig.level .01
 # Same for two sample:
 pwr.t.test(d = .5, sig.level = .05, power = .8, type = "two.sample") 
 # we usually assume .5 medium effect a priori
 # n = 63.76561  for each group!
 ?pwr.t.test
 
+
+#########################
+## Power Curve Function #
+#########################
 
 # Function to plot a power curve, based on the code from Cinni Patel
 # Code was adjusted for readability and uses regular plot() instead of ggplot2()
@@ -323,8 +471,9 @@ power_curve(sample_size = 5)
 power_curve(sample_size = 2000) # small effect size, already high power... 
                                 # side effects of uncorrected p-values (issue alpha-correction)...
 
-
-##### Wikipedia Plot CI-Definition:
+#################################
+## Wikipedia Plot CI-Definition #
+#################################
 
 # To recreate the wikipedia plot, we will use only 100 samples
 n_sim = 100
@@ -351,25 +500,56 @@ for(i in 1:length(conf_int_array[,1])){
 } # End for i
 
 
+#################################
+# ----------------------------- #
+#################################
 #################################################################################
-# 10 Lineare Regression via lin. least square method + via descript. parameters # 
+# 10 Lineare Regression via Lin. Least Square Method + via Descript. Parameters # 
 #################################################################################
+#######################
+## Idealized Data Set #
+#######################
 
-# Idealized data set: 
+# Dep. Var.:
 cups = c(0:10)
+# Indep. Var.:
 time = c(0:10)
+
+# Plot correlation of data points:
 plot(x=time, y=cups)
 
-# lm(y~x) => y under the condition of x
+# lm(y~x) => y (dep.) under the condition of x (dep):
 lm(cups~time)
-# Add linear model to plot above
+
+# Add linear model to plot above:
 abline(lm(cups~time))
 
 # Our goal for linear regression is understanding the below syntax of the summary(lm()) function:
 summary(lm(cups~time))
 
+# Call:
+#   lm(formula = cups ~ time)
 
-# Errors/residuals:
+# Residuals:
+#   Min         1Q     Median         3Q        Max 
+# -3.211e-16 -2.215e-16 -1.218e-16  1.251e-16  6.001e-16 
+
+# Coefficients:
+#              Estimate Std. Error   t value Pr(>|t|)    
+# (Intercept) 1.071e-15  1.879e-16 5.702e+00 0.000294 ***
+# time        1.000e+00  3.176e-17 3.149e+16  < 2e-16 ***
+#   ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# Residual standard error: 3.331e-16 on 9 degrees of freedom
+# Multiple R-squared:      1,	Adjusted R-squared:      1 
+# F-statistic: 9.916e+32 on 1 and 9 DF,  p-value: < 2.2e-16
+
+
+####################
+# Errors/Residuals #
+####################
+
 # error = y-f(x); f(x) = x
 error = cups - time
 # [1] 0 0 0 0 0 0 0 0 0 0 0
@@ -387,8 +567,12 @@ dino = read.csv("dino_csv.csv")
 plot(x = dino$x, y = dino$y)
 abline(lm(dino$y~dino$x))
 
-### Non idealized Lady Meow Example:
-# Cups of Tea:
+####################################
+## Non idealized Lady Meow Example #
+####################################
+
+
+# Cups of Tea (three days in the life of Lady Meow):
 cups = c(0, 1, 2, 3.5, 4.8, 5.2, 6, 6.9, 8.5, 9.1, 9.9,
          0, .6, 2.6, 3.1, 4.8, 6.9, 7.1, 7.5, 8.5, 9.9, 9.9,
          0, .2, 2.9, 2.9, 4.9, 5.2, 6.9, 7.1, 7.3, 9, 9.8)
@@ -396,14 +580,13 @@ cups = c(0, 1, 2, 3.5, 4.8, 5.2, 6, 6.9, 8.5, 9.1, 9.9,
 # Time passed for each run of measurements (cups), abbreviated:
 time = c(0:10,0:10,0:10) # technically 3 days in the life of Lady Meow
 
-# You can add labes to the plot!
+# You can add labels to the plot!
 plot(x=time, y=cups,
      ylab = "Cups of Tea", xlab= "Hours passed")
 # Play around with possible values of a and b (re-run plot() to reset):
 abline(a = 0, b = 1)
 abline(a = .5, b = 1.2)
-abline(a = .6, b = .8)
-
+abline(a = .23, b = 1.0082, col = "darkgreen")
 abline(a=0 , b=1, col = "blue")
 
 # Reset plot!
@@ -412,7 +595,7 @@ plot(x=time, y=cups,
 
 # Add the optimal linear model to the plot via:
 abline(lm(cups~time))
-# Slope and corssing point with the y-axis is:
+# Slope and crossing point with the y-axis is:
 lm(cups~time)
 
 # T-Test Reg. Coeff + Intercept:
@@ -421,12 +604,13 @@ summary(lm(cups~time))
 # The summary function works in various ways depending on the input:
 summary(c(0:10))
 
+#######################################
+## Lin. Reg. via Descript. Parameters #
+#######################################
 
-#### Lin. Reg. via descript. Parameters:
-
+# We use x and y since it is easier to read the formulas below:
 x = time
 y = cups
-
 
 # SumSqXY = ∑(x_i - E[X])*(y_i - E[y])
 SumSqXY = sum((x-mean(x))*(y-mean(y)))
