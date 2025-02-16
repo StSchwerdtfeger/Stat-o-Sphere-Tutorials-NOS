@@ -1,7 +1,7 @@
 #######################################
 #######################################
 #        R-Basic Tutorial I-III       #
-#   Solution for "Übungsaufgabe.docx" #
+#  Solution for "Übungsaufgabe.docx"  #
 #       CIPom @ Charité Edition       #
 #                 by                  #
 #       Steffen Schwerdtfeger         # 
@@ -10,52 +10,48 @@
 #######################################
 
 
-# DAS SCRIPT KANN HIER VON OBEN NACH UNTEN IN EINEM ZUG KOMPLETT AUSGEFÜHRT WERDEN
-# d.h. alles markieren (ALT+SHIFT oder CMD+SHIFT), dann ALT/CMD+ENTER...
-# Selbiges gilt nicht für die Tut-Scipte (zumindest nicht getestet). Gilt auch
-# für alle Fließtextartikel auf https://journal.medicine.berlinexchange.de/statosphere 
+# The script can be executed as a whole. Mark all via ALT + A and then Run via ALT + ENTER.
+# More details @ https://journal.medicine.berlinexchange.de/statosphere 
 
 
-### SCRIPT ENTHÄLT EINE WEITERE KURZE ÜBUNGSAUFGABE MIT LÖSUNG!!! 
-  
-
-# Load Data (a)):
-daten = read.csv("Uebungsaufgabe.csv") # Automatically in format data.frame!!
-daten # execute line or mark name of an object to show content in console,
-      # or, recall, use print(daten) to "print" the content of 
+########## Load Data (a)):
+data = read.csv("Uebungsaufgabe.csv") # Automatically in format data.frame!!
+data # execute line or mark name of an object to show content in console,
+      # or, recall, use print(data) to "print" the content of 
       # an object in the console
 
 
-# Add missing measurement value (d)):
-daten$measurement_sysRR[9] = 122
+########## Add missing measurement value (b)):
+data$measurement_sysRR[9] = 122
 
 
 # Load dplyr to use its filter() function (another function called filter() is masked):
 # install.packages(dplyr):
 library(dplyr)
 
-# Filter the table to obtain two tables given either t1 or t2 in the column "time"
-# (from 14x4 to 7x4x2, scheme row x col x number of tables). (preparation for b)):
-t1 = filter(daten, time == "t1")
+########## Filter the table to obtain two tables given either t1 or t2 in the column "time"
+# (from 14x4 to 7x4x2, scheme row x col x number of tables). (for a), also preparation for c)):
+t1 = filter(data, time == "t1")
 t1
-t2 = filter(daten, time == "t2")
+t2 = filter(data, time == "t2")
 t2
 
 # Check for normal distribution: 
 plot(density(t1$measurement_sysRR))
 plot(density(t2$measurement_sysRR))
-# Hard to tell visually in this case....
+# I find it always hard to exactly tell visually in this case....
 
-# Check with shapirot.test():
+# Check with shapiro.test():
 shapiro.test(t1$measurement_sysRR)
 shapiro.test(t2$measurement_sysRR)
 # => both have a p-value > .05 
-# => if it were non-normal distr., then a non-parametric Wilcoxon signed 
+# => if the values were non-normal distr., then a non-parametric Wilcoxon signed 
 #    rank test would be the choice in this case... 
 
-# Perform paired/dependent t-test: Note that input is t.test(t2,t1,paired=TRUE) (b)):
+######## Perform paired/dependent t-test: Note that input is t.test(t2,t1,paired=TRUE) (c)):
 result_t_test = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE)
 result_t_test
+
 # > result_t_test 
 #
 #           Paired t-test
@@ -84,8 +80,9 @@ result_t_test
 # the t-value, which, yes, is also a standardized difference, but entails sqrt(n)
 # and does not represent the CI of the mere effect, without considering the sample size
 
+# install.packages("effsize")
 library(effsize)
-cohen.d(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE) 
+effsize = cohen.d(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE) 
 
 # Cohen's d
 
@@ -94,8 +91,16 @@ cohen.d(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE)
 #      lower      upper 
 # -2.1005458 -0.9673354 
 
+# In order to reflect the result, we also have to consider the standard deviation!
+effsize$sd
+# [1] 5.975894
 
-# Power Analysis (c)):
+# You could also recreate it via (no matter how the sd was calculated for different
+# t-test forms, e.g., if sd_pooled was used...): 
+result_t_test$estimate/effsize$estimate
+
+
+# Power Analysis (d)):
 # install.packages("pwr")
 library(pwr)
 pwr.t.test(d = .5, sig.level = .05, power = .8, type = "paired") 
@@ -111,77 +116,97 @@ pwr.t.test(d = .5, sig.level = .05, power = .8, type = "paired")
 # NOTE: n is number of *pairs*
 
 
-# Look at the unique values (e)):
-unique(daten$fam)
+######### Look at the unique values (e)):
+unique(data$fam)
 
 # Change NA to "keine Angabe":
-daten$fam[which(is.na(daten$fam) == TRUE)] = "keine Angabe"
+data$fam[which(is.na(data$fam) == TRUE)] = "not specified"
 
 # Change "ys", "y" and "ja" to "yes":
-daten$fam[which(daten$fam == "ys")] = "yes"
-daten$fam[which(daten$fam == "y")] = "yes"
-daten$fam[which(daten$fam == "ja")] = "yes"
+data$fam[which(data$fam == "ys")] = "yes"
+data$fam[which(data$fam == "y")] = "yes"
+data$fam[which(data$fam == "ja")] = "yes"
 
 # Alternative with for loop:
 yes = c("ys", "y", "ja")
 for(i in 1:length(yes)){
-  daten$fam[which(daten$fam == yes[i])] = "yes"  
+  data$fam[which(data$fam == yes[i])] = "yes"  
 } # End for i
 
 # Change "noo" and "n" to "no":
-daten$fam[which(daten$fam == "noo")] = "no"
-daten$fam[which(daten$fam == "n")] = "no"
+data$fam[which(data$fam == "noo")] = "no"
+data$fam[which(data$fam == "n")] = "no"
 
-# Plot pie table of the column "fam" (f)):
-pie(table(daten$fam)) 
+# Result:
+unique(data$fam)
+# > unique(data$fam)
+# [1] "yes"          "no"           "not specified"
+
+
+######### Plot pie table of the column "fam" (f)):
+pie(table(data$fam)) 
 
 # Frequencies of each option (first filter for either t1 or t2, since entries are redundant
-# in the table "daten"!!!):
-frequencies = filter(daten, time == "t1")
+# in the table "data"!!!):
+frequencies = filter(data, time == "t1")
 table(frequencies$fam)
 # keine Angabe           no          yes 
 #            2            4            6 
 
 # Check in Console if table is fully cleaned...
-daten 
-# ... if so, then export cleaned data set (g)):
-write.csv(daten, "export_daten.csv")
+data 
 
-
-# > daten 
-#    patient_id time measurement_sysRR          fam
-# 1           1   t1               130          yes
-# 2           1   t2               122          yes
-# 3           2   t1               132           no
-# 4           2   t2               123           no
-# 5           3   t1               133 keine Angabe
-# 6           3   t2               121 keine Angabe
-# 7           4   t1               129           no
-# 8           4   t2               125           no
-# 9           5   t1               122           no
-# 10          5   t2               119           no
-# 11          6   t1               134          yes
-# 12          6   t2               127          yes
-# 13          7   t1               140 keine Angabe
-# 14          7   t2               125 keine Angabe
-# 15          8   t1               135          yes
-# 16          8   t2               128          yes
-# 17          9   t1               129          yes
-# 18          9   t2               122          yes
-# 19         10   t1               140           no
-# 20         10   t2               128           no
-# 21         11   t1               134          yes
-# 22         11   t2               122          yes
-# 23         12   t1               144          yes
-# 24         12   t2               130          yes
+# > data 
+# patient_id time measurement_sysRR           fam
+# 1           1   t1               130           yes
+# 2           1   t2               122           yes
+# 3           2   t1               132            no
+# 4           2   t2               123            no
+# 5           3   t1               133 not specified
+# 6           3   t2               121 not specified
+# 7           4   t1               129            no
+# 8           4   t2               125            no
+# 9           5   t1               122            no
+# 10          5   t2               119            no
+# 11          6   t1               134           yes
+# 12          6   t2               127           yes
+# 13          7   t1               140 not specified
+# 14          7   t2               125 not specified
+# 15          8   t1               135           yes
+# 16          8   t2               128           yes
+# 17          9   t1               129           yes
+# 18          9   t2               122           yes
+# 19         10   t1               140            no
+# 20         10   t2               128            no
+# 21         11   t1               134           yes
+# 22         11   t2               122           yes
+# 23         12   t1               144           yes
+# 24         12   t2               130           yes
 
 
 
-############################  
-########### BONUS EXERCISE!
+######### ... if so, then export cleaned data set (g)):
+# install.packages("readr")
+library("readr") # also within "tidyverse"
 
-# Synthetic data set to test na.omit() (a))
+# Save/Export .CSV
+write.csv(data, "export_data.csv")
+
+
+
+######################################
+######################################
+########### BONUS EXERCISE! ##########
+######################################
+######################################
+
+
+######## Synthetic data set to test na.omit() (a))
 test = cbind(c(1,NA,3),c(1,4,NA))
+#      [,1] [,2]
+# [1,]    1    1
+# [2,]   NA    4
+# [3,]    3   NA
 
 na.omit(test)
 #      [,1] [,2]
@@ -191,13 +216,15 @@ na.omit(test)
 # attr(,"class")
 # [1] "omit"
 
-# Reformat the table such that the sysRR for t1 and t2 has an extra column (b)):
-# Filter now cleaned data set: 
-t1 = filter(daten, time == "t1")
-t2 = filter(daten, time == "t2")
 
-# One way to do so would be cbind() each of the columns of t1 and only sysRR from t2
-# and add an empty row called RRdiff (c)):
+######## Reformat the table such that the sysRR for t1 and t2 has an extra column (b)):
+######## Filter now cleaned data set: 
+t1 = filter(data, time == "t1")
+t2 = filter(data, time == "t2")
+
+
+######## One way to do so would be cbind() each of the columns of t1 and only sysRR from t2
+######## and add an empty row called RRdiff (c)):
 RRdiff = c(0)
 sysRR_t1 = t1$measurement_sysRR
 sysRR_t2 = t2$measurement_sysRR
@@ -245,8 +272,9 @@ reformat
 # from wide to long format. However, this exercise size shows you how to reverse
 # the actions of tha long format function. 
 
-############################################################
-# Alternative easier way of adding a column with diff values (d)):
+
+
+######## Alternative easier way of adding a column with diff values (d)):
 RRdiff_alt = as.numeric(reformat$sysRR_t2)-as.numeric(reformat$sysRR_t1)
 cbind(reformat,RRdiff_alt) 
 
@@ -257,7 +285,7 @@ cbind(reformat,RRdiff_alt)
 # 4           4      129      125           no     -4         -4
 # 5           5      122      119           no     -3         -3
 # 6           6      134      127          yes     -7         -7
-# 7           7      140      125 keine Angabe    -15        -15
+# 7           7      140      125 keine Angabe    -15        -15 
 # 8           8      135      128          yes     -7         -7
 # 9           9      129      122          yes     -7         -7
 # 10         10      140      128           no    -12        -12
@@ -280,14 +308,14 @@ length(diff_10plus[,1])
 
 
 
-# Create a nice table for export (e)):
+####### Create a nice table for export (e)):
 # install.packages("gt")
 # library(gt)
 # gt(reformat)
 
 
-
 # Optionally you can turn the above table into a long format again:
+# install.packages("reshape2") # or load tidyverse
 library(reshape2) # within tidyverse
 
 # Converting data frame into a long format, which some functions such may demand:
@@ -331,12 +359,13 @@ long_format = melt(long_reformat, id.vars = "patient_id",
 
 
 # Alternative via gather() which does not require an id column
-library(tidyr)
+# install.packages("tidyr")  # or load tidyverse
+library(tidyr) # within tidyverse
 # Here the paramters key and value create new column names for the reshaped table.
 # Below I chose time for either sysRR_t1 and sysRR_t2 as entry. Values creates a
 # column with the actual values, which are here the actual sysRRs from t1 and t2,
-# so this column is calles sysRR.
-data_long <- gather(long_reformat, key = "time", value = "sysRR", sysRR_t1:sysRR_t2)
+# so this column is called sysRR.
+data_long = gather(long_reformat, key = "time", value = "sysRR", sysRR_t1:sysRR_t2)
 
 #    patient_id        time sysRR
 # 1           1    sysRR_t1   130
