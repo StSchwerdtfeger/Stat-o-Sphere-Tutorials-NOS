@@ -8,6 +8,10 @@
 ##################################
 ##################################
 
+# This tutorial script is equivalent with the tutorial script for the first 
+# part of the in-person peer-teaching tutorial, CIPOM/LZ@Charité.
+# https://doi.org/10.56776/abbd964d.665f7de5 
+
 # Corresponding Tutorial and more Educational Resources incl. Code can be found here:
 # https://journal.medicine.berlinexchange.de/statosphere 
 # https://journal.medicine.berlinexchange.de/user/steffen-schwerdtfeger-2 
@@ -75,6 +79,7 @@ print("Hello World!")
 print("Werde 1 Cyber!")
 
 
+
 #########################################
 # ------------------------------------- #
 #########################################
@@ -82,10 +87,17 @@ print("Werde 1 Cyber!")
 # 3 Open a Script and Execute Test Code #
 #########################################
 
-# Mark line and execute via ALT+ENTER or Cmnd+ENTER (Mac),
+# Mark line and execute via ALT+ENTER or Cmd+ENTER (Mac),
 # or make sure that the blinking | courser is in the line you want to execute 
 # and then press ALT+ENTER or Cmd+ENTER for mac users.
 test = 2 + 5
+
+# Test Code:
+test = 2 +4          # Spacing is mostly no problem...
+#test zwei = 2 + 5   # ... except for object / variable names, see white X 
+                     # and the left, stating Syntax error. R did not expect
+                     # this in the sense that it does not allow spacing in names.
+                     # remove the # in above line to see the effect.
 
 # View output in console:
 print(test)
@@ -232,7 +244,29 @@ colnames(mat_bind)[2] = "Second_Col"
 # 2   2          2     2
 # 3   3          3     3
 
-# Example array with 
+# Note that with the above method the class of all columns will be 
+# character, since combining a bunch of vectors c() is happening 
+# on an atomic level and therefore a soon as one entry is character
+# all entries are set to character. this can be avoided in the following way:
+
+# Create three column vectors:
+character = c("one", "two", "three")
+numeric1 = c(1,2,3)
+numeric2 = c(3,2,1)
+
+# First turn one vector into a data frame:
+data_frame = as.data.frame(character) 
+
+# And then add the others, so they are binded not at the atomic
+# but molecular level, so to speak, and hence get correct class 
+# assigned:
+data_frame = cbind(data_frame,numeric1, numeric2)
+is.character(data_frame$character)
+is.numeric(data_frame$numeric1)
+is.numeric(data_frame$numeric2)
+
+
+# Example array with dim = c(rows, columns, further_dimension)
 # Below uses a trick: 1 or 0 at the beginning and defining dimension
 # fills up the array with either 1 or 0:
 array(1, dim = c(3,3,3))
@@ -425,6 +459,13 @@ measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 # cbind() which concatenates vectors column-wise, then format into a data frame:
 table = as.data.frame(cbind(patient_id,time,measurement_sysRR,fam))
 
+# ...or via the below in order to keep class integrity, since via cbind()
+# columns are binded on a atomic level, such that given one character entry
+# all entries will be characters. This can be avoided by turning one column
+# into a data frame and then add the others via cbind().
+table = as.data.frame(patient_id)
+table = cbind(table,time,measurement_sysRR,fam)
+
 # install.packages("dplyr")  # install package
 library(dplyr)             # load/activate package
 # Filter function: filter(data_object, columnname == "entry") or != for unequal
@@ -440,7 +481,7 @@ points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
 
 # ... and perform a paired/dependent t-test):
 # Here using as.numeric() was necessary...
-result = t.test(as.numeric(t2$measurement_sysRR), as.numeric(t1$measurement_sysRR), paired  = TRUE)
+result = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired  = TRUE)
 
 #         Paired t-test
 
@@ -466,6 +507,13 @@ measurement_sysRRalt = c(130,122,132,NA,133,121,NA,125,135,119,134,127,140,125)
 
 # cbind() and format into a data frame:
 new_table = as.data.frame(cbind(patient_id,time,measurement_sysRRalt,fam))
+
+# ...or, again, via the below in order to keep class integrity, since via cbind()
+# columns are binded on a atomic level, such that given one character entry
+# all entries will be characters. This can be avoided by turning one column
+# into a data frame and then add the others via cbind().
+new_table = as.data.frame(patient_id)
+new_table = cbind(new_table,time,measurement_sysRRalt,fam)
 
 # Mean sysRR at t1:
 # First filter for t1:
@@ -808,8 +856,8 @@ library("tidyverse") # needed to create tibble data tables.
 # Simple tibble table:
 tibble_test = as.tibble(cbind(c(1,2,3), c("a","b","c"), c("ey","bee","see")))
 
-# Tibble also shows the dimension and the classes of the columns in the console output:
-
+# Tibble also shows the dimension and the 
+# classes of the columns in the console output:
 # A tibble: 3 × 3
 #   V1    V2    V3   
 #   <chr> <chr> <chr>
@@ -823,42 +871,74 @@ tibble_test = as.tibble(cbind(c(1,2,3), c("a","b","c"), c("ey","bee","see")))
 
 # Delete row with data.frame:
 x = new_table
+
+# Below is not "saved" since no object name, therefore table x keeps NAs for 
+# other examples below:
 x$measurement_sysRRalt[!is.na(x$measurement_sysRRalt)]
+# [1] 130 122 132 133 121 125 135 119 134 127 140 125
 
 #### SAME AND MORE BUT NOW WITH TIBBLE FORMAT:
 
 # "new_table" as tibble
-x = as.tibble(new_table)
+x = as.tibble(x)
 class(x)
 # [1] "tbl_df"     "tbl"        "data.frame"
 
-# Change entry, even though it is a different class (changes column to character):
-x[4,3] = "keine Angabe"
+# Change entry:
+x[4,3] = 122
 x$measurement_sysRRalt[4]
-# [1] "keine Angabe"
+# [1] 122
 
+#Cheack class of column:
+class(x$measurement_sysRRalt)
+# [1] "numeric"
+
+# Change all entries with NA to "keine Angabe", even though different class:
+x$measurement_sysRRalt[which(is.na(x$measurement_sysRRalt)==TRUE)] = "keine Angabe"
+
+# Class of column is now changed to character:
 class(x$measurement_sysRRalt)
 # [1] "character"
 
-# Change all entries with NA to "keine Angabe":
-x$measurement_sysRRalt[which(is.na(x$measurement_sysRRalt)==TRUE)] = "keine Angabe"
-
-# Delete row with na
-# Whe first have to recreate original x with NAs, since we changed NA into "keine Angabe" above:
+# Delete row with NAs
+# We first have to recreate original x with NAs, since we changed NA into "keine Angabe" above:
 x = as.tibble(new_table)
 new_x = filter(x, is.na(measurement_sysRRalt) != TRUE)
+# A tibble: 12 × 4
+#    patient_id time  measurement_sysRRalt fam  
+#         <dbl> <chr>                <dbl> <chr>
+#  1          1 t1                     130 yes  
+#  2          1 t2                     122 yes  
+#  3          2 t1                     132 no   
+#  4          3 t1                     133 NA   
+#  5          3 t2                     121 NA   
+#  6          4 t2                     125 n    
+#  7          5 t1                     135 no   
+#  8          5 t2                     119 no   
+#  9          6 t1                     134 ys   
+# 10          6 t2                     127 ys   
+# 11          7 t1                     140 NA   
+# 12          7 t2                     125 NA
 
 # Delete NA of a column (not the whole line, just single entries of a column vector)
 # Whe first have to recreate original x with NAs (above line deleted lines with NA in below column...):
 x = as.tibble(new_table)
 x$measurement_sysRRalt[!is.na(x$measurement_sysRRalt)]
+# [1] 130 122 132 133 121 125 135 119 134 127 140 125
 
 # You can also use na.omit(), but you should only do so for vectors, not tables/matrices:
 # The output format is nasty though; change via is.numeric():
 x = as.tibble(new_table)
 x2 = na.omit(x$measurement_sysRRalt)
+#  [1] 130 122 132 133 121 125 135 119 134 127 140 125
+# attr(,"na.action")
+# [1] 4 7
+# attr(,"class")
+# [1] "omit"
+
 # Calculate mean:
 x3 = mean(as.numeric(x2))
+# [1] 128.5833
 
 ########################################################
 ### 8.8 EXAMPLE VIII: Rearranging and Deleting Columns #
