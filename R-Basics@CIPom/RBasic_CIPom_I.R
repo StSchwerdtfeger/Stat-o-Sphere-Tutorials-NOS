@@ -14,16 +14,22 @@
 ##################################
 ##################################
 #           R-Basics I           #
-#        Tutorial  Script        #
+#         Tutorial Script        #
 #               by               #
 #     Steffen Schwerdtfeger      # 
 #            12.2023             #
 ##################################
 ##################################
 
-# Corresponding Tutorial and more Educational Resources incl. code can be found here:
+# This tutorial script is equivalent with the tutorial script for the first 
+# part of the in-person peer-teaching tutorial, CIPOM/LZ@Charité.
+# https://doi.org/10.56776/abbd964d.665f7de5 
+
+# Corresponding Tutorial and more Educational Resources incl. Code can be found here:
 # https://journal.medicine.berlinexchange.de/statosphere 
 # https://journal.medicine.berlinexchange.de/user/steffen-schwerdtfeger-2 
+
+# Github page with all Stat-o-Sphere Scripts
 # https://github.com/StSchwerdtfeger 
 
 #### UNFOLD CODE of the desired chapter (small arrow at the lower line of #'s).
@@ -81,6 +87,12 @@ parabola(x)
 # CLEAR WORKSPACE WHEN EXECUTING THE LAST FEW LINES
 # otherwise it takes a while to save the work space for such large numbers...
 
+# Print "Hello World!" and "Werde 1 Cyber!" ("Become a Cyber!" in German):
+print("Hello World!")
+print("Werde 1 Cyber!")
+
+
+
 #########################################
 # ------------------------------------- #
 #########################################
@@ -88,10 +100,17 @@ parabola(x)
 # 3 Open a Script and Execute Test Code #
 #########################################
 
-# Mark line and execute via ALT+ENTER or Cmnd+ENTER (Mac),
+# Mark line and execute via ALT+ENTER or Cmd+ENTER (Mac),
 # or make sure that the blinking | courser is in the line you want to execute 
 # and then press ALT+ENTER or Cmd+ENTER for mac users.
 test = 2 + 5
+
+# Test Code:
+test = 2 +4          # Spacing is mostly no problem...
+#test zwei = 2 + 5   # ... except for object / variable names, see white X 
+                     # and the left, stating Syntax error. R did not expect
+                     # this in the sense that it does not allow spacing in names.
+                     # remove the # in above line to see the effect.
 
 # View output in console:
 print(test)
@@ -238,7 +257,29 @@ colnames(mat_bind)[2] = "Second_Col"
 # 2   2          2     2
 # 3   3          3     3
 
-# Example array with 
+# Note that with the above method the class of all columns will be 
+# character, since combining a bunch of vectors c() is happening 
+# on an atomic level and therefore a soon as one entry is character
+# all entries are set to character. this can be avoided in the following way:
+
+# Create three column vectors:
+character = c("one", "two", "three")
+numeric1 = c(1,2,3)
+numeric2 = c(3,2,1)
+
+# First turn one vector into a data frame:
+data_frame = as.data.frame(character) 
+
+# And then add the others, so they are binded not at the atomic
+# but molecular level, so to speak, and hence get correct class 
+# assigned:
+data_frame = cbind(data_frame,numeric1, numeric2)
+is.character(data_frame$character)
+is.numeric(data_frame$numeric1)
+is.numeric(data_frame$numeric2)
+
+
+# Example array with dim = c(rows, columns, further_dimension)
 # Below uses a trick: 1 or 0 at the beginning and defining dimension
 # fills up the array with either 1 or 0:
 array(1, dim = c(3,3,3))
@@ -431,6 +472,13 @@ measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 # cbind() which concatenates vectors column-wise, then format into a data frame:
 table = as.data.frame(cbind(patient_id,time,measurement_sysRR,fam))
 
+# ...or via the below in order to keep class integrity, since via cbind()
+# columns are binded on a atomic level, such that given one character entry
+# all entries will be characters. This can be avoided by turning one column
+# into a data frame and then add the others via cbind().
+table = as.data.frame(patient_id)
+table = cbind(table,time,measurement_sysRR,fam)
+
 # install.packages("dplyr")  # install package
 library(dplyr)             # load/activate package
 # Filter function: filter(data_object, columnname == "entry") or != for unequal
@@ -446,7 +494,7 @@ points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
 
 # ... and perform a paired/dependent t-test):
 # Here using as.numeric() was necessary...
-result = t.test(as.numeric(t2$measurement_sysRR), as.numeric(t1$measurement_sysRR), paired  = TRUE)
+result = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired  = TRUE)
 
 #         Paired t-test
 
@@ -473,7 +521,15 @@ measurement_sysRRalt = c(130,122,132,NA,133,121,NA,125,135,119,134,127,140,125)
 # cbind() and format into a data frame:
 new_table = as.data.frame(cbind(patient_id,time,measurement_sysRRalt,fam))
 
+# ...or, again, via the below in order to keep class integrity, since via cbind()
+# columns are binded on a atomic level, such that given one character entry
+# all entries will be characters. This can be avoided by turning one column
+# into a data frame and then add the others via cbind().
+new_table = as.data.frame(patient_id)
+new_table = cbind(new_table,time,measurement_sysRRalt,fam)
+
 # Mean sysRR at t1:
+# First filter for t1:
 t1alt = filter(new_table, time == "t1")
 # Problem with NA
 mean(t1alt$measurement_sysRRalt)
@@ -481,6 +537,12 @@ mean(t1alt$measurement_sysRRalt)
 # Warning message:
 # In mean.default(t1alt$measurement_sysRRalt) :
 #  Argument ist weder numerisch noch boolesch: gebe NA zurück 
+
+# In general mean() also entails parameter that deletes NAs automatically.
+# However, in our case the solution is a bit more complicated
+mean(c(1,NA,3), na.rm = TRUE) 
+# [1] 2
+
 
 ### POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
 # In which lines are NAs (line numbver, not pat. id!)?
@@ -604,18 +666,23 @@ object = c(1,1,1,1)
 
 # Initilize a list to store the results:
 list_results = c()
+# [1] NULL
 
 # For loop that adds +1 to every element of the above object:
 for(i in 1:length(object)){ # i = 1 to n = 4; you could also start at i = 2, theoretically!
   list_results[i] = object[i]+1 # same scheme as repetitive code below, just using i for the indices now
 } # End for i
 list_results
+# [1] 2 2 2 2
 
 # Analoge without loop (same code, just each i is written out individually line by line)
 list_results[1] = object[1]+1
 list_results[2] = object[2]+1
 list_results[3] = object[3]+1
 list_results[4] = object[4]+1
+
+list_results
+# [1] 2 2 2 2 
 
 # A for loop is essentially used to perform a repetitive process with shorter syntax
 
@@ -802,8 +869,8 @@ library("tidyverse") # needed to create tibble data tables.
 # Simple tibble table:
 tibble_test = as.tibble(cbind(c(1,2,3), c("a","b","c"), c("ey","bee","see")))
 
-# Tibble also shows the dimension and the classes of the columns in the console output:
-
+# Tibble also shows the dimension and the 
+# classes of the columns in the console output:
 # A tibble: 3 × 3
 #   V1    V2    V3   
 #   <chr> <chr> <chr>
@@ -817,42 +884,74 @@ tibble_test = as.tibble(cbind(c(1,2,3), c("a","b","c"), c("ey","bee","see")))
 
 # Delete row with data.frame:
 x = new_table
+
+# Below is not "saved" since no object name, therefore table x keeps NAs for 
+# other examples below:
 x$measurement_sysRRalt[!is.na(x$measurement_sysRRalt)]
+# [1] 130 122 132 133 121 125 135 119 134 127 140 125
 
 #### SAME AND MORE BUT NOW WITH TIBBLE FORMAT:
 
 # "new_table" as tibble
-x = as.tibble(new_table)
+x = as.tibble(x)
 class(x)
 # [1] "tbl_df"     "tbl"        "data.frame"
 
-# Change entry, even though it is a different class (changes column to character):
-x[4,3] = "keine Angabe"
+# Change entry:
+x[4,3] = 122
 x$measurement_sysRRalt[4]
-# [1] "keine Angabe"
+# [1] 122
 
+#Cheack class of column:
+class(x$measurement_sysRRalt)
+# [1] "numeric"
+
+# Change all entries with NA to "keine Angabe", even though different class:
+x$measurement_sysRRalt[which(is.na(x$measurement_sysRRalt)==TRUE)] = "keine Angabe"
+
+# Class of column is now changed to character:
 class(x$measurement_sysRRalt)
 # [1] "character"
 
-# Change all entries with NA to "keine Angabe":
-x$measurement_sysRRalt[which(is.na(x$measurement_sysRRalt)==TRUE)] = "keine Angabe"
-
-# Delete row with na
-# Whe first have to recreate original x with NAs, since we changed NA into "keine Angabe" above:
+# Delete row with NAs
+# We first have to recreate original x with NAs, since we changed NA into "keine Angabe" above:
 x = as.tibble(new_table)
 new_x = filter(x, is.na(measurement_sysRRalt) != TRUE)
+# A tibble: 12 × 4
+#    patient_id time  measurement_sysRRalt fam  
+#         <dbl> <chr>                <dbl> <chr>
+#  1          1 t1                     130 yes  
+#  2          1 t2                     122 yes  
+#  3          2 t1                     132 no   
+#  4          3 t1                     133 NA   
+#  5          3 t2                     121 NA   
+#  6          4 t2                     125 n    
+#  7          5 t1                     135 no   
+#  8          5 t2                     119 no   
+#  9          6 t1                     134 ys   
+# 10          6 t2                     127 ys   
+# 11          7 t1                     140 NA   
+# 12          7 t2                     125 NA
 
 # Delete NA of a column (not the whole line, just single entries of a column vector)
 # Whe first have to recreate original x with NAs (above line deleted lines with NA in below column...):
 x = as.tibble(new_table)
 x$measurement_sysRRalt[!is.na(x$measurement_sysRRalt)]
+# [1] 130 122 132 133 121 125 135 119 134 127 140 125
 
 # You can also use na.omit(), but you should only do so for vectors, not tables/matrices:
 # The output format is nasty though; change via is.numeric():
 x = as.tibble(new_table)
 x2 = na.omit(x$measurement_sysRRalt)
+#  [1] 130 122 132 133 121 125 135 119 134 127 140 125
+# attr(,"na.action")
+# [1] 4 7
+# attr(,"class")
+# [1] "omit"
+
 # Calculate mean:
 x3 = mean(as.numeric(x2))
+# [1] 128.5833
 
 ########################################################
 ### 8.8 EXAMPLE VIII: Rearranging and Deleting Columns #
@@ -1260,7 +1359,7 @@ long_format = melt(wide_table, id.vars = "patient_id",
  
 # Alternative via gather() which does not require an id column
 library(tidyr)
-# Here the paramters key and value create new column names for the reshaped table.
+# Here the parameters key and value create new column names for the reshaped table.
 # Below I chose time for either sysRR_t1 and sysRR_t2 as entry. Values creates a
 # column with the actual values, which are here the actual sysRRs from t1 and t2,
 # so this column is calles sysRR.
@@ -1413,12 +1512,7 @@ print(x)
 # that mean(2 + 3) = 2.5. As you can see, the missing values was exchanged
 # with the mean of 2.5 in line 2, column 1. 
 
-
-
-
-
-
-
+                                                                                                                                       
 
 ############################################################################
 ### 8.15 EXAMPLE XV: Time Difference between Dates in Days and other Units # 
@@ -1458,6 +1552,92 @@ time_diff_days_vector = difftime(dates_1[-1], dates_1[-length(dates_1)], units =
 
 # So from "1998-02-12" to "2004-04-12" = 2251 days and
 #    from "2004-04-12" to "2014-05-04" = 3674 days
+
+
+#########################################################################
+### 8.16 EXAMPLE XVI: Extracting the Output from summary() into a Table #
+#########################################################################
+
+# Usually it is rather simple to extract the output of certain statistical functions
+x = c(0:10)
+y = c(0:10)*3
+result = t.test(x,y)
+
+# Get p-value only
+result$p.value
+# [1] 0.008039526
+
+# However extracting the result from summary() turned out to be a little 
+# troubling, so here is an example on how to do it. First let's create a
+# table with the results of a survey with a Likert scale (let us say
+# every participant chose 1 for every question):
+q_one   = c(1,2,1)
+q_two   = c(1,3,1)
+q_three = c(2,3,1)
+q_four  = c(2,2,2)
+results = as.data.frame(cbind(q_one,q_two,q_three))
+
+# When we run it through the summary function, we get this:
+summary_res = summary(results)
+
+#    q_one           q_two          q_three   
+# Min.   :1.000   Min.   :1.000   Min.   :1.0  
+# 1st Qu.:1.000   1st Qu.:1.000   1st Qu.:1.5  
+# Median :1.000   Median :1.000   Median :2.0  
+# Mean   :1.333   Mean   :1.667   Mean   :2.0  
+# 3rd Qu.:1.500   3rd Qu.:2.000   3rd Qu.:2.5  
+# Max.   :2.000   Max.   :3.000   Max.   :3.0
+
+# Our goal is now to get a table where the result of each column is put in
+# a table with the result of each column in one row:
+
+# Create an empty matrix that has the col length of summary_res[,1] = 6 
+# and a row for every question, i.e. the length(results[1,]) = number of questions:
+results_table = matrix(0, ncol = length(summary_res[,1]), nrow = length(results[1,]))
+
+# We now use a loop to put the summary of every column together
+# We have to use the summary() function again for each column,
+# since I could not find a way to reformat the above object summary_res:
+for(i in 1:length(results[1,])){             # loop over columns
+  results_table[i,] = summary(results[,i])   # Calculate summary of each column (only way it worked)
+} # End for i                                # ... and put result in row of results_table[i,]
+results_table = as.data.frame(results_table) # Turn res_table into data.frame()
+
+# > results_table
+# V1  V2 V3       V4  V5 V6
+# 1  1 1.0  1 1.333333 1.5  2
+# 2  1 1.0  1 1.666667 2.0  3
+# 3  1 1.5  2 2.000000 2.5  3
+
+# Change colum names:
+colnames(results_table) = c("Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.")
+# or using the names function:
+colnames(results_table) = names(summary(results[,1]))
+
+# And add row names (previous colnames of object results above!) 
+rownames(results_table) = colnames(results)
+
+# Optionally you can also rearrange columns, such that, e.g.
+# median and mean are in the first two columns:
+results_table = results_table[,c(3,4,1,2,5,6)]
+results_table$Mean = round(results_table$Mean,2) # round mean value
+
+# You may also want to add the SD of every question as well:
+SD = c() # Empty vector for results:
+for(i in 1:length(results[1,])){
+  SD[i] = round(sd(results[,i]),2) # get SD and round result
+} # End for i
+
+# [1] 0.5773503 1.1547005 1.0000000
+
+# Final table:
+results_table = cbind(results_table,SD)
+results_table_fin  = results_table[,c(1,2,7,3:6)]
+
+#         Median Mean   SD Min. 1st Qu. 3rd Qu. Max.
+# q_one        1 1.33 0.58    1     1.0     1.5    2
+# q_two        1 1.67 1.15    1     1.0     2.0    3
+# q_three      2 2.00 1.00    1     1.5     2.5    3
 
 
 #######################
@@ -1542,7 +1722,7 @@ add_1(object2)
 
 
 #############################################################################################
-### 9.3 EXAMPLE FUNCTION III: Replication of basic gather() Output Without Extra Parameters #
+### 9.3 EXAMPLE FUNCTION III: Replication of Basic gather() Output Without Extra Parameters #
 #############################################################################################
 
 
@@ -1802,7 +1982,7 @@ logistic.map <- function(r, x, N, M){
   z[c((N-M):N)]
 }
 
-# Set scanning range for bifurcation parameter r (caluclation
+# Set scanning range for bifurcation parameter r (calculation
 # may take a while)
 my.r <- seq(.9, 4, by=0.003)   #!!!! alternative start 2.5, so it may be more vivid
 system.time(Orbit <- sapply(my.r, logistic.map,  x=0.1, N=1000, M=300))
@@ -1918,7 +2098,7 @@ xnPLUS1
 
 xnPLUS2 = 3.2*xnPLUS1*(1-xnPLUS1)
 xnPLUS2 
-# .512, so "competintion kicks in", as they put it in the tutorial 
+# .512, so "competition kicks in", as they put it in the tutorial 
 
 
 xnPLUS3 = 3.2*xnPLUS2*(1-xnPLUS2)
@@ -1952,7 +2132,7 @@ xnPLUS7
 # SO WHAT THE NUMBER SAYS is that the length of X/LAMBDA is getting
 # 4.669 times smaller than the previous, i.e. with the previous value
 # of LAMBDA, in case of a doubling, as the length represents a
-# stabilasation of the cylce within that length!!
+# stabilisation of the cycle within that length!!
 
 
 ############### Mandel brot set function:
@@ -1990,6 +2170,49 @@ mandelbrot_generator <- function(
 }
 
 mandelbrot_generator(p=2, q=1)
+
+
+#################################################
+### 9.9 EXAMPLE FUNCTION IX: Fibonacci Sequence #
+#################################################
+
+# A simple function calculating the Fibonacci series up to n:
+fibonacci1 = function(n){
+  fn = c()
+  for(i in 1:n){
+    if(i == 1){
+      fn[i] = 0
+    } # End if
+    else if(i == 2){
+      fn[i] = 1
+    } # End else of
+    else{
+      fn[i] = fn[i-1] + fn[i-2] 
+    } # End else
+  } # End for i
+  return(fn)
+} # End of function
+
+fibonacci1(10)
+# [1]  0  1  1  2  3  5  8 13 21 34
+
+
+# A little shorter version:
+fibonacci2 = function(n){
+  fn = c()
+  for(i in 1:n){
+    if(i <= 2){
+      fn[i] = i-1
+    } # End if
+    else{
+      fn[i] = fn[i-1] + fn[i-2] 
+    } # End else
+  } # End for i
+  return(fn)
+} # End of function
+
+fibonacci2(10)
+# [1]  0  1  1  2  3  5  8 13 21 34
 
 
 ###################################################
@@ -2055,6 +2278,12 @@ any(c(1,2,3) > 4) # [1] FALSE
 
 
 ##### MATHEMATICAL OPERATORS:
+
+# Pi
+pi # [1] 3.141593
+
+# Euler's number
+exp(1) # [1] 2.718282
 
 # Addition
 2 + 5 # [1] 7
@@ -2303,7 +2532,5 @@ server = function(input, output) {
 ###########################################################################################
 # --------------------------------------------------------------------------------------- #
 ###########################################################################################
-
-
 
 
