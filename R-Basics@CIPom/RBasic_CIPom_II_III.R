@@ -8,14 +8,17 @@
 ##################################
 ##################################
 
-#####################################################################################
-# 8 Introduction into Inferential Statistics: Conditional Probability / Bayes‘ Rule #
-#####################################################################################
-
 ###### Benfords law example, number between 0 and 10: 
 n=seq(0,10,by=.1)
 benford = log(n+1)-log(n)
 plot(n,benford)
+
+#####################################################################################
+# 8 Introduction into Inferential Statistics: Conditional Probability / Bayes‘ Rule #
+#####################################################################################
+##########################################################
+## Numeric Cond. Prob. / Bayes Rule Example and Function #
+##########################################################
 
 ###### Numeric example cond. probability / Bayes' rule:
 prior = c(.5,.5)       # Can be set by us!
@@ -51,6 +54,61 @@ sum(joint1)==sum(joint2)
 # is not a prob. vector, but of course ex negativo entails 
 # its complement "not-data", as prob. vectors just do by themselves so to speak...
 
+
+############# BOTH OF THE BELOW FUNCTIONS ONLY WORK WITH PROB. VECTORS EXCEPT WHEN MODEL EVIDENCE IS PROVIDED
+############# First simple version of our Bayes_Machine() function:
+Bayes_Machine = function (prior,likelihood) {
+  joint = prior*likelihood
+  # na.rm = TRUE in sum() deletes 0 rows if given
+  modelevidence = sum(joint, na.rm = TRUE) 
+  posterior = joint/modelevidence
+  # Needed for console output and adds text to it
+  # using a matrix, which works similar as c()
+  postprint = as.data.frame(matrix(c("Posterior",posterior,
+                                     "Joint probability", joint,
+                                     "Model evidence", modelevidence)))
+  print(postprint) # or use return
+}  # end of function
+
+# Give it a try with defined prior and likelihood:
+prior = c(.5,.5)
+likelihood = c(.5,.5)
+Bayes_Machine(prior,likelihood)
+
+# Try these inputs and contemplate the results:
+prior = c(.1,.9)
+likelihood = c(.9,.1)
+Bayes_Machine(prior,likelihood)
+
+
+############## Here is the extended function that can also handle 
+############## the model evidence as input (and single prob. values, if given the model evidence!)
+
+Bayes_Machine = function (prior,likelihood,modelevidence) {
+  if (missing(modelevidence)){
+    joint = prior*likelihood
+    # na.rm = TRUE in sum() deletes 0 rows if given
+    modelevidence = sum(joint, na.rm = TRUE) 
+    posterior = joint/modelevidence
+    # Needed for console output
+    postprint = as.data.frame(matrix(c("Posterior",posterior,
+                                       "Joint probability", joint,
+                                       "Model evidence", modelevidence))) 
+    print(postprint)
+  } # End if
+  else {
+    joint = prior*likelihood
+    posterior = joint/modelevidence  
+    postprint = as.data.frame(matrix(c("Posterior",posterior,
+                                       "Joint probability", joint,
+                                       "Model evidence", modelevidence)))
+    print(postprint) 
+  } # End Else
+} # End of function
+
+Bayes_Machine(likelihood = likelihood, prior = prior)
+
+
 ###########################
 ## Vanessa Holmes Example #
 ###########################
@@ -84,6 +142,115 @@ posterior
 # to do further inference... 
 
 
+
+###################################
+# 3.2 Example COVID19 Quick Tests #
+###################################
+
+# Contingency table / confusion matrix of our COVID19 test-kit example
+true_pos = 144
+true_neg = 4
+false_pos = 1
+false_neg = 499
+
+# Turn the above into a matrix/table:
+table = matrix(c(true_pos,true_neg,false_pos,false_neg), nrow=2) # colwise 
+table = matrix(c(true_pos, false_pos,true_neg,false_neg), nrow=2, byrow=TRUE) # rowwise
+
+# table
+#      [,1] [,2]
+# [1,]  144    1
+# [2,]    4  499
+
+
+# Sensitivity
+sensit = true_pos/(true_pos+true_neg)
+# [1] 0.972973
+TNR = 1-sensit
+# [1] 0.02702703
+# Check:
+sensit+TNR
+# [1] 1
+
+# Specificity
+specif = false_neg/(false_neg+false_pos)
+# [1] 0.998
+FPR = 1-specif
+# [1] 0.002
+
+# PPV, NPV, FDR and FOR given a prevalence of 14%
+prev = .14
+PPV = (sensit*prev)/((sensit*prev)+(1-sensit)*(1-prev))
+# [1] 0.8542373
+FDR = 1-PPV
+# [1] 0.1457627
+
+NPV = (specif*prev)/((specif*prev)+(1-specif)*(1-prev))
+# [1] 0.9878394
+FOR = 1-NPV
+# [1] 0.01216063
+
+# Balanced Accuracy
+bal_acc = (sensit+specif)/2
+# [1] 0.9854875
+
+
+# Load Caret package for computing confusion matrix
+# install.package("caret") # UNCOMMENT TO INSTALL PACKAGE!!!
+library(caret)  
+confusionMatrix(table)
+?confusionMatrix()
+# Confusion Matrix and Statistics
+
+#     A   B
+# A 144   1
+# B   4 499
+
+# Accuracy : 0.9923          
+# 95% CI : (0.9821, 0.9975)
+# No Information Rate : 0.7716          
+# P-Value [Acc > NIR] : <2e-16          
+
+# Kappa : 0.978           
+
+# Mcnemar's Test P-Value : 0.3711          
+
+#             Sensitivity : 0.9730          
+#             Specificity : 0.9980          
+#          Pos Pred Value : 0.9931          
+#          Neg Pred Value : 0.9920          
+#              Prevalence : 0.2284          
+#          Detection Rate : 0.2222          
+#    Detection Prevalence : 0.2238          
+#       Balanced Accuracy : 0.9855          
+
+#        'Positive' Class : A
+
+
+# How did they obtain a accuracy of 99.2%? The code of the function
+# confusionMatrix() reveals it to us (starting line 43 at
+# https://github.com/topepo/caret/blob/master/pkg/caret/R/confusionMatrix.R):
+
+# #' The overall accuracy rate is computed along with a 95 percent confidence
+# #' interval for this rate (using \code{\link[stats]{binom.test}}) and a
+# #' one-sided test to see if the accuracy is better than the "no information
+# #' rate," which is taken to be the largest class percentage in the data.
+
+
+# Binominaltest to check if the true probability of success is equal to bal_acc:
+# Number of successes = 643; total number = 648
+binom.test(643,648,bal_acc)
+
+# Exact binomial test
+
+# data:  643 and 648
+# number of successes = 643, number of trials = 648, p-value = 0.1861
+# alternative hypothesis: true probability of success is not equal to 0.9854865
+# 95 percent confidence interval:
+#  0.9820858 0.9974900
+# sample estimates:
+# probability of success 
+#               0.992284 
 
 ###########################
 # ----------------------- #
@@ -372,9 +539,9 @@ effect_size_2 = (mean(x)-mean(y))/pop_sd
 all.equal(z_stat_2,effect_size_2)
 
 
-#########################
-# Plot of a 3D Gaussian #
-#########################
+##########################
+## Plot of a 3D Gaussian #
+##########################
 # 3D Plot of a Gaussian:
 x = seq(-4,4,by=.1)
 y = x
@@ -438,7 +605,7 @@ pwr.t.test(d = .5, sig.level = .05, power = .8, type = "two.sample")
 
 # Function to plot a power curve, based on the code from Cinni Patel
 # Code was adjusted for readability and uses regular plot() instead of ggplot2()
-# https://cinnipatel.medium.com/power-curve-in-r-8a1e67fb2600 
+# https://cinnipatel.medium.com/power-curve-in-r-8a1e67fb2600  
 
 power_curve <- function(sample_size){ # Start of function
   # Vector for the x-axis, representing possible effect sizes ranging from
@@ -525,7 +692,7 @@ lm(cups~time)
 abline(lm(cups~time))
 
 # Our goal for linear regression is understanding the below syntax of the summary(lm()) function:
-summary(lm(cups~time))
+summary(lm(cups~time)) # note that unreliable output, e.g., intercept signif, even though f(x)=0+x
 
 # Call:
 #   lm(formula = cups ~ time)
@@ -546,9 +713,9 @@ summary(lm(cups~time))
 # F-statistic: 9.916e+32 on 1 and 9 DF,  p-value: < 2.2e-16
 
 
-####################
-# Errors/Residuals #
-####################
+#####################
+## Errors/Residuals #
+#####################
 
 # error = y-f(x); f(x) = x
 error = cups - time
@@ -571,7 +738,6 @@ abline(lm(dino$y~dino$x))
 ## Non idealized Lady Meow Example #
 ####################################
 
-
 # Cups of Tea (three days in the life of Lady Meow):
 cups = c(0, 1, 2, 3.5, 4.8, 5.2, 6, 6.9, 8.5, 9.1, 9.9,
          0, .6, 2.6, 3.1, 4.8, 6.9, 7.1, 7.5, 8.5, 9.9, 9.9,
@@ -584,10 +750,10 @@ time = c(0:10,0:10,0:10) # technically 3 days in the life of Lady Meow
 plot(x=time, y=cups,
      ylab = "Cups of Tea", xlab= "Hours passed")
 # Play around with possible values of a and b (re-run plot() to reset):
-abline(a = 0, b = 1)
+abline(a = 0, b = .9)
 abline(a = .5, b = 1.2)
 abline(a = .23, b = 1.0082, col = "darkgreen")
-abline(a=0 , b=1, col = "blue")
+abline(a = 0 , b = 1, col = "blue")
 
 # Reset plot!
 plot(x=time, y=cups,
@@ -612,10 +778,12 @@ summary(c(0:10))
 x = time
 y = cups
 
+##### Calculating the Regression Coefficient via Covariance and Variance:
 # SumSqXY = ∑(x_i - E[X])*(y_i - E[y])
 SumSqXY = sum((x-mean(x))*(y-mean(y)))
+# [1] 332.7 Sum of squares allows no interpretation without counterweight/division by n
 
-# Covariance:
+# Covariance (Pop. and Samp.):
 covarXYsamp = SumSqXY / (length(x)-1) # sample covariance
 # [1] 10.39687
 covarXYpop  = SumSqXY / length(x)     # population covariance
@@ -623,20 +791,9 @@ covarXYpop  = SumSqXY / length(x)     # population covariance
 covarXYsamp = cov(x,y)                # samp cov := cov(x,y)
 # [1] 10.39687
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#### Calculating the intercept:
+intercept = mean(y)-(cov(x,y)/var(x))*mean(x)
+# [1] 0.2318182
 
 
 
