@@ -9,7 +9,7 @@
 ##################################
 
 # This tutorial script is equivalent with the tutorial script for the first 
-# part of the in-person peer-teaching tutorial, CIPOM/LZ@Charité.
+# part of the in-person peer-teaching tutorial for CIPOM/LZ@Charité.
 # https://doi.org/10.56776/abbd964d.665f7de5 
 
 # Corresponding Tutorial and more Educational Resources incl. Code can be found here:
@@ -30,14 +30,16 @@
 # the below is just some Code upfront that is shown in the introduction. 
 
 #### Example Parabola Function (also found in chapter 9 on functions):
-parabola = function(x){
-  fx = x^2
-  return(fx)
+parabola = function(x){ # Parabola is the name of a function with 1 input parameter x
+  fx = x^2              # and with that x some math is done, namely squaring x-
+  return(fx)            # The result object fx is then "returned" to the console
 } # End of function parabola
 
 # Example
 x = c(-4:4) # creates vector from -4 to 4, integer steps
 parabola(x)
+# > parabola(x)
+# [1] 16  9  4  1  0  1  4  9 16
 
 #### Random facts to get a grip on the scale of a CPU compared to its small size:
 
@@ -217,7 +219,18 @@ mat_bind = cbind(c(1,2,3),c(1,2,3),c(1,2,3))
 
 # Transforming an atomic matrix table into a "molecular" data table.
 # Here the columns can have different classes, each column for itself
-# though is still atomic in its class!
+# though is still atomic in its class. However, with the above method
+# all columns will at first have the same class (even though it can 
+# be changed, since different column classes are now possible). This
+# is because the vectors were combined from an atomic perspective 
+# via cbind(c()) so to speak and then the change into a molecular
+# data type was performed afterwards. Therefore below all columns are 
+# numeric, but would be character, if one element in the table was of type
+# character. However, again, different column classes are now possible
+# with the data.frame format, i.e. the table does not have to follow the
+# atomic vector constrains anymore - further below we will look at an 
+# alternative way to combine vectors right at the molecular level 
+# (first we will look at changing column names):
 mat_bind = as.data.frame(mat_bind) 
 #   V1 V2 V3  # V stands for variable
 # 1  1  1  1
@@ -229,6 +242,10 @@ mat_bind[,2]
 # Or we use the dollar sign to call/select a specific row of the table by name
 # We can then also still use the bracket syntax notation:
 mat_bind$V2[2]
+# you can also call a column by name within the brackets (same would be
+# possible with lines when lines were given names via rownames()...):
+mat_bind[1,"V2"]
+
 
 # Column names can be changed via:
 colnames(mat_bind) = c("One", "Two", "Three") # rownames() exists too
@@ -248,7 +265,6 @@ colnames(mat_bind)[2] = "Second_Col"
 # character, since combining a bunch of vectors c() is happening 
 # on an atomic level and therefore a soon as one entry is character
 # all entries are set to character. this can be avoided in the following way:
-
 # Create three column vectors:
 character = c("one", "two", "three")
 numeric1 = c(1,2,3)
@@ -259,11 +275,62 @@ data_frame = as.data.frame(character)
 
 # And then add the others, so they are binded not at the atomic
 # but molecular level, so to speak, and hence get correct class 
-# assigned:
+# assigned automatically and need not to be changed. Note that
+# the below also demonstrates how to use cbind() to add a vector 
+# to an existing table:
 data_frame = cbind(data_frame,numeric1, numeric2)
 is.character(data_frame$character)
+# [1] TRUE 
 is.numeric(data_frame$numeric1)
+# [1] TRUE
 is.numeric(data_frame$numeric2)
+# [1] TRUE
+
+
+# String Example
+string = c("One",2,3)
+# Try to add a 1 to the second element in the string above:
+# string[2]+1
+# Error in string[2] + 1 : non-numeric argument to binary operator
+
+# Character strings have to have ""
+c("object",2,3)
+# [1] "object" "2" "3"
+
+
+# Character strings:
+string = c("One",2,3) 
+# Even though there are numbers involved, they will
+# be converted into symbols.
+# [1] "One" "2"   "3" 
+
+class(string)
+# [1] "character"
+
+# Try to add a 1 to the second element in the string above:
+# string[2]+1 # uncomment this line and execute to see effect
+# Error in string[2] + 1 : non-numeric argument to binary operator
+
+# Character string to numeric vector:
+test = c("1","2","3")
+is.character(test)
+# [1] TRUE
+
+# Turn into a numeric vector:
+test = as.numeric(test)
+is.numeric(test)
+# [1] TRUE
+
+# Check what happens if one element is an actual character string
+# not just numbers treated as characters when turning that vector into class numeric:
+test = c("test", "12q","2","3") # including typo situation
+test = as.numeric(test) 
+# [1] NA NA  2  3
+# Warning message:
+# NAs introduced by coercion
+
+# The above output can be use to track entries in numeric columns with typos such as 12q,
+# i.e. a letter made it into the column...
 
 
 # Example array with dim = c(rows, columns, further_dimension)
@@ -296,17 +363,6 @@ array(1, dim = c(3,3,3))
 array(1, dim = c(3,3,3)) + 1
 
 
-# String Example
-string = c("One",2,3)
-# Try to add a 1 to the second element in the string above:
-# string[2]+1
-# Error in string[2] + 1 : non-numeric argument to binary operator
-
-# Character strings have to have ""
-c("object",2,3)
-# [1] "object" "2" "3"
-
-
 # Lists
 test_list = list("test",2,3)
 # [[1]]
@@ -320,38 +376,6 @@ test_list = list("test",2,3)
 
 test_list[[2]]
 # [1] 2
-
-# Character strings:
-string = c("One",2,3) 
-# Even though there are numbers involved, they will
-# be converted into symbols.
-# [1] "One" "2"   "3" 
-
-class(string)
-# [1] "character"
-
-# Try to add a 1 to the second element in the string above:
-# string[2]+1 # uncomment this line and execute to see effect
-# Error in string[2] + 1 : non-numeric argument to binary operator
-
-# Character string to numeric vector:
-test = c("1","2","3")
-is.character(test)
-# [1] TRUE
-
-# Turn into a numeric vector:
-test = as.numeric(test)
-is.numeric(test)
-# [1] TRUE
-
-# Check what happens if one element is an actual character string
-# not just numbers treated as characters when turning that vector into class numeric:
-test = c("test","2","3")
-test = as.numeric(test) 
-# [1] NA  2  3
-# Warning message:
-# NAs introduced by coercion
-
 
 
 ###################################################################
@@ -371,7 +395,7 @@ test = as.numeric(test)
 getwd() # No input needed!! Shows path assigned, e.g., for a project or standard folder
 
 # url() Function (NO ACTUAL WEBSITE DO NOT EXECUTE!)
-# read.csv(url("http://www.website.net/data_file.csv"))
+#  read.csv(url("http://www.website.net/data_file.csv"))
 
 # Load Dino Data Set for this!
 # I called the object "dino", such that plotting is done by:
@@ -389,6 +413,7 @@ library("readxl")
 
 # install.packages("readr")
 library("readr") # package also within "tidyverse"
+# Scheme: write.csv(export_table, "File Path")
 # write.csv()
 # write.csv2()
 
@@ -775,7 +800,7 @@ new_table2 == new_table3 # all TRUE...
 
 
 ### POSSIBLE SOLUTION II Simple dplyr/tidyverse alternative:
-new_table_alt %>%   # new_table_alt was filtered for NAs already 
+new_table_alt %>%   # new_table_alt was filtered for NAs already!!! 
   select(patient_id,time,measurement_sysRRalt)%>%
   group_by(patient_id) %>%  # sorts individ. entries into indiv. groups 
   # when executing next line!
@@ -936,13 +961,33 @@ x2 = na.omit(x$measurement_sysRRalt)
 # attr(,"class")
 # [1] "omit"
 
+# Again, the na.omit() is risky on tables, deletes every line no matter which column
+# NAs are found, which is usually not what you want at all!!
+# Example na.omit()
+test_na_omit = cbind(c(1,NA,3,4), c(1,2,NA,4))
+#      [,1] [,2]
+# [1,]    1    1
+# [2,]   NA    2
+# [3,]    3   NA
+# [4,]    4    4
+
+na.omit(test_na_omit)
+#      [,1] [,2]
+# [1,]    1    1
+# [2,]    4    4
+# attr(,"na.action")
+# [1] 2 3
+# attr(,"class")
+# [1] "omit"
+
+
 # Calculate mean:
 x3 = mean(as.numeric(x2))
 # [1] 128.5833
 
-########################################################
-### 8.8 EXAMPLE VIII: Rearranging and Deleting Columns #
-########################################################
+#################################################################
+### 8.8 EXAMPLE VIII: Rearranging and Deleting Columns and Rows #
+#################################################################
 
 test_re = as.data.frame(cbind(c(1,2,3),c(4,5,6),c(7,8,9)))
 # > test_re
@@ -979,9 +1024,9 @@ del_col = rearrange[,-2:-3]
 # [1] 7 8 9 # Just a vector remains...
 
 
-####################################################
-### 8.9 EXAMPLE IX: Working with Redundant Columns #
-####################################################
+######################################################################################
+### 8.9 EXAMPLE IX: Working with Redundant Columns (Encoding under Certain Criteria) #
+######################################################################################
 
 # Say, you want to create a column within your data set that entails, e.g., a 
 # binary (yes/no, 0/1, TRUE/FALSE), given a certain entry criteria is fulfilled
@@ -1167,16 +1212,16 @@ table_new
 # 5    a    44 Something1
 
 
-##############################################
-### 8.11 EXAMPLE XI: Changing Ä/ä into Ae/ae #
-##############################################
+##################################################################
+### 8.11 EXAMPLE XI: Changing Ä/ä into Ae/ae and Jumbled Unicode #
+##################################################################
 
 # Forgot to find the source for this one:
 # install.package("stringi")
 library(stringi)
 
 # Test character string:
-test_umlaut =c("ae", "oe", "ue", "Ae", "Oe", "Ue")
+test_umlaut = c("ae", "oe", "ue", "Ae", "Oe", "Ue")
 
 test_umlaut = stri_replace_all_fixed(
   test_umlaut, 
@@ -1188,6 +1233,18 @@ test_umlaut
 # > test_umlaut
 # [1] "ä" "ö" "ü" "Ä" "Ö" "Ü"
 
+### Jumbled German text:
+jumble = c("Stra\xdfe", "B\xfccher")
+
+for(i in 1:length(jumble)){
+  jumble = stri_replace_all_fixed(
+    jumble, 
+    c("\xc4","\xe4","\xdc", "\xfc","\xd6","\xf6", "\xdf"), # exchange to...
+    c(  "Ä",   "ä",  "Ü",    "ü",    "Ö",  "ö", "ß"),   # ... this
+    vectorize_all = FALSE)
+} # End for i
+
+# 1] "Straße" "Bücher"
 
 ################################################################
 ### 8.12 EXAMPLE XII: Deleting Duplicates (NOS Paper Example!) #
@@ -1235,12 +1292,12 @@ filtering = function(x,y){ # x = id column vector; y = full data set (i.e., give
   blank = matrix(0,length(x))             # matrix vector list for the nested for loop:
   
   for(i in 1:length(inter2$x)){           # for each individual [i] value of inter2 
-    # i.e., each value with duplicate(s)
-    for(j in 1:length(x)){               # + for each respective duplicate
-      #  value in column vector with the ids,
-      if(x[j] == inter2$x[i]){          # if the i_dth value is equivalent to 
-        # the evaluated explicit duplicate id values:
-        blank[j] = 1  # then / in such a case assing a 1 to the redundant binary/logical column.
+                                          # i.e., each value with duplicate(s)
+    for(j in 1:length(x)){                # + for each respective duplicate
+                                          #  value in column vector with the ids,
+      if(x[j] == inter2$x[i]){            # if the i_dth value is equivalent to 
+                                          # the evaluated explicit duplicate id values:
+        blank[j] = 1   # then / in such a case assing a 1 to the redundant binary/logical column.
       } # End if       # now any duplicate and the value that is duplicated are tagged by a logical!
     } # End for j
   } # End for i
@@ -1250,12 +1307,12 @@ filtering = function(x,y){ # x = id column vector; y = full data set (i.e., give
   # the id column
   data_frame = as.data.frame(data_frame)       # turn it into a data frame
   filtered = filter(data_frame, blank != "1" ) # ... in order to finally filter 
-  # all (!) redundant id values, no 
-  # matter how many duplicates there are,
-  #  in other words: if any id value had a duplicate, both the original 
-  #  and duplicate were erased, due to the fact that column and row wise
-  #  relation cannot be evaluated unambivalently in the given data set 
-  #  of the above mentioned paper by Rico Schmitt. 
+                                               #  all (!) redundant id values, no 
+                                               #  matter how many duplicates there are,
+                                               #  in other words: if any id value had a duplicate, both the original 
+                                               #  and duplicate were erased, due to the fact that column and row wise
+                                               #  relation cannot be evaluated unambivalently in the given data set 
+                                               #  of the above mentioned paper by Rico Schmitt. 
   return(filtered) # Return filtered returns the values of the respective object, 
   # i.e., the filtered full data frame
 } # End of function
@@ -1283,7 +1340,7 @@ filtering(test_dup$V1,test_dup)
 # zeros, since all lines that marked duplicate and the value 
 # that was duplicated with a 1 have been deleted...
 
-# V1               V2           V3 blank
+#     V1           V2           V3 blank
 # 1 id12 random entry random entry     0
 # 2 id14 random entry random entry     0
 # 3 id15 random entry random entry     0
@@ -1564,7 +1621,8 @@ q_three = c(2,3,1)
 q_four  = c(2,2,2)
 results = as.data.frame(cbind(q_one,q_two,q_three))
 
-# When we run it through the summary function, we get this:
+# When we run it through the summary function, we get this col-wise analysis
+# including quantiles, min/max values, mean, median:
 summary_res = summary(results)
 
 #    q_one           q_two          q_three   
@@ -1638,9 +1696,9 @@ results_table_fin  = results_table[,c(1,2,7,3:6)]
 ###############################################
 
 # Writing a parabola function:
-parabola = function(x){
-  fx = x^2
-  return(fx)
+parabola = function(x){ # Parabola is the name of a function with 1 input parameter x
+  fx = x^2              # and with that x some math is done, namely squaring x
+  return(fx)            # The result object fx is then "returned" to the console
 } # End of function parabola
 
 # Example
@@ -2402,6 +2460,8 @@ ppois(q = 0.2240418, lambda = 3) # [1] 0.04978707
 ### 11.1 EXAMPLE APP I: Plotting Standardized Difference in Means for a One-Sample Z-Test #
 ###########################################################################################
 
+### IMPORTANT!!!!!!!!!!! CLOSE APP AFTER USAGE, OTHERWISE OTHER CODE WONT BE PROCESSED!!!!!!
+
 # Install and load shiny package
 # install.packages("shiny")
 library(shiny)
@@ -2487,14 +2547,15 @@ server = function(input, output) {
     abline(h=0) 
     
     # Add Information on effect size to plot:
-    # Formula:
-    text(grconvertX(0.75, from = "npc", to = "user"), # Makes sure text will always be static!
+    # Formula (ifelse() function below places effect size output and 
+    # formula on the left or right side of the plot depending ES > or < 0):
+    text(grconvertX(ifelse(effectsize>=.1,0.25,0.75), from = "npc", to = "user"), # Makes sure text will always be static, either left or right!
          grconvertY(0.60, from = "npc", to = "user"),
          expression(frac(bar(x)-mu,sigma) == ""))
     # Result value:
     effectsize = signif(effectsize, digits = 3) # Round to 2 decimal places
-    text(grconvertX(0.82, from = "npc", to = "user"), # Makes sure text will always be static!
-         grconvertY(0.60, from = "npc", to = "user"),
+    text(grconvertX(ifelse(effectsize>=.1,0.32,0.82), from = "npc", to = "user"), # Makes sure text will always be static, either left or right!
+         grconvertY(0.60, from = "npc", to = "user"),                             # if effect size >= than formula on the left side...
          effectsize) # Adds value next to the above formula
       
   }) # End renderPlot()
@@ -2504,16 +2565,18 @@ server = function(input, output) {
 ##### and it then says "Run App" (which just executes the whole script). 
 ##### Some of you might want to use it, so I set the below as comment...
 
+
+#### IMPORTANT!!!!!!!!!!! CLOSE APP AFTER USAGE, OTHERWISE OTHER CODE WONT BE PROCESSED!!!!!!
 # shinyApp(ui = ui, server = server)
 
 
 # Consider the following cases:
 
-# Pop_mean = 130 		  Sample_mean = 120 	 Pop und Samp_SD = 5
-# Pop_mean = 130 		  Sample_mean = 120	   Pop und Samp_SD = 20
-# Pop_mean = 129.8  	Sample_mean = 130	   Pop und Samp_SD = 0.1 
+# Pop_mean = 130 		  Sample_mean = 120 	 Pop and Samp_SD = 5
+# Pop_mean = 130 		  Sample_mean = 120	   Pop and Samp_SD = 20
+# Pop_mean = 129.8  	Sample_mean = 130	   Pop and Samp_SD = 0.1 
 # Pop_mean = 130 		  Sample_mean = 120	   Pop_SD = 5	 	          Samp_SD = 20 (makes clear why CI of effect size is important)
-# Pop_mean = 130 		  Sample_mean = 120	   Pop_SD = 20	 	        Samp_SD = 21
+# Pop_mean = 130 		  Sample_mean = 20	   Pop_SD and Samp_SD = 20
 
 
 ###########################################################################################
