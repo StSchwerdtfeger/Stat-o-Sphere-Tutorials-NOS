@@ -9,9 +9,16 @@
 #######################################
 #######################################
 
+# Werde 1 Cyber!  / Become a Cyber!
+print("Werde 1 Cyber!")
+print("Become A Cyber!")
 
 ####### Recreation of table in R (a)):
 table = as.data.frame(cbind(c(1,2,3),c("Test","Test2","Test3"),c("Ey","Bee", "See")))
+
+# Alternative to keep class integrity for each column:
+table = as.data.frame(c(1,2,3))
+table = cbind(table,c("Test","Test2","Test3"),c("Ey","Bee", "See"))
 
 #   V1    V2  V3
 # 1  1  Test  Ey
@@ -29,7 +36,7 @@ table$V2[1] = "Test1"
 # 3  3 Test3 See
 
 ####### Delete first column (c)):
-table[,-c(1)]
+table = table[,-c(1)]
 
 #      V2  V3
 # 1 Test1  Ey
