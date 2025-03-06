@@ -22,14 +22,14 @@
 ##################################
 
 # This tutorial script is equivalent with the tutorial script for the first 
-# part of the in-person peer-teaching tutorial for CIPOM/LZ@Charité.
+# part of the in-person peer-teaching tutorial for CIPOM/LZ@Charité:
 # https://doi.org/10.56776/abbd964d.665f7de5 
 
 # Corresponding Tutorial and more Educational Resources incl. Code can be found here:
 # https://journal.medicine.berlinexchange.de/statosphere 
 # https://journal.medicine.berlinexchange.de/user/steffen-schwerdtfeger-2 
 
-# Github page with all Stat-o-Sphere Scripts
+# Github page with all Stat-o-Sphere Scripts:
 # https://github.com/StSchwerdtfeger 
 
 #### UNFOLD CODE of the desired chapter (small arrow at the lower line of #'s).
@@ -839,9 +839,9 @@ na.omit(test_na_omit)
 
 
 
-########################################################
-### 8.6 EXAMPLE VI: Adjusting Character String Entries #
-########################################################
+#############################################################################
+### 8.6 EXAMPLE VI: Adjusting Character String Entries and Pattern Matching #
+#############################################################################
 
 #### Duplicate our previous table:
 fin_table_alt = new_table
@@ -883,6 +883,13 @@ first_name = word(names$name,1) # the 1 stands for first word of
 # is targeted like delimiter so to speak 
 # [1] "Name" "Name" "Name"
 
+# Another important function is grep() which can detect a part of a character 
+# string or a pattern, so speak. It is from the base package
+# grep(pattern = , object)
+text = c("Bla", "Blub", "Bluna")
+grep("Bluna", text)
+# Output is the position, equivalent to the which() function output.
+# [1] 3
 
 
 ############################################################################################
@@ -1659,7 +1666,7 @@ results_table = matrix(0, ncol = length(summary_res[,1]), nrow = length(results[
 for(i in 1:length(results[1,])){             # loop over columns
   results_table[i,] = summary(results[,i])   # Calculate summary of each column (only way it worked)
 } # End for i                                # ... and put result in row of results_table[i,]
-results_table = as.data.frame(results_table) # Turn res_table into data.frame()
+results_table = as.data.frame(results_table) # Turn results_table into data.frame()
 
 # > results_table
 # V1  V2 V3       V4  V5 V6
