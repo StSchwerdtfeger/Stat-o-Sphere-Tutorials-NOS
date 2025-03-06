@@ -1,19 +1,19 @@
 ---
-title: "Universal Survey Analysis Script" 
+title: "Universal SoSci-Survey Analysis Script" 
 subtitle: "for CIPom / LERNZENTRUM @ Charité" 
 author: "Steffen Schwerdtfeger - CIMPOM/LZ Tutor and JNOS Editor"
 date: "`r Sys.Date()`\\clearpage"  # add \\clearpage so that TOC is on the next page!
-output:                            # \pagebreak below is for after the TOC
-  pdf_document: 
-    toc: TRUE       # content table with page number
+output:                            # \pagebreak below is for after the TOC, Sys.Date() = System Date
+  pdf_document:   # Adjustment of output options:
+    toc: TRUE       # content table with page number for each chapter
     toc_depth: 3    # depth means up to 1.1.1 (= 3), 
                     # this script actually only uses one level...
     latex_engine: xelatex  # makes sure é is correctly shown 
                            # in markdown texts (no problem in titles somehow)
 header-includes: # The below makes sure that page numbering starts at page 2.
-                 # The below took me ages to figure out, even with AI which I avoid no success
+                 # The below took me ages to figure out, even with AI, which I avoid, no success.
                  # Why? The issue was, that I was unaware of the fact that the tab
-                 # Spacing in this YAML code has a meandin, such that if header-includeds:
+                 # spacing in this YAML code has a syntactic meaning, such that if header-includes:
                  # is tabbed, it will not be read properly!! AI also offered "bloated code" 
                  # with options I didn't even chose and was therefore very confusing to read... 
                  # I eventually figured it out via regular websites... Here it is, one line: 
@@ -23,6 +23,65 @@ editor_options:
  markdown:
     wrap: 72 # Line length of 72 characters; ensured for the case of multiple editors
 ---
+
+``` {r, echo = FALSE, warning = FALSE, message = FALSE}
+# echo = FALSE, warning = FALSE, message = FALSE => makes sure console output, error messages
+# and warnings are not knitted into the pdf...
+
+#############################
+#############################
+# EXPORT AND IMPORT OPTION: # 
+#############################
+#############################
+
+# Set your Path including file name and file ending! 
+# CHANGE DATA AND CODE FILE TO CSV FORMAT FIRST!!!
+# INPUT SCHEME: path = "YOUR_PATH_INCLUDING_FILENAME.csv" 
+# NOTE: change \ to / in Windows!!!!
+path_data = "data_Example.csv" # here abbreviated, since I set up R project with set wd()...
+path_code = "codebook_Example.csv" # ... same here.
+
+
+# EXPORT PATH Default FALSE for no .csv export
+export_text = FALSE
+export_path = "text_response_Example.csv"
+
+# NO ADJUSTMENT NEEDED HERE! 
+# Actual Import CSV (did not work well with the .xlsx Versions...):
+data = read.csv(path_data)
+code = read.csv(path_code)
+Frequency = c(0) # used to create an empty "Frequency" column, with 0 as default value...
+code = cbind(code,Frequency) # ... via this line (fills up the whole column with 0 eventually).
+
+################
+################
+# PLOT OPTIONS #
+################
+################
+
+# Plot options, default is plot all (note bar and hist are the same, just different functions; 
+# a histogram is actually a bar plot with y-axis entailing densities, here it is frequency and
+# percentage...)
+
+# POSSIBLE OPTIONS => default is all three: options = c("box","heat","bar") 
+options = c("box","heat","bar")
+
+#############
+#############
+# Libraries #
+#############
+#############
+
+###### The below loads packages 
+# install.packages("tidyverse")
+library("tidyverse") # filter() and ggplot()
+#install.packages("stringi")
+library("stringi") # for changing faulty umlaut and ß conversion
+#install.packages("kableExtra")
+library("kableExtra") # for kbl() text response table and summary table
+#install.packages("gridExtra")
+library("gridExtra") # needed for grid.arrange() for multiple plots on a page without looking messy
+```
 
 \pagebreak
 
@@ -44,26 +103,26 @@ parameter is set TRUE in the first code chunk (default is FALSE; see
 very last code chunk for respective code, e.g. to add .xlsx as export
 option).\newline However, the PDF Export comes with a table as well:
 three columns, one with the question label, one for the index of each
-element for each question (nor mere row number of the exported table)
+element for each question (not mere row number of the exported table)
 and one column with the free text answers.\newline
 
 ## What does the corresponding Rmarkdown script do and how can I make use of it?
 
 The Rmarkdown script corresponding to this PDF is a generalized way to
 process reoccurring survey data with repeating data table and code book
-structure. You start with defining your file path for the code book and
-the data table in the first code chunk (i.e., demarcated space within
-the Rmarkdown script, where code can be executed). The supported import
-format is CSV (which is recommended; the R function read.csv() for
-regular comma delimiter tables is used). In the same first code chunk,
-you can optionally export a CSV with the free text responses by setting
+structure (e.g. via SoSci Survey in this case). You start with defining your 
+file path for the code book and the data table in the first code chunk (i.e., 
+demarcated space within the Rmarkdown script, where code can be executed). 
+The supported import format is CSV (which is recommended; the R function 
+read.csv() for regular comma delimiter tables is used). In the same first code 
+chunk, you can optionally export a CSV with the free text responses by setting
 the respective parameter from FALSE (default) to TRUE. For the text export and 
 table included in the PDF, the columns STATUS, SERIAL, REF, QUESTNNR, MODE were
-excluded (not in entailed in example code book anyways). The layout is kept 
-simple and it was made sure that page numbering starts at page 2 (which took 
-quite a while to figure out, since I wasn't aware of the fact that tab spacing 
-or spacing in the YAML code has a syntactic meaning; keep that in mind when 
-further adjusting this script).
+excluded (not entailed in the example code book anyways, but for regular SoSci
+Survey code books). The layout is kept simple and it was made sure that page 
+numbering starts at page 2 (which took quite a while to figure out, since I 
+wasn't aware of the fact that tab spacing or spacing in the YAML code has a 
+syntactic meaning; keep that in mind when further adjusting this script).
 
 \par
 
@@ -90,7 +149,7 @@ data).
 \par
 
 Any kind of text data is pre-processed such that faulty uni-code
-transformation of Umlaute and ß are corrected in the columns
+transformation of "Umlaute" and "ß" are corrected in the columns
 Variable.Label and Response.Label of the code book, as well as in the
 respective free text response columns of the data table. As mentioned in
 the previous chapter, a table is added to the PDF using the package
@@ -119,19 +178,20 @@ to percentage (given a sum of frequencies of $n = 100$). This was the case with
 the original data for this script, and yes, it was confusing.\newline 
 The x-axis labels of bar plots were tilted, so they cannot overlap in the plot
 horizontally in case the likert scale options consists of a longer word
-or phrase. For the bar plots, the Variable "STATUS" was omitted, since
-it had a total frequency of zero (this may be casually be the case).
+or phrase.\newline 
+For the bar plots, the variable "STATUS" was omitted, since
+it had a total frequency of zero (this may casually be the case).
 Note that columns with zero sum of frequencies are a problem for the bar
 plot (ggplot2) since they globally mess up the y-axis numeric tick marks
-of the percentage axis for any plot, since they disappear as soon as a
-zero sum of frequencies case is plotted (in the future the code for this
-script will be expanded to automatically omit zero sum of frequencies
-variable responses. The heat map should be self-explanatory, however, it 
-necessary to reverse / mirror the labels in order to be able to flip
-the y-axis. This was due to the fact, that the frequency heat map legend
-was mostly inverted to the most outcomes, where the highest frequency is 
-also on the top. The box plot is also straight forward, except of the fact 
-that missing responses where excluded. 
+of the percentage axis for any plot -- they disappear as soon as a
+zero sum of frequencies case is plotted. The code for this
+script automatically omits zero sum of frequencies
+variable responses to avoid this of happenin. The heat map should be 
+self-explanatory, however, it necessary to reverse / mirror the labels in 
+order to be able to flip the y-axis. This was due to the fact, that the 
+frequency heat map legend was mostly inverted to the most outcomes, where the 
+highest frequency is  also on the top. The box plot is also straight forward, 
+except of the fact that missing responses where excluded. 
 
 \par
 
@@ -145,57 +205,6 @@ peer-teaching tutorial series.
 
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
-#############################
-#############################
-# EXPORT AND IMPORT OPTION: #
-#############################
-#############################
-
-# Set your Path including file name! 
-# CHANGE DATA AND CODE FILE TO CSV FORMAT FIRST!!!
-# INPUT SCHEME: path = "YOUR_PATH_INCLUDING_FILENAME.csv" 
-# NOTE: change \ to / in Windows!!!!
-path_data = "data_Example.csv" # here abbreviated, since I set up R project with set wd()...
-path_code = "codebook_Example.csv" # ... same here.
-
-
-# EXPORT PATH Default FALSE for no .csv export
-export_text = FALSE
-export_path = "text_response_Example.csv"
-
-# Actual Import CSV (did not work well with the .xlsx Versions...):
-data = read.csv(path_data)
-code = read.csv(path_code)
-Frequency = c(0) # used to create an empty "Frequency" column, with 0 as default value...
-code = cbind(code,Frequency) # ... via this line (fills up the whole column with 0 eventually).
-
-################
-################
-# PLOT OPTIONS #
-################
-################
-
-# Plot options, Default is plot all (note bar and hist are the same, just different functions; 
-# a histogram is actually a bar plot with y-axis entailing densities...)
-#POSSIBLE OPTIONS => default is all three. options = c("box","heat","bar") 
-options = c("box","heat","bar")
-
-#############
-#############
-# Libraries #
-#############
-#############
-
-###### The below loads packages 
-# install.packages("tidyverse")
-library("tidyverse") # filter() and ggplot()
-#install.packages("stringi")
-library("stringi") # for changing faulty umlaut and ß conversion
-#install.packages("kableExtra")
-library("kableExtra") # for kbl() text response table and summary table
-#install.packages("gridExtra")
-library("gridExtra") # needed for grid.arrange() for multiple plots on a page without looking messy
-
 
 #############################################
 # Pre-Processing Faulty Unicode Translation #
@@ -384,14 +393,15 @@ freq_del = c()
 freqs = c()
 for(i in 1:length(freq_list)){
   if(sum(freq_list[[i]][,"Frequency"]) == 0){
-    freq_del[i] = i 
+    freq_del[i] = i # Positions with Frequency == 0
     freqs[i] = sum(freq_list[[i]][,"Frequency"])
   } # End if
 } # End for i
 
-# Now delete all with sum of frequency == 0, since the case of no survey item having frequency 0
-# can occur, it can lead to an error when executing frequ_list2[-0]... So we only delete, given
-# that there is at least one case:   
+# Now delete all positions with sum of frequency == 0, since the case of no survey 
+# item having frequency 0 can occur, it can lead to an error when executing 
+# frequ_list2[-0]... So we only keep, given that there is at least one case of 
+# a zero sum of frequencies:   
 if(length(which(freqs == 0)) > 0){
   freq_list = freq_list[-freq_del]
 } # End if
@@ -539,7 +549,8 @@ for(i in 1:length(freq_list)){
 
 Below just uses simple bar plots of binary responses. If there are field
 with zero frequencies, they may mess up the numeric tick marks of the
-second percentage y-axes.
+second percentage y-axes, so any question with a total frequency of zero 
+responses. 
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE,fig.align="center", out.width="80%",out.height="80%", fig.pos="hold"}
 
