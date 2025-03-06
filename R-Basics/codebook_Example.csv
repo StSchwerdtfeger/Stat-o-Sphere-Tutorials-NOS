@@ -1,0 +1,23 @@
+Variable,Variable Label,Response Code,Response Label,Variable Type,Input Type
+CASE,Interview-Number ,,,METRIC,TXT
+SERIAL,ID or participant code,,,TEXT,TXT
+QUESTNNR,Questionare that was used,,,TEXT,TXT
+MODE,Interview mode,,,TEXT,TXT
+STARTED,Time the interview started,,,TIME,TXT
+AR01,FAQ ,1,Very helpful,NOMINAL,MC
+AR01,FAQ ,2,Rather helpful,NOMINAL,MC
+AR01,FAQ ,3,Undecided,NOMINAL,MC
+AR01,FAQ ,4,Rather not helpful,NOMINAL,MC
+AR01,FAQ ,5,Not helpful at all,NOMINAL,MC
+AR01,FAQ ,-9,no answer,NOMINAL,MC
+AR02,Experience with X,1,"Yes, comprehensive experience",NOMINAL,MC
+AR02,Experience with X,2,"Yes, some experience",NOMINAL,MC
+AR02,Experience with X,3,Little experience,NOMINAL,MC
+AR02,Experience with X,4,"No experience, but interested",NOMINAL,MC
+AR02,Experience with X,5,No experience and not interested.,NOMINAL,MC
+AR02,Experience with X,-9,no answer,NOMINAL,MC
+PR01_01,Information channel,1,Social media,DICHOTOMOUS,CK
+PR01_01,Information channel,2,Print media,DICHOTOMOUS,CK
+SS02_01,informed,1,yes,DICHOTOMOUS,CK
+SS02_01,informed,2,no,DICHOTOMOUS,CK
+SS08_01,Wishes,,,TEXT,TXT

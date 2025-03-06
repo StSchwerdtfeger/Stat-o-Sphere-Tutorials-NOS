@@ -1,0 +1,722 @@
+---
+title: "Universal Survey Analysis Script" 
+subtitle: "for CIPom / LERNZENTRUM @ Charité" 
+author: "Steffen Schwerdtfeger - CIMPOM/LZ Tutor and JNOS Editor"
+date: "`r Sys.Date()`\\clearpage"  # add \\clearpage so that TOC is on the next page!
+output:                            # \pagebreak below is for after the TOC
+  pdf_document: 
+    toc: TRUE       # content table with page number
+    toc_depth: 3    # depth means up to 1.1.1 (= 3), 
+                    # this script actually only uses one level...
+    latex_engine: xelatex  # makes sure é is correctly shown 
+                           # in markdown texts (no problem in titles somehow)
+header-includes: # The below makes sure that page numbering starts at page 2.
+                 # The below took me ages to figure out, even with AI which I avoid no success
+                 # Why? The issue was, that I was unaware of the fact that the tab
+                 # Spacing in this YAML code has a meandin, such that if header-includeds:
+                 # is tabbed, it will not be read properly!! AI also offered "bloated code" 
+                 # with options I didn't even chose and was therefore very confusing to read... 
+                 # I eventually figured it out via regular websites... Here it is, one line: 
+  - \thispagestyle{empty}   # Remove header and the footer including numbering from title page
+word_document: default      # no options for potential word output are set (but are possible)
+editor_options: 
+ markdown:
+    wrap: 72 # Line length of 72 characters; ensured for the case of multiple editors
+---
+
+\pagebreak
+
+# Details on Statistics, Data Visualisation, Handling of Text Responses and the Rmarkdown Script
+
+**Statistics below entails:** \newline Only for data that is tagged
+nominal in the codebook (likert scale data).\newline a)
+quantiles\newline b) median\newline c) mean\newline d) sd\newline e)
+frequency of NA's (no response cases)\newline
+
+**Plot types:**\newline Depending on chosen options, a bar plot, heat plot 
+and/or box plot can be chosen -- for nominal data. Default option is all three.
+See first code chunk to adjust plot options. For dichotomous / Boolean data 
+only bar plots are provided. \newline
+
+**Free Text Responses**\newline The corresponding Rmarkdown optionally
+allows for an export of all the free text answers as .csv table, when a
+parameter is set TRUE in the first code chunk (default is FALSE; see
+very last code chunk for respective code, e.g. to add .xlsx as export
+option).\newline However, the PDF Export comes with a table as well:
+three columns, one with the question label, one for the index of each
+element for each question (nor mere row number of the exported table)
+and one column with the free text answers.\newline
+
+## What does the corresponding Rmarkdown script do and how can I make use of it?
+
+The Rmarkdown script corresponding to this PDF is a generalized way to
+process reoccurring survey data with repeating data table and code book
+structure. You start with defining your file path for the code book and
+the data table in the first code chunk (i.e., demarcated space within
+the Rmarkdown script, where code can be executed). The supported import
+format is CSV (which is recommended; the R function read.csv() for
+regular comma delimiter tables is used). In the same first code chunk,
+you can optionally export a CSV with the free text responses by setting
+the respective parameter from FALSE (default) to TRUE. For the text export and 
+table included in the PDF, the columns STATUS, SERIAL, REF, QUESTNNR, MODE were
+excluded (not in entailed in example code book anyways). The layout is kept 
+simple and it was made sure that page numbering starts at page 2 (which took 
+quite a while to figure out, since I wasn't aware of the fact that tab spacing 
+or spacing in the YAML code has a syntactic meaning; keep that in mind when 
+further adjusting this script).
+
+\par
+
+The script is universal in the sense that the specific variable names of
+the question do not matter, the amount of questions and the possible
+options (likert scale or not) etc. do not matter... Important is that
+the data table has to have a certain structure, were each
+question/field, i.e., the responses (answers) to each variable
+(question), has to to have its own column (not row, or any other format,
+such as a list() object formats in R). Take a look at some of the
+regular data tables to get a better understanding of their scheme. Apart
+from that, the code book has also to be of the same table structure as
+in this example. More important -- and the biggest constrain of this
+Rmarkdown script -- is the fact that it also has to follow the scheme of
+the column names and the options for the data types as given in this
+example. This essentially concerns the following column names of the
+code book: Variable, Variable.Label, Response.Label, Response.Code,
+Variable.Type and the added dummy column Frequency for later processes
+(R is case sensitive, therefore the capital letters).\newline The below
+script processes data of the variable types BOOL, DICHOTOMOUS (both
+essentially binary), TEXT (free text response) and NOMINAL (likert scale
+data).
+
+\par
+
+Any kind of text data is pre-processed such that faulty uni-code
+transformation of Umlaute and ß are corrected in the columns
+Variable.Label and Response.Label of the code book, as well as in the
+respective free text response columns of the data table. As mentioned in
+the previous chapter, a table is added to the PDF using the package
+kableExtra.
+
+\par
+
+For the calculation of the quantiles, median, mean, sd and NA
+frequencies the regular summary() function is used in the Rmarkdown
+script. For the summary (median, mean, quantiles) the variable labels Consent,
+Geschlecht, Alter, and Studiengang were omitted too (Engl. age, sex, course 
+of study). CAVE: The variable label Alter is actually "Alter " in the data table, 
+and yes, it has an unnecessary spacing in the column name, the code below also 
+filters for case without spacing; this problem can occur at least, if you want 
+to filter for "Alter " via the logical operator "==" in R. I could have used
+grep(), however the word "Alter" can appear in other words as well, so I
+would not recommend. 
+
+\par
+
+The bar plots entail two y-axes, left and right: frequencies and
+percentages -- note that given an example with around $n = 100$ is confusing, 
+since when the sample size is around $100$, it leads to a case where the numeric 
+tick marks of both y-axes are (nearly) the same, since frequency is equivalent 
+to percentage (given a sum of frequencies of $n = 100$). This was the case with
+the original data for this script, and yes, it was confusing.\newline 
+The x-axis labels of bar plots were tilted, so they cannot overlap in the plot
+horizontally in case the likert scale options consists of a longer word
+or phrase. For the bar plots, the Variable "STATUS" was omitted, since
+it had a total frequency of zero (this may be casually be the case).
+Note that columns with zero sum of frequencies are a problem for the bar
+plot (ggplot2) since they globally mess up the y-axis numeric tick marks
+of the percentage axis for any plot, since they disappear as soon as a
+zero sum of frequencies case is plotted (in the future the code for this
+script will be expanded to automatically omit zero sum of frequencies
+variable responses. The heat map should be self-explanatory, however, it 
+necessary to reverse / mirror the labels in order to be able to flip
+the y-axis. This was due to the fact, that the frequency heat map legend
+was mostly inverted to the most outcomes, where the highest frequency is 
+also on the top. The box plot is also straight forward, except of the fact 
+that missing responses where excluded. 
+
+\par
+
+More information on the plotting routines and such can be found in the
+actual Rmarkdown script this PDF was "knitted" from (as it's said). The
+script was heavily commented and there is also a thorough tutorial on
+the script provided in the respective JNOS Stat-o-Sphere R-Basic
+tutorial article, corresponding to the CIPOM/LZ \@ Charité in-person
+peer-teaching tutorial series.
+\url{https://doi.org/10.56776/abbd964d.665f7de5}
+
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+#############################
+#############################
+# EXPORT AND IMPORT OPTION: #
+#############################
+#############################
+
+# Set your Path including file name! 
+# CHANGE DATA AND CODE FILE TO CSV FORMAT FIRST!!!
+# INPUT SCHEME: path = "YOUR_PATH_INCLUDING_FILENAME.csv" 
+# NOTE: change \ to / in Windows!!!!
+path_data = "data_Example.csv" # here abbreviated, since I set up R project with set wd()...
+path_code = "codebook_Example.csv" # ... same here.
+
+
+# EXPORT PATH Default FALSE for no .csv export
+export_text = FALSE
+export_path = "text_response_Example.csv"
+
+# Actual Import CSV (did not work well with the .xlsx Versions...):
+data = read.csv(path_data)
+code = read.csv(path_code)
+Frequency = c(0) # used to create an empty "Frequency" column, with 0 as default value...
+code = cbind(code,Frequency) # ... via this line (fills up the whole column with 0 eventually).
+
+################
+################
+# PLOT OPTIONS #
+################
+################
+
+# Plot options, Default is plot all (note bar and hist are the same, just different functions; 
+# a histogram is actually a bar plot with y-axis entailing densities...)
+#POSSIBLE OPTIONS => default is all three. options = c("box","heat","bar") 
+options = c("box","heat","bar")
+
+#############
+#############
+# Libraries #
+#############
+#############
+
+###### The below loads packages 
+# install.packages("tidyverse")
+library("tidyverse") # filter() and ggplot()
+#install.packages("stringi")
+library("stringi") # for changing faulty umlaut and ß conversion
+#install.packages("kableExtra")
+library("kableExtra") # for kbl() text response table and summary table
+#install.packages("gridExtra")
+library("gridExtra") # needed for grid.arrange() for multiple plots on a page without looking messy
+
+
+#############################################
+# Pre-Processing Faulty Unicode Translation #
+#############################################
+
+# Correct Umlaut in code table, column response label:
+for(i in 1:length(code$Response.Label)){
+  code$Response.Label = stri_replace_all_fixed(
+    code$Response.Label, # Col that is targeted
+    c("\xc4","\xe4","\xdc","\xfc","\xd6","\xf6","\xdf"), # exchange to...
+    c(  "Ä",   "ä",  "Ü",   "ü",    "Ö",  "ö",   "ß"),   # ... this
+    vectorize_all = FALSE)
+} # End for i
+
+# Same for Variable.Label 
+for(i in 1:length(code$Variable.Label)){
+  code$Variable.Label = stri_replace_all_fixed(
+    code$Variable.Label, # Col that is targeted
+    c("\xc4","\xe4","\xdc","\xfc","\xd6","\xf6","\xdf"),  # exchange to...
+    c(  "Ä",   "ä",  "Ü",    "ü",   "Ö",  "ö",   "ß"),    # ... this.
+    vectorize_all = FALSE)
+} # End for i
+
+
+```
+
+\pagebreak
+
+# Basic Statistical Analysis - Quantiles, Median, Mean, SD and Frequency of NA's
+
+Note that the NA's (not assigned) stand for cases with no response.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+#########################################################
+#########################################################
+# Summary() - Quantiles, Median, Mean) for Nominal Data #
+#########################################################
+#########################################################
+
+# Filter all Nominal Code (likert scale data):
+nominal = filter(code, Variable.Type == "NOMINAL")
+
+# Our goal is now to get a table where the result of each column is put in
+# a table with the result of each column in one row.
+
+# First we will put all response codes col wise into a table
+uniq_ques = unique(nominal$Variable)
+
+# Empty result vector (here no matrix needed...):
+nom_sum = c()
+
+# Loop over individual question IDs and cbind() them:
+for(i in 1:length(uniq_ques)){
+  nom_sum = cbind(nom_sum, data[,uniq_ques[i]])
+} # End for i
+
+# Change to format data frame and use first col as colnames
+nom_sum_fin = as.data.frame(nom_sum[-1,], header = TRUE)
+colnames(nom_sum_fin) = nom_sum[1,]
+
+# Create an empty matrix that has the col length of summary_res[,1] = 6 
+# and a row for every question, i.e. the length(results[1,]) = number of questions:
+results_table = matrix(0, ncol = length(summary(as.numeric(nom_sum_fin[,1]))),
+                          nrow = length(nom_sum_fin[1,]))
+
+# We now use a loop to put the summary of every column together
+# We have to use the summary() function again for each column,
+# since I could not find a way to reformat the above object summary() objects...:
+for(i in 1:length(nom_sum_fin[1,])){             # loop over columns
+  results_table[i,] = summary(as.numeric(nom_sum_fin[,i]))   # Calculate summary of 
+                                                             # each column (only way it worked)
+} # End for i                                # ... and put result in row of results_table[i,]
+
+# Add columnn with Variables of the questions
+results_table = as.data.frame(results_table)
+results_table = cbind(colnames(nom_sum_fin),results_table)
+
+# Change columns of this table to entail c("Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.")
+# as column names (extract from summary() output of a single column):
+colnames(results_table) = c("Question",names(summary(as.numeric(nom_sum_fin[,1]))))
+
+# Round Mean for better table overview:
+results_table$Mean = round(results_table$Mean,2) # round mean value
+
+# You may also want to add the SD of every question as well:
+SD = c() # Empty vector for results:
+for(i in 1:length(nom_sum_fin[1,])){
+  extract_col = as.numeric(nom_sum_fin[,i])
+  col_no_na = extract_col[!is.na(extract_col)] # get rid of NA's
+  SD[i] = round(sd(as.numeric(col_no_na)),2) # get SD and round result
+} # End for i
+
+# Final table:
+results_table = cbind(results_table,SD) # add sd to result_table
+results_table_fin  = results_table[,c(1:5,9,6:8)] # put sd col next to mean
+
+# Delete c("Consent","Geschlecht","Alter","Studiengang"), since they make little
+# sense for a summary (Engl. Consent, Sex, Course of study):
+# NOT NECESSARY FOR EXAMPLE DATA SET AND CODE BOOK, but for the actual survey 
+# this Rmarkdown was made for:
+del_rows = c("Consent","Geschlecht","Alter ","Alter","Studiengang")
+for(i in 1:length(del_rows)){
+  results_table_fin = filter(results_table_fin, Question != del_rows[i])
+} # End for i
+
+####### Create a nice table for export:
+# Plot as nice looking table
+results_table_fin %>%
+  kbl(format="latex", booktabs = TRUE) %>% # Booktabs for certain style of that package
+  kable_styling(latex_options = c("hold_position", "striped")) # hold_position, otherwise floating object
+                                                               # creating funky effects in pdf.
+
+# NOTE THAT THE TABLE WILL ONLY BE SHOWN IN THE PDF OUTPUT OR WHEN YOU EXECUTE CODE IN
+# A REGULAR R SCRIPT PARALLEL TO SEE HOW IT LOOKS!!! DON'T GET CONFUSED!!!
+
+# NOTE THAT THE TABLE WILL ONLY BE SHOWN IN THE PDF OUTPUT OR WHEN YOU EXECUTE CODE IN
+# A REGULAR R SCRIPT PARALLEL TO SEE HOW IT LOOKS!!! DON'T GET CONFUSED!!!
+
+```
+
+\pagebreak
+
+# Plot for the Analysis of Likert Scale Responses (Bar Plot, Box Plot and Heat Map Possible)
+
+Depending on the chosen options, the below will entail all three possible 
+plot types, a combination of two of the three, or only one type of plot (see 
+first code chunk to toggle options; default option is all three plot types). 
+The bar plot entails frequencies and percentages. Note that in the case of 
+the example data for this script, the sample size turns out to be near 100, 
+such that the numeric tick marks for percentages and frequencies are nearly on 
+the same level. The box plots do not entail missing responses.  
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center", out.width="85%",out.height="85%", fig.pos="hold", fig.asp = 1.5}
+# Concerning the above parameters, I am not sure if fig.align="center" and fig.pos)"hold" are necessary
+# given different code below. You may experience it yourself, but at some point, for now I may say:
+# never change a running system :D You may play around with it yourself. For the context of tutorials I 
+# think it is good that they are there to be shown.
+
+
+###################################################################################################
+###################################################################################################
+## Extract Frequencies from Data for Heat map, Bar Chart / Histogram and Box plot of Nominal Data #
+###################################################################################################
+###################################################################################################
+
+# BAR CHART and HISTOGRAM more or less the same, since the hist() function also allows for frequencies
+# not densities in the y-axis
+
+# Filter all Nominal Code (likert scale data):
+nominal = filter(code, Variable.Type == "NOMINAL")
+
+# Different to the codebook, the imported data does not entail -9 for nicht beantwortet, 
+# but "", i.e., empty fields... In order to relate the code to the actual text response,
+# we have to change the codebook first:
+for(i in 1:length(nominal$Response.Code)){
+  if(nominal$Response.Code[i] == -9){   # change -9 in the codebook...
+    nominal$Response.Code[i] = ""       # ... to ""
+  } # End if
+} # End for i
+  
+# All unique Survey Question IDs: 
+ques_id = unique(nominal$Variable)
+
+# Put all Questions into a separate list element each using filter() and
+# looping over the vector ques_id with individual nominal 
+# likert scale survey question ids:
+freq_list = list()
+for(i in 1:length(ques_id)){
+  freq_list[[i]] = filter(code, Variable == ques_id[i])
+} # End for i
+
+# Calculate Frequency and add to freq_list using length(which()) for each response variable:
+for(i in 1:length(freq_list)){
+  for (j in 1:length(freq_list[[1]][,1])){
+    data_col = which(colnames(data) == freq_list[[i]][1,"Variable"]) # Extract Variable for 
+                                                                     # below in which()
+    # Calculate frequency using length(which()) and add to table in list()...
+    freq_list[[i]][j,"Frequency"] = length(which(data[,data_col] == freq_list[[i]][j,"Response.Code"])) 
+  } # End for j
+} # End for i
+
+# Delete those tables in the list with sum of frequencies of 0, since they mess up the plot:
+# Vector with lines to delete, given sum of frequency == 0: 
+freq_del = c()
+# Frequencies to check for 0:
+freqs = c()
+for(i in 1:length(freq_list)){
+  if(sum(freq_list[[i]][,"Frequency"]) == 0){
+    freq_del[i] = i 
+    freqs[i] = sum(freq_list[[i]][,"Frequency"])
+  } # End if
+} # End for i
+
+# Now delete all with sum of frequency == 0, since the case of no survey item having frequency 0
+# can occur, it can lead to an error when executing frequ_list2[-0]... So we only delete, given
+# that there is at least one case:   
+if(length(which(freqs == 0)) > 0){
+  freq_list = freq_list[-freq_del]
+} # End if
+
+#############################################################
+# Loop to Plot Likert Scale Bar Chart / Heat Map / Box Plot #
+#############################################################
+
+# For loop successively plots all of the above plot types:
+for(i in 1:length(freq_list)){
+  
+    # Each table including the frequencies is changed into a data frame:
+    likert_scale = as.data.frame(freq_list[[i]])
+    likert_rev = as.data.frame(freq_list[[i]])
+
+    # Response as factor (relates text to a set of numeric factors, so it is 
+    # easier to switch when a function allows data type factor) In general this 
+    # is necessary so that the answers in the bar chart aren't jumbled.
+    unfactor_labels = likert_scale$Response.Label # Some functions can't handle factorized columns... 
+    likert_scale$Response.Label = factor(likert_scale$Response.Label, 
+                                         levels = likert_scale$Response.Label)
+    # Needed in order to be able to flip y-axis heat for the heat map:
+    likert_rev$Response.Label = factor(likert_scale$Response.Label, 
+                                       levels = rev(likert_scale$Response.Label))
+
+    ########### BAR PLOT
+    ####################
+    if(length(grep("bar",options)) > 0){ 
+        # Get sum frequency for transformation for second y-axis
+        sum_freq = sum(freq_list[[i]][,"Frequency"]) # Sum of freq object; 
+                                                     # calling trans = ~./ max() => leads to error!
+        #### Bar Chart Plot (same as hist() but via ggplot and more simple in use):
+        bar = ggplot(freq_list[[i]]) +
+          geom_bar(aes(x=likert_scale$Response.Label, y=Frequency), # Axis labels
+                   stat="identity", # frequencies on y-axis
+                   fill="skyblue",  # color bars
+                   alpha=0.7)+      # opacity of plot
+          scale_y_continuous(
+          name = "Frequency", # Label of the left side y-axis 
+                              # (original y-axis; redundant since aes() already...)
+          sec.axis = sec_axis(trans = ~./sum_freq*100,  # transform into percentages
+                          name = "Percentage")) +       # label for 2nd y-axis, right side
+          ggtitle(freq_list[[i]][1,"Variable.Label"]) + # Title is Question name 
+                                                        # (called Variable label in the code book)
+          xlab("") + # blank x-label
+          coord_fixed(ratio = .4) + # to avoid unusual spacing between plots: 
+                                    # set the aspect ratio here and in theme()
+          # Below labels with angle for better readability; margin 
+          # shrinks the plots, such that 3 fit on a page:
+          theme(axis.text.x = element_text(vjust=0.6,angle=20),
+                plot.margin = margin(10, 10, 10,10), 
+                aspect.ratio = .4) # Here and in coord_fixed(), otherwise plot arrangement messy  
+    } # End if length(grep("bar",options)) > 0
+  
+    ########### Heat Map
+    ####################
+    if(length(grep("heat",options)) > 0){
+       #### Heat map Plot:
+       heat = ggplot(likert_rev, aes(x = "", y = Response.Label, fill = Frequency)) + 
+         geom_tile(color = "white") +  # Tiles of the Heat map
+         geom_text(aes(label = Frequency), color = "black", size = 5) +  # Labels
+         scale_fill_gradient(low = "lightblue", high = "blue") +     # Gradient color scheme
+         theme_minimal() + # simple scheme
+         labs(title = paste(likert_rev[1,1],likert_rev$Variable.Label),
+              x = "",                          # Labels, x is left blank
+              y = "Response",             
+              fill = "Frequency") +            # Label for legend 
+          theme(axis.text.x = element_blank(), # Removes the text from the x-axis, title enough 
+               axis.ticks.x = element_blank()) +
+        # Keeping plot in bounds such that 3 fit on a page
+        theme(plot.margin = margin(10, 10, 10,10), aspect.ratio = 1) # coord_fixed() not necessary here
+    } # End if length(grep("heat",options)) > 0
+ 
+    ########### BOX PLOT
+    ####################
+    if(length(grep("box",options)) > 0){
+       # Extract Names of relevant columns:
+       box_cols_data = unique(nominal$Variable)
+   
+       # Nominal cols from data:
+       data_nom = data[,paste(box_cols_data[i])]
+   
+       # Delete first element (== Var Label) and empty entries
+       Varlab = data_nom[1] # Var Label for Plot
+       data_nom = data_nom[-1] # delete Var Label
+       data_nom = data_nom[data_nom!=""] # delete "nicht beantwortet", which == "" 
+                                         # (-9 to "" was changed with a loop further above)
+       data_box = as.data.frame(as.numeric(data_nom)) # convert to data frame, data_nom is now col_name 
+                                                      # (necessary format for ggplot())
+       colnames(data_box) = c("data_vec") # rename column such data there is no confusion with 
+                                          # the object data_nom within ggplot()
+     
+       # Actual box plot 
+       box = ggplot(data_box, aes(x="", y=data_vec)) + 
+         geom_boxplot(fill = "skyblue") + # color of fill   
+         labs(title = "", x = Varlab, y = "Responses") +           # title label
+         coord_fixed(ratio = 2) + # to delete spacing between plots I had to set the aspect
+                                  # ratio here and in theme(), same for bar plot above...
+         theme(plot.margin = margin(10, 10, 10,10), aspect.ratio = 2) + # keeping plot in bounds such 
+                                                                        # that 3 fit on a page
+         # Labels instead of numbers on y-axis: 
+         scale_y_continuous(breaks = 1:length(likert_scale$Response.Label), # Steps
+                            labels = likert_scale$Response.Label)           # Labels for each step
+    } # End if length(grep("box",options)) > 0
+    
+    # Plot via grid.arrange, otherwise it makes trouble arranging the plots on a page (floaty). 
+    # Below grid.arrange setup for the case of every possible plot option. Reason is that   
+    # plotting without grid.arrange() and grid.arrange() using a list() didn't work for the pdf export. 
+    if(length(options) == 3){
+       grid.arrange(bar,heat,box, nrow = length(options), ncol = 1, heights = c(1,.5,1))
+    } # End if length(options) == 3 
+    
+    if(length(options) == 2){
+       if(length(grep("bar",options)) > 0 & length(grep("heat",options)) > 0){
+          grid.arrange(bar,heat, nrow = 2, ncol = 1, heights = c(1,.5))
+       } # End if
+       if(length(grep("bar",options)) > 0 & length(grep("box",options)) > 0){
+          grid.arrange(bar,box, nrow = 2, ncol = 1, heights = c(1,1))
+       } # End if
+       if(length(grep("heat",options)) > 0 & length(grep("box",options)) > 0){
+         grid.arrange(heat,box, nrow = 2, ncol = 1, heights = c(.5,1))
+       } # End if
+    } # End if length(options) == 2 
+    
+    if(length(options) == 1){
+       if(length(grep("bar",options))){
+         grid.arrange(bar, nrow = 1, ncol = 1, heights = c(1))
+       } # End if
+       if(length(grep("heat",options))){
+         grid.arrange(hear, nrow = 1, ncol = 1, heights = c(1))
+       } # End if
+       if(length(grep("box",options))){
+         grid.arrange(box, nrow = 1, ncol = 1, heights = c(1))
+       } # End if
+    } # End if length(options) == 1
+    
+} # End for i
+
+
+```
+
+\pagebreak
+
+# Bar Plot for the Case of Dichotomous and Boolean Variable Responses
+
+Below just uses simple bar plots of binary responses. If there are field
+with zero frequencies, they may mess up the numeric tick marks of the
+second percentage y-axes.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE,fig.align="center", out.width="80%",out.height="80%", fig.pos="hold"}
+
+# BELOW SIMILAR TO PLOT OF LIKERT SCALES:
+
+# Filter all bool and dichotomous code:
+dichoto = filter(code, Variable.Type == "DICHOTOMOUS")
+bool = filter(code, Variable.Type == "BOOL")
+
+# Add them row-wise them together:
+binary = rbind(dichoto,bool)
+
+# Add col for frequencies. Needed for freq_list below when calculating 
+# the frequencies of each response case:
+freq2 = c(0) 
+binary = cbind(binary,freq2)
+
+# All unique Survey Question IDs: 
+ques_id2 = unique(binary$Variable)
+
+# Put all Questions into a separate list element each using filter() and
+# looping over the vector ques_id with individual binary survey question ids:
+freq_list2 = list()
+for(i in 1:length(ques_id2)){
+  freq_list2[[i]] = filter(code, Variable == ques_id2[i])
+} # End for i
+
+# Calculate Frequency and add to freq_list2:
+for(i in 1:length(freq_list2)){
+  for (j in 1:length(freq_list2[[1]][,1])){
+    data_col = which(colnames(data) == freq_list2[[i]][1,"Variable"])
+    freq_list2[[i]][j,"Frequency"] = length(which(data[,data_col] == freq_list2[[i]][j,"Response.Code"]))
+  } # End for j
+} # End for i
+
+# Delete those tables in the list with sum of frequencies of 0, since they mess up the plot:
+# Vector with lines to delete, given sum of frequency == 0: 
+freq_del = c()
+# Frequencies to check for 0:
+freqs = c()
+for(i in 1:length(freq_list2)){
+  if(sum(freq_list2[[i]][,"Frequency"]) == 0){
+    freq_del[i] = i 
+    freqs[i] = sum(freq_list2[[i]][,"Frequency"])
+  } # End if
+} # End for i
+
+# Now delete all with sum of frequency == 0, since the case of no survey item having frequency 0
+# can occur, it can lead to an error when executing frequ_list2[-0]... So we only delete, given
+# that there is at least one case:   
+if(length(which(freqs == 0)) > 0){
+  freq_list2 = freq_list2[-freq_del]
+} # End if
+
+# Get sum frequency for transformation for second y-axis:
+sum_freq2 = sum(freq_list2[[i]][,"Frequency"]) # Sum of freq object: Can't be called 
+                                               # within trans = ~./ max() => leads to error!
+# Plot Histogram:
+for(i in 1:length(freq_list2)){
+  # Plot Histogram:
+  bar2 = ggplot(freq_list2[[i]]) +
+    geom_bar(aes(x = freq_list2[[i]][,"Response.Label"], y = freq_list2[[i]][,"Frequency"]), # axis labels
+             stat ="identity",  # frequencies
+             fill =  "skyblue", # col of bars
+             alpha = 0.7) +     # Opacity
+    scale_y_continuous(
+    name = "Frequency", # Label of the left side y-axis 
+                        # (original y-axis; redundant since aes() already...)
+    sec.axis = sec_axis(trans = ~./sum_freq2*100,   # transform values into percentages
+                        name = "Percentage")) +  # label for 2nd y-axis
+  ggtitle(paste(freq_list2[[i]][1,"Variable.Label"]))+
+    xlab("") +
+    # Labels with angle for better readability
+    theme(axis.text.x = element_text(vjust=0.6,angle=20),,plot.margin = margin(60, 60, 60, 0)) 
+  # Plot bar (again, needed for ggplot() within a loop...):
+  plot(bar2)
+  # New pdf page after plotting
+} # End for i
+
+```
+
+\pagebreak
+
+# Free Text Answers
+
+Below all free text answers are listed in a table. The first column
+entails the numeric index of each answer for one specific question
+(variable label in the codebook), i.e., not the mere line index of the
+whole table below.\newline Additionally a .csv export can be created of
+all the questions that were answered via free text response input,
+entailing the respective question or variable label, the index of each
+element of responses for each responses (not mere row indices), and the
+answer. See very last code chunk regarding text processing in the
+Rmarkdown and very first code to adjust the respective parameter to TRUE
+for such an export (default is FALSE).
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+
+#######################
+# Language Processing #
+#######################
+
+### Pre- Processing Text Elements:
+text_general = filter(code, Variable.Type == "TEXT")
+# Status actually output similar to likert scale therefore plotted with dichotomous and bool:
+text = filter(text_general, Variable != "STATUS") # deletes!
+# Filter other unnecessary Variables with TEXT as type:
+del = c("SERIAL", "REF","QUESTNNR","MODE")
+for(i in 1:length(del)){
+   text = filter(text, Variable != del[i])
+} # End for i
+
+# All unique Survey Question IDs: 
+ques_id3 = unique(text$Variable)
+
+# Put all Questions into a separate list element each using filter() and
+# looping over the vector ques_id with individual binary survey question ids:
+text_list = list()
+for(i in 1:length(ques_id3)){
+  text_list[[i]] = data[,ques_id3[i]]
+  omit_na = text_list[[i]]
+  omit_na = omit_na[omit_na!=""]
+  omit_na = omit_na[omit_na!="."]
+  omit_na = omit_na[omit_na!="/"]
+  text_list[[i]] = omit_na[omit_na!=" -"]
+} # End for i
+
+# Correct Umlaut in code table, column response label:
+for(i in 1:length(text_list)){
+  text_list[[i]] = stri_replace_all_fixed(
+    text_list[[i]], 
+    c("\xc4","\xe4","\xdc", "\xfc","\xd6","\xf6", "\xdf"), # exchange to...
+    c(  "Ä",   "ä",  "Ü",    "ü",    "Ö",  "ö", "ß"),   # ... this
+    vectorize_all = FALSE)
+} # End for i
+
+### Natural Language Processing would be possible, but so far didn't really
+### lead to insightful perspectives/results...
+### However, below is some code that exports the questions as table.
+text_export = c()
+for(i in 1:length(text_list)){
+     text_ques = as.data.frame(text_list[[i]][1]) # first col as.data.frame for class integrity
+     Index = c(1:length(text_list[[i]][-1]))  # col for indices of each question (not the table as such..)
+     text_ques_resp = cbind(Index, text_ques,text_list[[i]][-1]) # cbind() them
+     text_export = as.data.frame(rbind(text_export,text_ques_resp)) # rbind() with previous lines...
+} # End for i
+
+# Change second col name:
+colnames(text_export)[2:3] = c("Question","Answers") 
+
+#### Print/Plot Table with Text using kableExtra package: 
+text_export %>%
+  kable(format="latex", booktabs = TRUE, longtable = TRUE) %>%
+  kable_styling(latex_options = c("hold_position", "repeat_header"))%>%
+  column_spec(2, width = "3.5cm")%>% # Adjusts column width such that the text within a field
+  column_spec(3, width = "9.5cm")%>% # breaks, otherwise specially col Answer gets very wide,
+                                     # clipping over and over again... 
+  row_spec(seq(1, nrow(text_export), 2), background = "#F0F0F0") 
+                                     # striped table for better readability
+                                     # kable_styling("striped") does not work somehow, t#
+                                     # it worked with latex_options = in the summary table though...
+
+# NOTE THAT THE TABLE WILL ONLY BE SHOWN IN THE PDF OUTPUT OR WHEN YOU EXECUTE CODE IN
+# A REGULAR R SCRIPT PARALLEL TO SEE HOW IT LOOKS!!! DON'T GET CONFUSED!!!
+
+# NOTE THAT THE TABLE WILL ONLY BE SHOWN IN THE PDF OUTPUT OR WHEN YOU EXECUTE CODE IN
+# A REGULAR R SCRIPT PARALLEL TO SEE HOW IT LOOKS!!! DON'T GET CONFUSED!!!
+
+
+##################
+##################
+#### Export Text #
+##################
+##################
+
+if(export_text==TRUE){
+  write.csv(text_export,export_path)
+} # End if
+
+```
