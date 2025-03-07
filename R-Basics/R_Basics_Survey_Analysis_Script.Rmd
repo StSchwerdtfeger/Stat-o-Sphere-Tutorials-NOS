@@ -37,7 +37,7 @@ editor_options:
 # Set your Path including file name and file ending! 
 # CHANGE DATA AND CODE FILE TO CSV FORMAT FIRST!!!
 # INPUT SCHEME: path = "YOUR_PATH_INCLUDING_FILENAME.csv" 
-# NOTE: change \ to / in Windows!!!!
+# NOTE: change \ to / in path in Windows!!!!
 path_data = "data_Example.csv" # here abbreviated, since I set up R project with set wd()...
 path_code = "codebook_Example.csv" # ... same here.
 
@@ -46,8 +46,8 @@ path_code = "codebook_Example.csv" # ... same here.
 export_text = FALSE
 export_path = "text_response_Example.csv"
 
-# NO ADJUSTMENT NEEDED HERE! 
-# Actual Import CSV (did not work well with the .xlsx Versions...):
+# NO ADJUSTMENT NEEDED HERE! NO ADJUSTMENT NEEDED HERE! NO ADJUSTMENT NEEDED HERE!
+# This is ust the actual code fot the import of CSV (did not work well with the .xlsx Versions...):
 data = read.csv(path_data)
 code = read.csv(path_code)
 Frequency = c(0) # used to create an empty "Frequency" column, with 0 as default value...
@@ -66,21 +66,6 @@ code = cbind(code,Frequency) # ... via this line (fills up the whole column with
 # POSSIBLE OPTIONS => default is all three: options = c("box","heat","bar") 
 options = c("box","heat","bar")
 
-#############
-#############
-# Libraries #
-#############
-#############
-
-###### The below loads packages 
-# install.packages("tidyverse")
-library("tidyverse") # filter() and ggplot()
-#install.packages("stringi")
-library("stringi") # for changing faulty umlaut and ß conversion
-#install.packages("kableExtra")
-library("kableExtra") # for kbl() text response table and summary table
-#install.packages("gridExtra")
-library("gridExtra") # needed for grid.arrange() for multiple plots on a page without looking messy
 ```
 
 \pagebreak
@@ -132,19 +117,18 @@ options (likert scale or not) etc. do not matter... Important is that
 the data table has to have a certain structure, were each
 question/field, i.e., the responses (answers) to each variable
 (question), has to to have its own column (not row, or any other format,
-such as a list() object formats in R). Take a look at some of the
-regular data tables to get a better understanding of their scheme. Apart
-from that, the code book has also to be of the same table structure as
-in this example. More important -- and the biggest constrain of this
-Rmarkdown script -- is the fact that it also has to follow the scheme of
-the column names and the options for the data types as given in this
-example. This essentially concerns the following column names of the
-code book: Variable, Variable.Label, Response.Label, Response.Code,
-Variable.Type and the added dummy column Frequency for later processes
-(R is case sensitive, therefore the capital letters).\newline The below
-script processes data of the variable types BOOL, DICHOTOMOUS (both
-essentially binary), TEXT (free text response) and NOMINAL (likert scale
-data).
+such as a list() object formats in R). Take a look at the example data table 
+to get a better understanding of their scheme. Apart from that, the code book 
+also has to have the same table structure as in this example. More important
+-- and the biggest constrain of this Rmarkdown script -- is the fact that it 
+also has to follow the scheme of the column names and the options for the 
+data types as given in this example (SoScie Surcey code book structure). This 
+essentially concerns the following column names of the code book: Variable, 
+Variable.Label, Response.Label, Response.Code, Variable.Type and the added 
+dummy column Frequency for later processes (R is case sensitive, therefore the 
+capital letters).\newline The below script processes data of the variable 
+types BOOL, DICHOTOMOUS (both essentially binary), TEXT (free text response) 
+and NOMINAL (likert scale data).
 
 \par
 
@@ -186,11 +170,11 @@ plot (ggplot2) since they globally mess up the y-axis numeric tick marks
 of the percentage axis for any plot -- they disappear as soon as a
 zero sum of frequencies case is plotted. The code for this
 script automatically omits zero sum of frequencies
-variable responses to avoid this of happenin. The heat map should be 
-self-explanatory, however, it necessary to reverse / mirror the labels in 
+variable responses to avoid this of happening. The heat map should be 
+self-explanatory, however, it was necessary to reverse / mirror the labels in 
 order to be able to flip the y-axis. This was due to the fact, that the 
 frequency heat map legend was mostly inverted to the most outcomes, where the 
-highest frequency is  also on the top. The box plot is also straight forward, 
+highest frequency is shown on the top. The box plot is also straight forward, 
 except of the fact that missing responses where excluded. 
 
 \par
@@ -206,8 +190,27 @@ peer-teaching tutorial series.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
+#############
+#############
+# Libraries #
+#############
+#############
+
+###### The below loads packages 
+# install.packages("tidyverse")
+library("tidyverse") # filter() and ggplot()
+#install.packages("stringi")
+library("stringi") # for changing faulty umlaut and ß conversion
+#install.packages("kableExtra")
+library("kableExtra") # for kbl() text response table and summary table
+#install.packages("gridExtra")
+library("gridExtra") # needed for grid.arrange() for multiple plots on a page without looking messy
+
+
+#############################################
 #############################################
 # Pre-Processing Faulty Unicode Translation #
+#############################################
 #############################################
 
 # Correct Umlaut in code table, column response label:
