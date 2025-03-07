@@ -520,9 +520,9 @@ result = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired  = TRUE)
 #     -10.14286 
 
 
-######################################################
-### 8.2 EXAMPLE II: Filtering NAs (Non-Trivial Case) #
-######################################################
+#######################################################
+### 8.2 EXAMPLE II: Filtering Na's (Non-Trivial Case) #
+#######################################################
 
 # SLIGHTLY DIFFERENT, including NA in the measurements:
 patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
@@ -555,8 +555,7 @@ mean(t1alt$measurement_sysRRalt)
 mean(c(1,NA,3), na.rm = TRUE) 
 # [1] 2
 
-
-### POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
+######################## POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
 # In which lines are NAs (line numbver, not pat. id!)?
 # The below line of code is not assigned to an object name, so that the output 
 # will directly be returned in the console. The output however can't be called
@@ -595,7 +594,7 @@ new_table$patient_id[4] == new_table$patient_id[na_lines[1]]
 new_table$patient_id[7] == new_table$patient_id[na_lines[2]]
 
 
-# Initilize table:
+# Initialize table:
 fin_table = new_table
 # Delete every line with the patient_id given in the list
 # pat_id_na:
@@ -604,7 +603,8 @@ for(i in 1:length(pat_id_na)){ # or length(na_lines)
 } # End for i
 fin_table 
 
-# Example for loop:
+
+############################ Example for loop:
 # Define a object you want to loop over:
 object = c(1,1,1,1)
 
@@ -623,7 +623,29 @@ list_results[3] = object[3]+1
 list_results[4] = object[4]+1
 
 
-#### POSSIBLE SOLUTION II:
+############################ Partial Alternative of the above:
+# Using a nested for loop to get the patient ids with na
+fin_table_alt = new_table
+pat_id_na_alt = c()
+# Patient IDs with NA, alternative way via one nested loop:
+for(i in 1:length(new_table$measurement_sysRRalt)){
+  if(is.na(new_table$measurement_sysRRalt[i])==TRUE){
+    pat_id_na_alt[i] = new_table$patient_id[i]
+  } # End if
+} # End for i
+
+pat_id_na_alt
+# [1] NA NA NA  2 NA NA  4
+
+# Filter NA cases, where new_table$measurement_sysRRalt[i])==FALSE and 
+# no i was stored to the vector pat_id_na_alt...
+pat_id_na_alt = pat_id_na_alt[!is.na(pat_id_na_alt)]
+# [1] 2 4
+
+# Now we could use the previous code for filtering the table...
+
+
+################################################## POSSIBLE SOLUTION II:
 # Filter NA in measurement_sysRRalt
 new_table_alt = filter(new_table, is.na(measurement_sysRRalt) == FALSE)
 
@@ -879,9 +901,9 @@ grep("Bluna", text)
 # [1] 3
 
 
-############################################################################################
-### 8.7 EXAMPLE VII: Deleting NAs from a Single Row and Introducing the Tibble Data Format #
-############################################################################################
+#############################################################################################
+### 8.7 EXAMPLE VII: Deleting NA's from a Single Row and Introducing the Tibble Data Format #
+#############################################################################################
 
 library("tidyverse") # needed to create tibble data tables.
 
@@ -1075,7 +1097,7 @@ test_multi = as.data.frame(cbind(c("criteria","criteria",3),c(1,"criteria",3),c(
 # Here V3 now entails the entry "criteria fulfilled" only   
 # when two criterias are fulfilled!! Via the operator & below.
 # You could also use | which functions as "or" if thats what you need...
-for(i in 1:length(test$V2)){ # cols have same length, same result with V1 or V3 
+for(i in 1:length(test_multi$V1)){ # cols have same length, same result with V2 or V3 
   if(test_multi$V1[i] == "criteria" & test_multi$V2[i] == "criteria"){
     test_multi$V3[i] = "criteria fulfilled"
   } # End if 
@@ -1224,7 +1246,7 @@ table_new
 ##################################################################
 
 # Forgot to find the source for this one:
-# install.package("stringi")
+# install.packages("stringi")
 library(stringi)
 
 # Test character string:
