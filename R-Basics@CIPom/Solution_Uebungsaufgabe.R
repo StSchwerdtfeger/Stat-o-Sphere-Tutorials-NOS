@@ -10,9 +10,23 @@
 #######################################
 
 
-# The script can be executed as a whole. Mark all via ALT + A and then Run via ALT + ENTER.
+# The script can be executed as a whole, given all packages are installed. 
+# Mark all via ALT + A and then Run via ALT + ENTER.
 # More details @ https://journal.medicine.berlinexchange.de/statosphere 
 
+# INSTALL AND LOAD NECESSARY PACKEGES. However, all packages are loaded on spot 
+# in this script as well for educative purposes. A lot of the packages are 
+# entailed in the package "tidyverse" which is actually a package with packages
+# where a package itself is a collection of functions...
+
+# install.packages("tidyverse"):
+library(tidyverse) # filter(), write.csv(); BONUS: reshape(), gather()
+# install.packages("pwr")
+library(pwr) # for power analysis regarding t-test
+# install.packages("effsize")
+library(effsize) # cohen.d() => syntax equivalent to t.test()
+# install.packages("gt")
+library(gt) # gt() for nice looking table, such as in scientific papers
 
 ########## Load Data (a)):
 data = read.csv("Uebungsaufgabe.csv") # Automatically in format data.frame!!
@@ -83,6 +97,7 @@ result_t_test
 # install.packages("effsize")
 library(effsize)
 effsize = cohen.d(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE) 
+effsize
 
 # Cohen's d
 
@@ -150,10 +165,16 @@ pie(table(data$fam))
 # in the table "data"!!!):
 frequencies = filter(data, time == "t1")
 table(frequencies$fam)
-# keine Angabe           no          yes 
-#            2            4            6 
+#     no not specified           yes 
+#      4             2             6
 
-# Check in Console if table is fully cleaned...
+# Alternative way:
+table(data$fam)/2
+# SAME RESULT just somehow sorte differently
+#     no not specified           yes 
+#      4             2             6
+
+# NBefore exporting the table, check in console if your table is fully cleaned...
 data 
 
 # > data 
@@ -232,19 +253,19 @@ fam = t1$fam
 patient_id = t1$patient_id
 reformat = as.data.frame(cbind(patient_id, sysRR_t1, sysRR_t2, fam, RRdiff))
 
-#    patient_id sysRR_t1 sysRR_t2          fam RRdiff
-# 1           1      130      122          yes      0
-# 2           2      132      123           no      0
-# 3           3      133      121 keine Angabe      0
-# 4           4      129      125           no      0
-# 5           5      122      119           no      0
-# 6           6      134      127          yes      0
-# 7           7      140      125 keine Angabe      0
-# 8           8      135      128          yes      0
-# 9           9      129      122          yes      0
-# 10         10      140      128           no      0
-# 11         11      134      122          yes      0
-# 12         12      144      130          yes      0
+#    patient_id sysRR_t1 sysRR_t2            fam RRdiff
+# 1           1      130      122            yes      0
+# 2           2      132      123             no      0
+# 3           3      133      121  not specified      0
+# 4           4      129      125             no      0
+# 5           5      122      119             no      0
+# 6           6      134      127            yes      0
+# 7           7      140      125  not specified      0
+# 8           8      135      128            yes      0
+# 9           9      129      122            yes      0
+# 10         10      140      128             no      0
+# 11         11      134      122            yes      0
+# 12         12      144      130            yes      0
 
 # Add sysRR difference in new column:
 for(i in 1:length(reformat[,1])){
@@ -254,19 +275,19 @@ for(i in 1:length(reformat[,1])){
 # View results: 
 reformat
 # > reformat
-#    patient_id sysRR_t1 sysRR_t2          fam RRdiff
-# 1           1      130      122          yes     -8
-# 2           2      132      123           no     -9
-# 3           3      133      121 keine Angabe    -12
-# 4           4      129      125           no     -4
-# 5           5      122      119           no     -3
-# 6           6      134      127          yes     -7
-# 7           7      140      125 keine Angabe    -15
-# 8           8      135      128          yes     -7
-# 9           9      129      122          yes     -7
-# 10         10      140      128           no    -12
-# 11         11      134      122          yes    -12
-# 12         12      144      130          yes    -14
+#    patient_id sysRR_t1 sysRR_t2           fam RRdiff
+# 1           1      130      122           yes     -8
+# 2           2      132      123            no     -9
+# 3           3      133      121 not specified    -12
+# 4           4      129      125            no     -4
+# 5           5      122      119            no     -3
+# 6           6      134      127           yes     -7
+# 7           7      140      125 not specified    -15
+# 8           8      135      128           yes     -7
+# 9           9      129      122           yes     -7
+# 10         10      140      128            no    -12
+# 11         11      134      122           yes    -12
+# 12         12      144      130           yes    -14
 
 # I'd say reformatting in the above way is rather unusual, since conversion is mostly 
 # from wide to long format. However, this exercise size shows you how to reverse
@@ -278,40 +299,40 @@ reformat
 RRdiff_alt = as.numeric(reformat$sysRR_t2)-as.numeric(reformat$sysRR_t1)
 cbind(reformat,RRdiff_alt) 
 
-#    patient_id sysRR_t1 sysRR_t2          fam RRdiff RRdiff_alt
-# 1           1      130      122          yes     -8         -8
-# 2           2      132      123           no     -9         -9
-# 3           3      133      121 keine Angabe    -12        -12
-# 4           4      129      125           no     -4         -4
-# 5           5      122      119           no     -3         -3
-# 6           6      134      127          yes     -7         -7
-# 7           7      140      125 keine Angabe    -15        -15 
-# 8           8      135      128          yes     -7         -7
-# 9           9      129      122          yes     -7         -7
-# 10         10      140      128           no    -12        -12
-# 11         11      134      122          yes    -12        -12
-# 12         12      144      130          yes    -14        -14
+#    patient_id sysRR_t1 sysRR_t2           fam RRdiff RRdiff_alt
+# 1           1      130      122           yes     -8         -8
+# 2           2      132      123            no     -9         -9
+# 3           3      133      121 not specified    -12        -12
+# 4           4      129      125            no     -4         -4
+# 5           5      122      119            no     -3         -3
+# 6           6      134      127           yes     -7         -7
+# 7           7      140      125 not specified    -15        -15 
+# 8           8      135      128           yes     -7         -7
+# 9           9      129      122           yes     -7         -7
+# 10         10      140      128            no    -12        -12
+# 11         11      134      122           yes    -12        -12
+# 12         12      144      130           yes    -14        -14
 
 # You want to know how many people have a RR diff over or equal to 10.
 # You can work with the abs() function for the absolute value:
 diff_10plus = reformat[abs(as.numeric(reformat$RRdiff)) >= 10,]
-# patient_id sysRR_t1 sysRR_t2          fam RRdiff
-# 3           3      133      121 keine Angabe    -12
-# 7           7      140      125 keine Angabe    -15
-# 10         10      140      128           no    -12
-# 11         11      134      122          yes    -12
-# 12         12      144      130          yes    -14
+#    patient_id sysRR_t1 sysRR_t2           fam RRdiff
+# 3           3      133      121 not specified    -12
+# 7           7      140      125 not specified    -15
+# 10         10      140      128            no    -12
+# 11         11      134      122           yes    -12
+# 12         12      144      130           yes    -14
 
 length(diff_10plus[,1])
 # [1] 5
-# => five patient_ids with RR difference >=10
+# => five patient_ids with RR difference >= 10
 
 
 
 ####### Create a nice table for export (e)):
 # install.packages("gt")
 # library(gt)
-# gt(reformat)
+gt(reformat)
 
 
 # Optionally you can turn the above table into a long format again:
