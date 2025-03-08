@@ -563,6 +563,10 @@ mean(c(1,NA,3), na.rm = TRUE)
 is.na(new_table$measurement_sysRRalt)
 # [1] FALSE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 
+# Note that in order to get the frequency of NA's you can do the following:
+sum(is.na(new_table$measurement_sysRRalt)*1)
+# [1] 2
+
 # Using the which() function linguistically corresponds to our question:
 # In which lines are NAs? Here we execute the is.na() function within which():
 na_lines = which(is.na(new_table$measurement_sysRRalt) == TRUE)
@@ -1714,6 +1718,58 @@ results_table_fin  = results_table[,c(1,2,7,3:6)]
 # q_three      2 2.00 1.00    1     1.5     2.5    3
 
 
+#######################################################
+### 8.17 EXAMPLE XVII: Summing only Parts of a Column #
+#######################################################
+
+# Setting up test table:
+pat_id = c(c(1,1,1),c(2,2), c(3,3,3))
+stay = c(c("22.01.2024","23.02.2024","12.03.2024"),c("02.01.2024","15.04.2024"),c("01.01.2024","24.02.2024","06.03.2024"))
+infect_A = c(c(1,0,1),c(1,0), c(1,1,1)) # 0 == no infection A; 1 == infection A given
+
+# Fitting it together in a data.frame()
+table_infect = as.data.frame(pat_id)
+table_infect = as.data.frame(cbind(table_infect, stay,infect_A))
+
+#   pat_id       stay infect_A
+# 1      1 22.01.2024        1
+# 2      1 23.02.2024        1
+# 3      1 12.03.2024        1
+# 4      2 02.01.2024        2
+# 5      2 15.04.2024        2
+# 6      3 01.01.2024        3
+# 7      3 24.02.2024        3
+# 8      3 06.03.2024        3
+
+# Get infdividual patient ids:
+uniq_id = unique(table_infect$pat_id)
+# [1] 1 2 3
+
+# Summing only the part of the column infect_A that related to pat_id = 1:
+test_filter = filter(table_infect, pat_id == "1")
+sum(test_filter$infect_A)
+# [1] 3
+
+# Using loop to do this with all patient ids:
+# Empty vector for answers:
+sum_infect_A = c()
+for(i in 1:length(uniq_id)){
+  filter_id = filter(table_infect, pat_id == as.character(uniq_id[i]))
+  sum_infect_A[i] = sum(filter_id$infect_A)
+} # End for i
+
+sum_infect_A
+# [1] 2 1 3
+
+# You could now make a table
+as.data.frame(cbind(uniq_id,sum_infect_A))
+
+#   uniq_id sum_infect_A
+# 1       1            2
+# 2       2            1
+# 3       3            3
+
+
 #######################
 # ------------------- #
 #######################
@@ -2490,6 +2546,9 @@ ppois(q = 0.2240418, lambda = 3) # [1] 0.04978707
 ###########################################################################################
 
 ### IMPORTANT!!!!!!!!!!! CLOSE APP AFTER USAGE, OTHERWISE OTHER CODE WONT BE PROCESSED!!!!!!
+### ALSO: YOU MIGHT NEED TO UPDATE R, this was written in R 4.4.1. Same goes for the
+###       Rmarkdown example, downloadable from the R Basics article https://doi.org/10.56776/abbd964d.665f7de5 
+
 
 # Install and load shiny package
 # install.packages("shiny")
@@ -2542,7 +2601,7 @@ server = function(input, output) {
     } # End of Function
     
     # Effect size diff_mean/po_sd 
-    # RECALL: INPUT NAMES WHERE SET VIA numericInput() in code for UI!
+    # RECALL: INPUT NAMES WERE SET VIA numericInput() in code for UI!
     effectsize = (input$sampmean-input$popmean)/input$popsd
     
     # Create sequence of numbers of x (sd's of the x-axis) which then run through
