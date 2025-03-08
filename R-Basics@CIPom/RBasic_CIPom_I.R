@@ -533,9 +533,9 @@ result = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired  = TRUE)
 #     -10.14286 
 
 
-######################################################
-### 8.2 EXAMPLE II: Filtering NAs (Non-Trivial Case) #
-######################################################
+#######################################################
+### 8.2 EXAMPLE II: Filtering Na's (Non-Trivial Case) #
+#######################################################
 
 # SLIGHTLY DIFFERENT, including NA in the measurements:
 patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
@@ -568,14 +568,17 @@ mean(t1alt$measurement_sysRRalt)
 mean(c(1,NA,3), na.rm = TRUE) 
 # [1] 2
 
-
-### POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
+######################## POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
 # In which lines are NAs (line numbver, not pat. id!)?
 # The below line of code is not assigned to an object name, so that the output 
 # will directly be returned in the console. The output however can't be called
 # via a name for another process then...
 is.na(new_table$measurement_sysRRalt)
 # [1] FALSE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+
+# Note that in order to get the frequency of NA's you can do the following:
+sum(is.na(new_table$measurement_sysRRalt)*1)
+# [1] 2
 
 # Using the which() function linguistically corresponds to our question:
 # In which lines are NAs? Here we execute the is.na() function within which():
@@ -608,7 +611,7 @@ new_table$patient_id[4] == new_table$patient_id[na_lines[1]]
 new_table$patient_id[7] == new_table$patient_id[na_lines[2]]
 
 
-# Initilize table:
+# Initialize table:
 fin_table = new_table
 # Delete every line with the patient_id given in the list
 # pat_id_na:
@@ -617,7 +620,8 @@ for(i in 1:length(pat_id_na)){ # or length(na_lines)
 } # End for i
 fin_table 
 
-# Example for loop:
+
+############################ Example for loop:
 # Define a object you want to loop over:
 object = c(1,1,1,1)
 
@@ -636,7 +640,29 @@ list_results[3] = object[3]+1
 list_results[4] = object[4]+1
 
 
-#### POSSIBLE SOLUTION II:
+############################ Partial Alternative of the above:
+# Using a nested for loop to get the patient ids with na
+fin_table_alt = new_table
+pat_id_na_alt = c()
+# Patient IDs with NA, alternative way via one nested loop:
+for(i in 1:length(new_table$measurement_sysRRalt)){
+  if(is.na(new_table$measurement_sysRRalt[i])==TRUE){
+    pat_id_na_alt[i] = new_table$patient_id[i]
+  } # End if
+} # End for i
+
+pat_id_na_alt
+# [1] NA NA NA  2 NA NA  4
+
+# Filter NA cases, where new_table$measurement_sysRRalt[i])==FALSE and 
+# no i was stored to the vector pat_id_na_alt...
+pat_id_na_alt = pat_id_na_alt[!is.na(pat_id_na_alt)]
+# [1] 2 4
+
+# Now we could use the previous code for filtering the table...
+
+
+################################################## POSSIBLE SOLUTION II:
 # Filter NA in measurement_sysRRalt
 new_table_alt = filter(new_table, is.na(measurement_sysRRalt) == FALSE)
 
@@ -892,9 +918,9 @@ grep("Bluna", text)
 # [1] 3
 
 
-############################################################################################
-### 8.7 EXAMPLE VII: Deleting NAs from a Single Row and Introducing the Tibble Data Format #
-############################################################################################
+#############################################################################################
+### 8.7 EXAMPLE VII: Deleting NA's from a Single Row and Introducing the Tibble Data Format #
+#############################################################################################
 
 library("tidyverse") # needed to create tibble data tables.
 
@@ -1088,7 +1114,7 @@ test_multi = as.data.frame(cbind(c("criteria","criteria",3),c(1,"criteria",3),c(
 # Here V3 now entails the entry "criteria fulfilled" only   
 # when two criterias are fulfilled!! Via the operator & below.
 # You could also use | which functions as "or" if thats what you need...
-for(i in 1:length(test$V2)){ # cols have same length, same result with V1 or V3 
+for(i in 1:length(test_multi$V1)){ # cols have same length, same result with V2 or V3 
   if(test_multi$V1[i] == "criteria" & test_multi$V2[i] == "criteria"){
     test_multi$V3[i] = "criteria fulfilled"
   } # End if 
@@ -1237,7 +1263,7 @@ table_new
 ##################################################################
 
 # Forgot to find the source for this one:
-# install.package("stringi")
+# install.packages("stringi")
 library(stringi)
 
 # Test character string:
@@ -1703,6 +1729,58 @@ results_table_fin  = results_table[,c(1,2,7,3:6)]
 # q_one        1 1.33 0.58    1     1.0     1.5    2
 # q_two        1 1.67 1.15    1     1.0     2.0    3
 # q_three      2 2.00 1.00    1     1.5     2.5    3
+
+
+#######################################################
+### 8.17 EXAMPLE XVII: Summing only Parts of a Column #
+#######################################################
+
+# Setting up test table:
+pat_id = c(c(1,1,1),c(2,2), c(3,3,3))
+stay = c(c("22.01.2024","23.02.2024","12.03.2024"),c("02.01.2024","15.04.2024"),c("01.01.2024","24.02.2024","06.03.2024"))
+infect_A = c(c(1,0,1),c(1,0), c(1,1,1)) # 0 == no infection A; 1 == infection A given
+
+# Fitting it together in a data.frame()
+table_infect = as.data.frame(pat_id)
+table_infect = as.data.frame(cbind(table_infect, stay,infect_A))
+
+#   pat_id       stay infect_A
+# 1      1 22.01.2024        1
+# 2      1 23.02.2024        1
+# 3      1 12.03.2024        1
+# 4      2 02.01.2024        2
+# 5      2 15.04.2024        2
+# 6      3 01.01.2024        3
+# 7      3 24.02.2024        3
+# 8      3 06.03.2024        3
+
+# Get infdividual patient ids:
+uniq_id = unique(table_infect$pat_id)
+# [1] 1 2 3
+
+# Summing only the part of the column infect_A that related to pat_id = 1:
+test_filter = filter(table_infect, pat_id == "1")
+sum(test_filter$infect_A)
+# [1] 3
+
+# Using loop to do this with all patient ids:
+# Empty vector for answers:
+sum_infect_A = c()
+for(i in 1:length(uniq_id)){
+  filter_id = filter(table_infect, pat_id == as.character(uniq_id[i]))
+  sum_infect_A[i] = sum(filter_id$infect_A)
+} # End for i
+
+sum_infect_A
+# [1] 2 1 3
+
+# You could now make a table
+as.data.frame(cbind(uniq_id,sum_infect_A))
+
+#   uniq_id sum_infect_A
+# 1       1            2
+# 2       2            1
+# 3       3            3
 
 
 #######################
@@ -2481,6 +2559,9 @@ ppois(q = 0.2240418, lambda = 3) # [1] 0.04978707
 ###########################################################################################
 
 ### IMPORTANT!!!!!!!!!!! CLOSE APP AFTER USAGE, OTHERWISE OTHER CODE WONT BE PROCESSED!!!!!!
+### ALSO: YOU MIGHT NEED TO UPDATE R, this was written in R 4.4.1. Same goes for the
+###       Rmarkdown example, downloadable from the R Basics article https://doi.org/10.56776/abbd964d.665f7de5 
+
 
 # Install and load shiny package
 # install.packages("shiny")
@@ -2533,7 +2614,7 @@ server = function(input, output) {
     } # End of Function
     
     # Effect size diff_mean/po_sd 
-    # RECALL: INPUT NAMES WHERE SET VIA numericInput() in code for UI!
+    # RECALL: INPUT NAMES WERE SET VIA numericInput() in code for UI!
     effectsize = (input$sampmean-input$popmean)/input$popsd
     
     # Create sequence of numbers of x (sd's of the x-axis) which then run through
