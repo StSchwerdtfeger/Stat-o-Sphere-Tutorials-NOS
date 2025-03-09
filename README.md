@@ -11,3 +11,6 @@ https://journal.medicine.berlinexchange.de/statosphere
 ## Introduction Article (written together with Raphael Leuner):
 https://journal.medicine.berlinexchange.de/pub/into-the-stat-o-sphere
 
+## R Basics Article:
+https://doi.org/10.56776/abbd964d.665f7de5 
+
