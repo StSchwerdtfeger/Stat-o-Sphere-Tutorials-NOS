@@ -8,8 +8,15 @@
 ##################################
 ##################################
 
+# install.packages("tidyverse") # needed for caret...
+library(tidyverse)
+# install.packages("caret") # May demand R 4.4.x 
+library(caret)
+# install.packages("shiny") # Shiny app
+library("shiny")
+
 ###### Benfords law example, number between 0 and 10: 
-n=seq(0,10,by=.1)
+n = seq(0,10,by=.1)
 benford = log(n+1)-log(n)
 plot(n,benford)
 
@@ -57,7 +64,7 @@ sum(joint1)==sum(joint2)
 
 ############# BOTH OF THE BELOW FUNCTIONS ONLY WORK WITH PROB. VECTORS EXCEPT WHEN MODEL EVIDENCE IS PROVIDED
 ############# First simple version of our Bayes_Machine() function:
-Bayes_Machine = function (prior,likelihood) {
+Bayes_Machine = function(prior,likelihood) {
   joint = prior*likelihood
   # na.rm = TRUE in sum() deletes 0 rows if given
   modelevidence = sum(joint, na.rm = TRUE) 
@@ -135,6 +142,7 @@ model_evidence = sum(c(.5,.5,0,0)*c(0,0,0,0)) # sum(joint)
 posterior = joint/model_evidence # Note that it says: 0 divided by 0!
 posterior
 
+
 # [1] NaN NaN NaN NaN 
 # NaN = Not a number.
 # This is due to the fact that 0/0 is not defined. At this point
@@ -143,9 +151,9 @@ posterior
 
 
 
-###################################
-# 3.2 Example COVID19 Quick Tests #
-###################################
+###############################
+# Example COVID19 Quick Tests #
+###############################
 
 # Contingency table / confusion matrix of our COVID19 test-kit example
 true_pos = 144
@@ -154,8 +162,8 @@ false_pos = 1
 false_neg = 499
 
 # Turn the above into a matrix/table:
-table = matrix(c(true_pos,true_neg,false_pos,false_neg), nrow=2) # colwise 
-table = matrix(c(true_pos, false_pos,true_neg,false_neg), nrow=2, byrow=TRUE) # rowwise
+table = matrix(c(true_pos,true_neg,false_pos,false_neg), nrow=2) # col-wise 
+table = matrix(c(true_pos, false_pos,true_neg,false_neg), nrow=2, byrow=TRUE) # row-wise
 
 # table
 #      [,1] [,2]
@@ -196,7 +204,7 @@ bal_acc = (sensit+specif)/2
 
 
 # Load Caret package for computing confusion matrix
-# install.package("caret") # UNCOMMENT TO INSTALL PACKAGE!!!
+# install.packages("caret") # UNCOMMENT TO INSTALL PACKAGE!!!
 library(caret)  
 confusionMatrix(table)
 ?confusionMatrix()
@@ -497,9 +505,10 @@ n = seq(0,1000, by = 10)
 t_val = c()
 
 # t_values for effect size 0.1 given different sizes of n:
-# The below is just a repetitive calculation of t-/z-values, given differnt sample sizes!
+# The below is just a repetitive calculation of t-/z-values, given different sample sizes!
+effsiz = .1
 for(i in 1:length(n)){
-  t_val[i] = 0.1*sqrt(n[i]) 
+  t_val[i] = effsiz*sqrt(n[i]) 
 } # End for i
 
 # Plot result:
@@ -605,7 +614,7 @@ pwr.t.test(d = .5, sig.level = .05, power = .8, type = "two.sample")
 
 # Function to plot a power curve, based on the code from Cinni Patel
 # Code was adjusted for readability and uses regular plot() instead of ggplot2()
-# https://cinnipatel.medium.com/power-curve-in-r-8a1e67fb2600  
+# https://cinnipatel.medium.com/power-curve-in-r-8a1e67fb2600   
 
 power_curve <- function(sample_size){ # Start of function
   # Vector for the x-axis, representing possible effect sizes ranging from
@@ -794,6 +803,17 @@ covarXYsamp = cov(x,y)                # samp cov := cov(x,y)
 #### Calculating the intercept:
 intercept = mean(y)-(cov(x,y)/var(x))*mean(x)
 # [1] 0.2318182
+
+
+
+
+
+
+
+
+
+
+
 
 
 
