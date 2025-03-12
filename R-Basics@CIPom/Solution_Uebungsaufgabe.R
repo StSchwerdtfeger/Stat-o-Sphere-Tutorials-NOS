@@ -1,7 +1,8 @@
 #######################################
 #######################################
 #        R-Basic Tutorial I-III       #
-#  Solution for "Übungsaufgabe.docx"  #
+#   Solution for "R_Basics_Exercise"  #
+#       and "Übungsaufgabe.docx"      #
 #       CIPom @ Charité Edition       #
 #                 by                  #
 #       Steffen Schwerdtfeger         # 
