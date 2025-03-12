@@ -8,7 +8,7 @@ output:                            # \pagebreak below is for after the TOC, Sys.
     toc: TRUE       # content table with page number for each chapter
     toc_depth: 3    # depth means up to 1.1.1 (= 3), 
                     # this script actually only uses one level...
-    latex_engine: xelatex  # makes sure é is correctly shown 
+    latex_engine: xelatex  # makes sure é is correctly shown        
                            # in markdown texts (no problem in titles somehow)
 header-includes: # The below makes sure that page numbering starts at page 2.
                  # The below took me ages to figure out, even with AI, which I avoid, no success.
@@ -22,6 +22,8 @@ word_document: default      # no options for potential word output are set (but 
 editor_options: 
  markdown:
     wrap: 72 # Line length of 72 characters; ensured for the case of multiple editors
+    
+########### ==>>> LINE 11 to 20 optional! Script then may run without MikTex, Tex Live installation!
 ---
 
 ``` {r, echo = FALSE, warning = FALSE, message = FALSE}
@@ -53,6 +55,7 @@ code = read.csv(path_code)
 Frequency = c(0) # used to create an empty "Frequency" column, with 0 as default value...
 code = cbind(code,Frequency) # ... via this line (fills up the whole column with 0 eventually).
 
+
 ################
 ################
 # PLOT OPTIONS #
@@ -66,6 +69,24 @@ code = cbind(code,Frequency) # ... via this line (fills up the whole column with
 # POSSIBLE OPTIONS => default is all three: options = c("box","heat","bar") 
 options = c("box","heat","bar")
 
+
+#############
+#############
+# Libraries #
+#############
+#############
+
+###### The below loads packages 
+#install.packages("tidyverse")
+library("tidyverse") # filter() and ggplot()
+#install.packages("stringi")
+library("stringi") # for changing faulty umlaut and ß conversion
+#install.packages("kableExtra")
+library("kableExtra") # for kbl() text response table and summary table
+#install.packages("gridExtra")
+library("gridExtra") # needed for grid.arrange() for multiple plots on a page without looking messy
+#install.packages("rmarkdown")
+library("rmarkdown")
 ```
 
 \pagebreak
@@ -91,7 +112,7 @@ three columns, one with the question label, one for the index of each
 element for each question (not mere row number of the exported table)
 and one column with the free text answers.\newline
 
-## What does the corresponding Rmarkdown script do and how can I make use of it?
+## What does the corresponding Rmarkdown script do and how can I use it?
 
 The Rmarkdown script corresponding to this PDF is a generalized way to
 process reoccurring survey data with repeating data table and code book
@@ -189,23 +210,6 @@ peer-teaching tutorial series.
 
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
-
-#############
-#############
-# Libraries #
-#############
-#############
-
-###### The below loads packages 
-# install.packages("tidyverse")
-library("tidyverse") # filter() and ggplot()
-#install.packages("stringi")
-library("stringi") # for changing faulty umlaut and ß conversion
-#install.packages("kableExtra")
-library("kableExtra") # for kbl() text response table and summary table
-#install.packages("gridExtra")
-library("gridExtra") # needed for grid.arrange() for multiple plots on a page without looking messy
-
 
 #############################################
 #############################################
@@ -321,10 +325,10 @@ results_table_fin %>%
                                                                # creating funky effects in pdf.
 
 # NOTE THAT THE TABLE WILL ONLY BE SHOWN IN THE PDF OUTPUT OR WHEN YOU EXECUTE CODE IN
-# A REGULAR R SCRIPT PARALLEL TO SEE HOW IT LOOKS!!! DON'T GET CONFUSED!!!
+# A REGULAR R SCRIPT >IN PARALLEL TO SEE HOW IT LOOKS!!! DON'T GET CONFUSED!!!
 
 # NOTE THAT THE TABLE WILL ONLY BE SHOWN IN THE PDF OUTPUT OR WHEN YOU EXECUTE CODE IN
-# A REGULAR R SCRIPT PARALLEL TO SEE HOW IT LOOKS!!! DON'T GET CONFUSED!!!
+# A REGULAR R SCRIPT IN PARALLEL TO SEE HOW IT LOOKS!!! DON'T GET CONFUSED!!!
 
 ```
 
@@ -452,6 +456,7 @@ for(i in 1:length(freq_list)){
           xlab("") + # blank x-label
           coord_fixed(ratio = .4) + # to avoid unusual spacing between plots: 
                                     # set the aspect ratio here and in theme()
+                                    # ratio is though of as 2 = 2/1; .5 = 1/2...
           # Below labels with angle for better readability; margin 
           # shrinks the plots, such that 3 fit on a page:
           theme(axis.text.x = element_text(vjust=0.6,angle=20),
@@ -490,7 +495,7 @@ for(i in 1:length(freq_list)){
        # Delete first element (== Var Label) and empty entries
        Varlab = data_nom[1] # Var Label for Plot
        data_nom = data_nom[-1] # delete Var Label
-       data_nom = data_nom[data_nom!=""] # delete "nicht beantwortet", which == "" 
+       data_nom = data_nom[data_nom!=""] # delete "nicht beantwortet" / "not answered", which == "" 
                                          # (-9 to "" was changed with a loop further above)
        data_box = as.data.frame(as.numeric(data_nom)) # convert to data frame, data_nom is now col_name 
                                                       # (necessary format for ggplot())
@@ -545,9 +550,46 @@ for(i in 1:length(freq_list)){
 
 
 ```
-
 \pagebreak
 
+# Frequency of Completed Surveys per Day
+
+The below bar plot can be used to evaluate when to stop a survey -- e.g. when 
+only few surveys are completed in the last couple of days, compared to other
+times with a much higher or peak frequency. 
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE,fig.align="center", out.width="80%",out.height="80%", fig.pos="hold"}
+
+##########################################
+##########################################
+# Frequency of Completed Surveys per Day #
+##########################################
+##########################################
+
+# Extract Column with dates and delete first entry (Label name)
+dates = data$STARTED[-1] # STARTED entails time stamp when survey was started
+
+# Convert to POSIXct and extract date without time
+dates = as.POSIXct(dates, format="%Y-%m-%d %H:%M")
+dates = as.Date(dates)
+
+# Completed Surveys per Day
+freq_per_day <- as.data.frame(table(dates))
+
+# Change column names:
+colnames(freq_per_day) <- c("date", "frequency")
+
+#### Bar Chart Plot of Frequency of Completed Surveys per Day:
+bar_comp_sur = ggplot(freq_per_day) + # same code used for other plots in this script
+  geom_bar(aes(x=date, y=frequency), stat = "identity",  fill="skyblue", alpha=0.7)+
+  xlab("Frequency of Completed Surveys")+
+  theme(axis.text.x = element_text(vjust=0.6,angle=45),
+                plot.margin = margin(10, 10, 10,10))
+
+plot(bar_comp_sur) # Plot Bar plot
+
+```
+\pagebreak
 # Bar Plot for the Case of Dichotomous and Boolean Variable Responses
 
 Below just uses simple bar plots of binary responses. If there are field
@@ -653,7 +695,9 @@ for such an export (default is FALSE).
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 
 #######################
+#######################
 # Language Processing #
+#######################
 #######################
 
 ### Pre- Processing Text Elements:
