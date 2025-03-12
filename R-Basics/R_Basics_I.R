@@ -19,7 +19,26 @@
 # Github page with all Stat-o-Sphere Scripts:
 # https://github.com/StSchwerdtfeger 
 
-#### UNFOLD CODE of the desired chapter (small arrow at the lower line of #'s).
+#### FOLD / UNFOLD CODE of the desired chapter (small arrow at the lower line of #'s).
+
+# Libraries used in this tutorial script (will be loaded on spot as well for
+# educational purpose; however installing the below makes sure the whole script,
+# exercise and Rmarkdown example can be executed in one go):
+
+#install.packages(c("tidyverse","stringi","effsize","shiny", "readxl"))
+#library("tidyverse") # filter(), select(), gather(), melt() 
+#library("stringi")   # changing symbol patterns such as Ae to Ä
+#library("effsize")   # cohen.d()
+#library("shiny")     # create and run shiny apps
+#library/"readxl")    # read_excel()
+
+# Needed for Rmarkdown example:
+#install.packages(c("gt","kableExtra",))
+#library("gt") # gt() nice looking tables
+#install.packages("kableExtra")
+#library("kableExtra") # kbl() nice looking tables
+#install.packages("gridExtra") 
+#library("gridExtra") # grid.arrange() multiple plot on one page
 
 ################################################################
 # 1 What is the Function of a Computer? — A Short Introduction #
@@ -217,6 +236,10 @@ mat_bind = cbind(c(1,2,3),c(1,2,3),c(1,2,3))
 # [2,]    2    2    2
 # [3,]    3    3    3
 
+# Note that you can select several rows and colums via
+mat_bind[c(1,2),1] # first two rows, first column
+# [1] 1 2
+
 # Transforming an atomic matrix table into a "molecular" data table.
 # Here the columns can have different classes, each column for itself
 # though is still atomic in its class. However, with the above method
@@ -245,7 +268,6 @@ mat_bind$V2[2]
 # you can also call a column by name within the brackets (same would be
 # possible with lines when lines were given names via rownames()...):
 mat_bind[1,"V2"]
-
 
 # Column names can be changed via:
 colnames(mat_bind) = c("One", "Two", "Three") # rownames() exists too
@@ -296,14 +318,6 @@ string = c("One",2,3)
 # Character strings have to have ""
 c("object",2,3)
 # [1] "object" "2" "3"
-
-
-# Character strings:
-string = c("One",2,3) 
-# Even though there are numbers involved, they will
-# be converted into symbols.
-# [1] "One" "2"   "3" 
-
 class(string)
 # [1] "character"
 
@@ -413,7 +427,8 @@ library("readxl")
 
 # install.packages("readr")
 library("readr") # package also within "tidyverse"
-# Scheme: write.csv(export_table, "File Path")
+# Scheme: 
+write.csv(export_table, "File Path")
 # write.csv()
 # write.csv2()
 
@@ -493,10 +508,14 @@ table = cbind(table,time,measurement_sysRR,fam)
 
 # install.packages("dplyr")  # install package
 library(dplyr)             # load/activate package
-# Filter function: filter(data_object, columnname == "entry") or != for unequal
+# Filter function: filter(data_object, column_name == "entry") or != for unequal
 t1 = filter(table, time == "t1")
 t1 = filter(table, time != "t2") # alternative
 t2 = filter(table, time == "t2")
+
+# Alternative without filter function:
+t1_alt = table[table$time == "t1",] # placed in row position; don't forget comma
+t1 == t1_alt # All true...
 
 # From there we could go on an explore the data:
 # Simple plotting example (note that the code is spread over two lines!!!):
@@ -555,8 +574,27 @@ mean(t1alt$measurement_sysRRalt)
 mean(c(1,NA,3), na.rm = TRUE) 
 # [1] 2
 
+############################ Example for loop:
+# Define a object you want to loop over:
+object = c(1,1,1,1)
+
+# Initialize a list to store the results:
+list_results = c()
+
+# For loop that adds +1 to every element of the above object:
+for(i in 1:length(object)){
+  list_results[i] = object[i]+1
+} # End for i
+
+# Analoge without loop (same code, just each i is written out individually line by line): 
+list_results[1] = object[1]+1
+list_results[2] = object[2]+1
+list_results[3] = object[3]+1
+list_results[4] = object[4]+1
+
+
 ######################## POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
-# In which lines are NAs (line numbver, not pat. id!)?
+# In which lines are NAs (line number, not pat. id!)?
 # The below line of code is not assigned to an object name, so that the output 
 # will directly be returned in the console. The output however can't be called
 # via a name for another process then...
@@ -582,6 +620,7 @@ na_lines = which(na == TRUE) # which numeric index position is na?
 
 # Initialize vector:
 pat_id_na = c()
+
 # Determine which patient_id is in the lines from the list na_lines: 
 for(i in 1:length(na_lines)){
   pat_id_na[i] = new_table$patient_id[na_lines[i]]
@@ -607,27 +646,7 @@ for(i in 1:length(pat_id_na)){ # or length(na_lines)
 } # End for i
 fin_table 
 
-
-############################ Example for loop:
-# Define a object you want to loop over:
-object = c(1,1,1,1)
-
-# Initilize a list to store the results:
-list_results = c()
-
-# For loop that adds +1 to every element of the above object:
-for(i in 1:length(object)){
-  list_results[i] = object[i]+1
-} # End for i
-
-# Analoge without loop (same code, just each i is written out individually line by line): 
-list_results[1] = object[1]+1
-list_results[2] = object[2]+1
-list_results[3] = object[3]+1
-list_results[4] = object[4]+1
-
-
-############################ Partial Alternative of the above:
+############################ Alternative of the above Step I and II:
 # Using a nested for loop to get the patient ids with na
 fin_table_alt = new_table
 pat_id_na_alt = c()
@@ -641,12 +660,13 @@ for(i in 1:length(new_table$measurement_sysRRalt)){
 pat_id_na_alt
 # [1] NA NA NA  2 NA NA  4
 
-# Filter NA cases, where new_table$measurement_sysRRalt[i])==FALSE and 
+# Filter NA cases of a single column, where new_table$measurement_sysRRalt[i])==FALSE and 
 # no i was stored to the vector pat_id_na_alt...
 pat_id_na_alt = pat_id_na_alt[!is.na(pat_id_na_alt)]
 # [1] 2 4
 
 # Now we could use the previous code for filtering the table...
+
 
 
 ################################################## POSSIBLE SOLUTION II:
@@ -702,7 +722,7 @@ fin_table$patient_id == fin_table_alt$patient_id
 # Define an object you want to loop over:
 object = c(1,1,1,1)
 
-# Initilize a list to store the results:
+# Initialize a list to store the results:
 list_results = c()
 # [1] NULL
 
@@ -767,9 +787,10 @@ apply(result, MARGIN = 2, FUN = function(x){x+1})
 
 # Here sum the cols via calling sum() within apply()
 apply(result, MARGIN = 2, FUN = sum)
+#[1] 6 6
 # Here sum the rows
 apply(result, MARGIN = 1, FUN = sum)
-
+# [1] 4 4 4
 
 ########################################################################
 ### 8.5 EXAMPLE V: Introduction into “tidyverse” and the Pipe Operator #
@@ -796,7 +817,7 @@ test1 = new_table %>%
 # confusing as a beginner, when starting with piped functions and then wanting 
 # to use each function for itself.
 
-test1 # for t1 only patient_id 2 has an NA...
+test1 # for t2 only patient_id 2 has an NA...
 #   patient_id time measurement_sysRRalt
 # 1          1   t2                  122
 # 3          3   t2                  121
@@ -810,7 +831,7 @@ new_table %>%
   select(patient_id,time)
 
 # Casual way we have gone through before via $ and cbind()
-new_table2 = cbind(new_table$patient_id,new_table$time)
+new_table2 = as.data.frame(cbind(new_table$patient_id,new_table$time))
 
 # Scheme: select(data_table, colname1, colname2) or more columns of course...
 new_table3 = select(new_table, patient_id, time)
@@ -896,13 +917,26 @@ first_name = word(names$name,1) # the 1 stands for first word of
 # is targeted like delimiter so to speak 
 # [1] "Name" "Name" "Name"
 
+# Select certain parts of a string:
+text = c("Become a Cyber!")
+substr(text,10,15) # Element 10 to 15
+# [1] "Cyber!"
+
 # Another important function is grep() which can detect a part of a character 
 # string or a pattern, so speak. It is from the base package
 # grep(pattern = , object)
 text = c("Bla", "Blub", "Bluna")
-grep("Bluna", text)
-# Output is the position, equivalent to the which() function output.
-# [1] 3
+grep("Blu", text)
+# Output is the positions, equivalent to the which() function output.
+# [1] 2 3
+
+# grepl() does pattern matching returning a logical:
+grepl("Blu",text)
+# [1] FALSE  TRUE  TRUE
+
+# Replace parts of a character string (similar to example in 8.11)
+gsub("Blu","Bla", text)
+# [1] "Bla"   "Blab"  "Blana"
 
 
 #############################################################################################
@@ -1221,7 +1255,7 @@ table_new
 # 5    a    44 Something1
 
 
-############### This time only i and j!!!
+############### This time only i and j needed, so even shorter!!!
 decode = c("") # empty vector
 table_new = as.data.frame(cbind(code,count,decode))
 
@@ -1319,7 +1353,7 @@ filtering = function(x,y){ # x = id column vector; y = full data set (i.e., give
   # function wont work:   
   
   inter2 = filter(binded, inter == "1" )  # filter rows with binary 0 :=
-  # explicit non (!) duplicate values
+                                          # explicit non (!) duplicate values
   # inter2 = filter(binded, inter != "0") # => optionally delivers equivalent results. 
   
   blank = matrix(0,length(x))             # matrix vector list for the nested for loop:
@@ -1733,13 +1767,13 @@ table_infect = as.data.frame(cbind(table_infect, stay,infect_A))
 
 #   pat_id       stay infect_A
 # 1      1 22.01.2024        1
-# 2      1 23.02.2024        1
+# 2      1 23.02.2024        0
 # 3      1 12.03.2024        1
-# 4      2 02.01.2024        2
-# 5      2 15.04.2024        2
-# 6      3 01.01.2024        3
-# 7      3 24.02.2024        3
-# 8      3 06.03.2024        3
+# 4      2 02.01.2024        1
+# 5      2 15.04.2024        0
+# 6      3 01.01.2024        1
+# 7      3 24.02.2024        1
+# 8      3 06.03.2024        1
 
 # Get infdividual patient ids:
 uniq_id = unique(table_infect$pat_id)
@@ -2431,11 +2465,9 @@ exp(1) # [1] 2.718282
 2^2 # [1] 4
 
 # Dot product:
-c(2,4,6)*cbind(c(1,1,1),c(2,2,2))
+c(2,4,6)%*%cbind(c(1,1,1),c(2,2,2))
 #      [,1] [,2]
-# [1,]    2    4
-# [2,]    4    8
-# [3,]    6   12
+# [1,]   12    24
 
 # MAX/MIN
 max(c(1,2,3)) # [1] 3
