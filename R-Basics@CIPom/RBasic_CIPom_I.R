@@ -872,10 +872,9 @@ new_table3 = select(new_table, patient_id, time)
 new_table2 == new_table3 # all TRUE...
 
 
-#########################################################################
-### 8.5.1 Representation of “Solution/Algorithm II” from Example II via # 
-### tidyverse and the Dangers of the na.omit() Function                 #
-#########################################################################
+###################################################################################
+### 8.5.1 Representation of “Solution/Algorithm II” from Example II via tidyverse #
+###################################################################################
 
 
 ### POSSIBLE SOLUTION II Simple dplyr/tidyverse alternative:
@@ -885,23 +884,6 @@ new_table_alt %>%   # new_table_alt was filtered for NAs already!!!
   # when executing next line!
   filter(n()>1)     # filters if n of each grouped entry is greater 
 # than 1 such that all single entries get filtered
-
-# Example na.omit()
-test_na_omit = cbind(c(1,NA,3,4), c(1,2,NA,4))
-#      [,1] [,2]
-# [1,]    1    1
-# [2,]   NA    2
-# [3,]    3   NA
-# [4,]    4    4
-
-na.omit(test_na_omit)
-#      [,1] [,2]
-# [1,]    1    1
-# [2,]    4    4
-# attr(,"na.action")
-# [1] 2 3
-# attr(,"class")
-# [1] "omit"
 
 
 
@@ -1079,10 +1061,31 @@ na.omit(test_na_omit)
 # attr(,"class")
 # [1] "omit"
 
-
-# Calculate mean:
+# Calculate mean using as.numeric():
 x3 = mean(as.numeric(x2))
 # [1] 128.5833
+
+# Another function that can be used is drop_na(df,column), where
+# you just have to name the table and the column with NAs, which you 
+# want to delete (the lines, so similar to filter(data, is.na(data$col)==TRUE)):
+# Test data for drop_na() - function only works with data frames:
+a = c(1,2,3)
+b = c(1,2,NA)
+c = c(1,NA,3)
+data = as.data.frame(cbind(a,b,c))
+data
+#   a  b  c
+# 1 1  1  1
+# 2 2  2 NA
+# 3 3 NA  3
+
+# Drop lines given NAs in column b
+drop_na(data,b)
+# > drop_na(df,b)
+#   a b  c
+# 1 1 1  1
+# 2 2 2 NA
+
 
 #################################################################
 ### 8.8 EXAMPLE VIII: Rearranging and Deleting Columns and Rows #
