@@ -1,0 +1,54 @@
+Function,Package,Short Description,Chapter (if function very common then only chapter with first mention)
+c(),base,Combines any value of any data type to form a vector,5
+cbind() rbind(),base,Combines vectors column- or row-wise,5
+is.numeric() as.numeric()base,base,Scheme: is.CLASS and as.CLASS functions to evaluate and change classes,5
+class(),base,Evaluate class,5
+sum(),base,Summing vectors/matrices�,"9.5,8.2.1,8.4,8.17"
+print(),base,�Print� in console,1
+matrix(),base,Create atomic matrix,5
+array(),base,Multidimensional table / tensor,5
+list(),base,"Create a list of tables, values etc., no boundaries",5
+t(),base,"Transpose vector, matrix.",5
+as.data.frame(),base,Change atomic vector/matrix to a �molecular� data frame.,5
+colnames() rownames,base,Change column or row names of a data frame,5
+read.csv()( read.csv2(),utils,Import CSV file with either colon or semicolon as delimiter.,6
+getwd(),base,Check working directory folder,6
+setwd(),base,Set working directory folder,6
+url(),base,"Load url, e.g. a data table from a website-",6
+read.excel(),readxl,Import Excel tables. ,6
+write.csv() write.csv2(),utils,Export as CSV file.,6
+plot(),base,"Plot graphs, dots etc.",6
+View(),utils,View table in Rstudio viewer,7
+data(),utils,Show all (when executed with no input) or load data table.,7
+library(),base,Load packages,7
+install.packages(),base,Install package from CRAN server.,7
+ggplot(),ggplot2,Advanced plot function,7
+filter(),dplyr,"Filter function, filtering rows by a certain column entry criteria. Replication in chapter 9.6.","8.1,9.6"
+points(),base,Add points to existing plot,8.1
+t.test(),stats,T-test in various forms. ,8.1
+mean(),stats,Mean function,8.2
+is.na(),base,Checks which entries of a vector or table are NA and marks them TRUE and FALSE otherwise. ,8.2
+which(),base,In which index position is a certain entrie with certain criteria,
+apply(),base,Apply a function onto a table (repetitively),8.4
+select(),dplyr,Similar to cbind() just different syntax. Select columns to become a table. ,8.5
+na.omit(),base,Omits lines with Nas. ,8.5
+unique(),base,Show unique values in a vector (==without duplicates),8.6
+word(),stringr,E.g. extract first word of a character phrase and more.,8.6
+grep(),base,Pattern matching function,8.6
+stri_replace_all_fixed(),stringi,"Used to change patters, e.g. Ae into ą",8.11
+duplicated(),base,Marks duplicates as TRUE and FALSE otherwise.,8.12
+gather(),tidyr,Wide to long format,8.13
+melt(),reshape2,-- same purpose --,8.13
+sd(),stats,Sample standard deviation,8.15
+as.Date(),base,Format into special date format.,8.15
+summary(),base,"Summary has several functions, dependent on input, for table: quantiles, mean, median; different with lm()�",8.16
+round(),base,Round numbers to a certain decimal step.,8.16
+Shiny app functions (several functions),shiny,"Several functions, see Chapter 11",11
+grid.arrange(),pdp,Controlling floaty plots and arrange several on a page,12
+gt(),gt,Create nice looking table,12
+kble(),kabelExtra,Creating nice looking tables.,12
+cohen.d(),effsize,Effect size with CI.,8.18
+length(),base,Evaluate length / n of a vector/object ,8.2
+pie(),graphics,Create a pie chart based on a frequency table via table(),14
+table(),base,Create a frequency table (and more),14
+Table with discussed functions from the R-Basics article. Several math functions such runif() and logical operators are found in chapter 10 and are not entailed on this list.,,,
