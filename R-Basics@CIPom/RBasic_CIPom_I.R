@@ -36,14 +36,16 @@
 
 # Libraries used in this tutorial script (will be loaded on spot as well for
 # educational purpose; however installing the below makes sure the whole script,
-# exercise and Rmarkdown example can be executed in one go):
+# exercise and Rmarkdown example can be executed as a whole in one go):
 
 #install.packages(c("tidyverse","stringi","effsize","shiny", "readxl"))
-#library("tidyverse") # filter(), select(), gather(), melt() 
+# Tidyverse entails among others stringr, dplyr, ggplot
+#library("tidyverse") # filter(), select(), gather(), melt() group_by() summarize() 
 #library("stringi")   # changing symbol patterns such as Ae to Ä
 #library("effsize")   # cohen.d()
 #library("shiny")     # create and run shiny apps
 #library/"readxl")    # read_excel()
+
 
 # Needed for Rmarkdown example:
 #install.packages(c("gt","kableExtra",))
@@ -314,12 +316,25 @@ data_frame = as.data.frame(character)
 # the below also demonstrates how to use cbind() to add a vector 
 # to an existing table:
 data_frame = cbind(data_frame,numeric1, numeric2)
+# or just:
+data_frame = data.frame(character,numeric1,numeric2)
 is.character(data_frame$character)
 # [1] TRUE 
 is.numeric(data_frame$numeric1)
 # [1] TRUE
 is.numeric(data_frame$numeric2)
+# [1] TRUE # Col 1 is character the others numeric: molecular data frame!
+
+# In comparison to binding on the atomic levels:
+data_frame_atomic = as.data.frame(cbind(character,numeric1,numeric2))
+is.character(data_frame_atomic$character)
 # [1] TRUE
+is.character(data_frame_atomic$numeric1)
+# [1] TRUE
+is.character(data_frame_atomic$numeric2)
+# [1] TRUE # ALL ARE STILL OF THE CLASS CHARACTER! 
+           # But can be changed each now as it is
+           # still also now a molecular data frame format
 
 
 # String Example
@@ -441,7 +456,7 @@ library("readxl")
 # install.packages("readr")
 library("readr") # package also within "tidyverse"
 # Scheme: 
-write.csv(export_table, "File Path")
+# write.csv(export_table, "File Path")
 # write.csv()
 # write.csv2()
 
@@ -529,6 +544,10 @@ t2 = filter(table, time == "t2")
 # Alternative without filter function:
 t1_alt = table[table$time == "t1",] # placed in row position; don't forget comma
 t1 == t1_alt # All true...
+
+# Also note that you can filter for multiple factors. The below keeps only
+# those lines that are either "ys" in fam and "yes" in fam:
+filter(table, fam == "ys" | fam == "yes") 
 
 # From there we could go on an explore the data:
 # Simple plotting example (note that the code is spread over two lines!!!):
@@ -994,7 +1013,7 @@ x[4,3] = 122
 x$measurement_sysRRalt[4]
 # [1] 122
 
-#Cheack class of column:
+# Check class of column:
 class(x$measurement_sysRRalt)
 # [1] "numeric"
 
@@ -1765,9 +1784,9 @@ results_table_fin  = results_table[,c(1,2,7,3:6)]
 # q_three      2 2.00 1.00    1     1.5     2.5    3
 
 
-#######################################################
-### 8.17 EXAMPLE XVII: Summing only Parts of a Column #
-#######################################################
+#################################################################################################
+### 8.17 EXAMPLE XVII: Summing only Parts of a Column also via using group_by() and summarize() #
+#################################################################################################
 
 # Setting up test table:
 pat_id = c(c(1,1,1),c(2,2), c(3,3,3))
@@ -1795,7 +1814,7 @@ uniq_id = unique(table_infect$pat_id)
 # Summing only the part of the column infect_A that related to pat_id = 1:
 test_filter = filter(table_infect, pat_id == "1")
 sum(test_filter$infect_A)
-# [1] 3
+# [1] 2
 
 # Using loop to do this with all patient ids:
 # Empty vector for answers:
@@ -1816,6 +1835,83 @@ as.data.frame(cbind(uniq_id,sum_infect_A))
 # 2       2            1
 # 3       3            3
 
+# Alternative via tidyverse syntax and using group_by()
+sum_table = table_infect %>% # call table
+  group_by(pat_id) %>% # Groups in the sense of creating sub-tables in the background
+  summarize(sum(infect_A)) # Summing will now be down only for each group, i.e., pat_id
+
+sum_table
+# A tibble: 3 × 2
+#   pat_id `sum(infect_A)`
+#    <dbl>           <dbl>
+# 1      1               2
+# 2      2               1
+# 3      3               3
+
+############################################################
+### 8.18 EXAMPLE XVIII: Joining two tables via full_join() #
+############################################################
+
+# Create table one (Example from 8.1):
+patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
+fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
+time = c("t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2")
+measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
+
+# Create table
+table = as.data.frame(patient_id)
+table = cbind(table,time,measurement_sysRR,fam)
+
+# Create second table with diagnoses related to the same patients (patient id!):
+patient_id = c(1:7)
+diagnosis = c("dia1","dia2","dia2","dia1","dia2","dia3","dia3")
+table2 = as.data.frame(patient_id)
+table2 = cbind(table2,diagnosis)
+
+# Joined table:
+join = full_join(table,table2, by = "patient_id")
+
+#    patient_id time measurement_sysRR  fam diagnosis
+# 1           1   t1               130  yes      dia1
+# 2           1   t2               122  yes      dia1
+# 3           2   t1               132   no      dia2
+# 4           2   t2               123   no      dia2
+# 5           3   t1               133 <NA>      dia2
+# 6           3   t2               121 <NA>      dia2
+# 7           4   t1               129    n      dia1
+# 8           4   t2               125    n      dia1
+# 9           5   t1               135   no      dia2
+# 10          5   t2               119   no      dia2
+# 11          6   t1               134   ys      dia3
+# 12          6   t2               127   ys      dia3
+# 13          7   t1               140 <NA>      dia3
+# 14          7   t2               125 <NA>      dia3
+
+
+##############################################################################
+### 8.19 EXAMPLE XIX: Deleting Spacing from Character Strings (Text Entries) #
+##############################################################################
+
+#install.packages("stringr")
+library(stringr) # within tidyverse
+
+# The below comes in handy when trying to merge two table into one, in order
+# to be able to detect an entry via equivalence (==):
+# Example character string
+string = c("age ", " name")
+
+# Trim/delete spacing on the right
+str_trim(string, "right")
+# [1] "age"   " name"
+
+# Trim/delete spacing on the left
+str_trim(string, "left")
+# [1] "age "   "name"
+
+# Remove all spacing (makes sense for the above case).
+# Scheme: pattern, replace with, data:
+gsub(" ", "", string) 
+# [1] "age"   "name"
 
 #######################
 # ------------------- #
@@ -2058,6 +2154,9 @@ for(i in 1:length(new_table$time)){
 lines_to_filtertest
 #  [1]  1 NA  3 NA  5 NA  7 NA  9 NA 11 NA 13
 
+# Recall alternative without filter function, chapter 8.1:
+t1_alt = table[table$time == "t1",] # placed in row position; don't forget comma
+t1 == t1_alt # All true...
 
 ###########################################################################
 ### 9.7 EXAMPLE FUNCTION VII: Replication of lm(y~x) and summary(lm(y~x)) #
