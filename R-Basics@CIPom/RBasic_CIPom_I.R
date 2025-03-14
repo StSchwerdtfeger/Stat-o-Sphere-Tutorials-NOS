@@ -2161,6 +2161,30 @@ lines_to_filtertest
 t1_alt = table[table$time == "t1",] # placed in row position; don't forget comma
 t1 == t1_alt # All true...
 
+# Test code to understand the loop within the above function
+lines_to_filtertest = c()
+for(i in 1:length(new_table$time)){
+  if(new_table$time[i] == "t1"){
+    lines_to_filtertest[i] = i 
+  } # End if
+} # End for i
+#  [1]  1 NA  3 NA  5 NA  7 NA  9 NA 11 NA 13
+
+# The filter function also works for filtering NAs:
+# Columns
+a = c(1,2,3)
+b = c(1,2,NA)
+c = c(1,NA,3)
+
+# Bind to table:
+data = as.data.frame(cbind(a,b,c))
+#   a  b  c
+# 1 1  1  1
+# 2 2  2 NA
+# 3 3 NA  3
+
+# filter NAs
+filter_alt(data,is.na(data$c),TRUE)
 ###########################################################################
 ### 9.7 EXAMPLE FUNCTION VII: Replication of lm(y~x) and summary(lm(y~x)) #
 ###########################################################################
