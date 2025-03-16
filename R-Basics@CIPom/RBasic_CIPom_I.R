@@ -38,13 +38,14 @@
 # educational purpose; however installing the below makes sure the whole script,
 # exercise and Rmarkdown example can be executed as a whole in one go):
 
-#install.packages(c("tidyverse","stringi","effsize","shiny", "readxl"))
+#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR"))
 # Tidyverse entails among others stringr, dplyr, ggplot
-#library("tidyverse") # filter(), select(), gather(), melt() group_by() summarize() 
-#library("stringi")   # changing symbol patterns such as Ae to Ä
-#library("effsize")   # cohen.d()
-#library("shiny")     # create and run shiny apps
-#library/"readxl")    # read_excel()
+#library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
+#library("stringi")      # Changing symbol patterns such as Ae to Ä
+#library("effsize")      # cohen.d() for the exercise
+#library("shiny")        # Create and run shiny apps
+#library/"readxl")       # read_excel()
+#library("tidytuesdayR") # Resource for plenty of free example data sets
 
 
 # Needed for Rmarkdown example:
@@ -506,6 +507,16 @@ lm(dino$y~dino$x)
 # Full output iincl. t-test etc.
 summary(lm(dino$y~dino$x)) # Slope is not significant...
 
+#### Tidytuesday - weekly free data sets and challanges:
+# install.packages("tidytuesdayR")
+library("tidytuesdayR")
+
+# Load example data set scoony doo:
+tt_scooby = tt_load(2021,week=29)
+
+# All Scooby Doo Episodes, whoop!
+scooby = tt_scooby$scoobydoo
+
 
 ###########################################
 # --------------------------------------- #
@@ -887,9 +898,9 @@ new_table_alt %>%   # new_table_alt was filtered for NAs already!!!
 
 
 
-#############################################################################
-### 8.6 EXAMPLE VI: Adjusting Character String Entries and Pattern Matching #
-#############################################################################
+########################################################################################################
+### 8.6 EXAMPLE VI: Adjusting Character String Entries and Pattern Matching and Deleting Empty Entries #
+########################################################################################################
 
 #### Duplicate our previous table:
 fin_table_alt = new_table
@@ -916,7 +927,7 @@ unique(fin_table_alt$fam)
 # Pie chart (since frequencies are not shown, they do not have to be divided by two):
 pie(table(fin_table_alt$fam))
 
-#### Get first name only!
+#### Get last name only, which is first position!
 name = c("Name Surname","Name Surname","Name Surname")
 surname = c("","","")
 names = cbind(name,surname)
@@ -930,6 +941,12 @@ first_name = word(names$name,1) # the 1 stands for first word of
 # the character string; the spacing
 # is targeted like delimiter so to speak 
 # [1] "Name" "Name" "Name"
+
+# All words first letter upper case (from stringr; locale = adjust language, "en" default):
+#install.packages("stringr")
+library(stringr)
+str_to_title(c("name name","naMe","NAME"))
+# [1] "Name Name" "Name" "Name"
 
 # Select certain parts of a string:
 text = c("Become a Cyber!")
@@ -952,6 +969,63 @@ grepl("Blu",text)
 gsub("Blu","Bla", text)
 # [1] "Bla"   "Blab"  "Blana"
 
+# Similar to deleting NAs (as shown in the next chapter) you can also delete
+# those entries that are empty and only entail "":
+Col1 = c("one","","three")
+Col2 = c("one", "two", "three")
+table_emp_entry = as.data.frame(cbind(Col1,Col2))
+#    Col1  Col2
+# 1   one   one
+# 2         two
+# 3 three three
+
+# Filter for "" or nchar(): 
+filter_emp1 = filter(table_emp_entry,Col1 != "") # keep those entries that are not empty ""
+filter_emp2 = filter(table_emp_entry,nchar(Col1) > 0) # keep entries with number of characters greater zero
+filter_emp3 = table_emp_entry[table_emp_entry$Col1 != "",] # keep those entries that are not empty ""
+#    Col1  Col2
+# 1   one   one
+# 2 three three
+
+# Check for equality:
+filter_emp1 == filter_emp2 & filter_emp2 == filter_emp3 
+#      Col1 Col2
+# [1,] TRUE TRUE
+# [2,] TRUE TRUE
+
+# %in% "in"-Operator, which checks if elements of one vecotr are in another:
+c(1,2,3) %in% c(1,2,3,4,5)
+# [1] TRUE TRUE TRUE
+sum(c(1,2,3) %in% c(1,2,3,4,5))
+# [3]
+
+# Reverse case (sum will be equivalent in both cases:
+c(1,2,3,4,5) %in% c(1,2,3)
+# [1]  TRUE  TRUE  TRUE FALSE FALSE
+sum(c(1,2,3,4,5) %in% c(1,2,3))
+# [1] 3
+
+#  Slightly adjusted:
+c(1,2,3) %in% c(1,2,3,3,5)
+# [1] TRUE TRUE TRUE 
+sum(c(1,2,3) %in% c(1,2,3,3,5))
+# [1] 3 
+
+# Reverse case (sum will NOT BE equivalent in both cases!!!):
+c(1,2,3,3,5) %in% c(1,2,3)
+# [1]  TRUE  TRUE  TRUE TRUE FALSE
+sum(c(1,2,3,3,5) %in% c(1,2,3))
+# [1] 4
+
+# Relation of %in% to the function duplicated(): 
+duplicated(c(1,2,3,3,5))
+# [1] FALSE FALSE FALSE TRUE FALSE
+
+# The sum of TRUE  TRUE  TRUE TRUE FALSE - the sum of  TRUE  TRUE  TRUE  
+#                                                               == FALSE FALSE FALSE TRUE FALSE
+# 4 - 3 = 1
+sum(c(1,2,3,3,5) %in% c(1,2,3)) - sum(c(1,2,3) %in% c(1,2,3,3,5)) == sum(duplicated(c(1,2,3,3,5)))
+# [1] TRUE
 
 #############################################################################################
 ### 8.7 EXAMPLE VII: Deleting NA's from a Single Row and Introducing the Tibble Data Format #
@@ -1851,9 +1925,9 @@ sum_table
 # 2      2               1
 # 3      3               3
 
-############################################################
-### 8.18 EXAMPLE XVIII: Joining two tables via full_join() #
-############################################################
+#######################################################################################
+### 8.18 EXAMPLE XVIII: Joining/Merging/Fusing Two Tables via full_join() and merge() #
+#######################################################################################
 
 # Create table one (Example from 8.1):
 patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7)
@@ -1890,6 +1964,86 @@ join = full_join(table,table2, by = "patient_id")
 # 13          7   t1               140 <NA>      dia3
 # 14          7   t2               125 <NA>      dia3
 
+# Doing the same using merge()
+merge = merge(table,table2, by = "patient_id")
+
+# Check for equality with join
+merge == join # all true
+
+#       patient_id time measurement_sysRR  fam diagnosis
+# [1,]        TRUE TRUE              TRUE TRUE      TRUE
+# [2,]        TRUE TRUE              TRUE TRUE      TRUE
+# [3,]        TRUE TRUE              TRUE TRUE      TRUE
+# [4,]        TRUE TRUE              TRUE TRUE      TRUE
+# [5,]        TRUE TRUE              TRUE   NA      TRUE
+# [6,]        TRUE TRUE              TRUE   NA      TRUE
+# [7,]        TRUE TRUE              TRUE TRUE      TRUE
+# [8,]        TRUE TRUE              TRUE TRUE      TRUE
+# [9,]        TRUE TRUE              TRUE TRUE      TRUE
+# [10,]       TRUE TRUE              TRUE TRUE      TRUE
+# [11,]       TRUE TRUE              TRUE TRUE      TRUE
+# [12,]       TRUE TRUE              TRUE TRUE      TRUE
+# [13,]       TRUE TRUE              TRUE   NA      TRUE
+# [14,]       TRUE TRUE              TRUE   NA      TRUE
+
+# IMPORTANT!! Note that merge drops thos lines with values in patient_id
+# that are not present in both sets!!
+
+# Create table one (Example from 8.1) WITH PATIENT ID 8 ADDED!
+patient_id = c(1,1,2,2,3,3,4,4,5,5,6,6,7,7.,8,8)
+fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA,"no","no")
+time = c("t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2")
+measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125,140,125)
+
+# Create table NOW WITH PATIENT ID 8
+table = as.data.frame(patient_id)
+table = cbind(table,time,measurement_sysRR,fam)
+
+# Create second table with diagnoses related to the same patients (patient id!).
+# NOTE THAT THIS TABLE DOES NOT HAPE patient_id = 8
+patient_id = c(1:7) # only up to 7, not 8!
+diagnosis = c("dia1","dia2","dia2","dia1","dia2","dia3","dia3")
+table2 = as.data.frame(patient_id)
+table2 = cbind(table2,diagnosis)
+
+# Merging: 
+merge2 = merge(table,table2, by = "patient_id")
+
+merge == merge2 # ALL TRUE! 
+# Let us have a look at the length of unique values of patient_id:
+length(unique(merge2$patient_id))
+# [1] 7
+
+# Unique values for themselves:
+unique(merge2$patient_id)
+# [1] 1 2 3 4 5 6 7
+
+# The function full_joint() will not do so, but leave a NA, here in the column 
+# diagnosis that could not be related to the second table only entailing 
+# patient id 1 to 7:
+merge3 = full_join(table,table2, by = "patient_id")
+merge4 = merge(table,table2, by = "patient_id", all = TRUE)
+
+#    patient_id time measurement_sysRR  fam diagnosis
+# 1           1   t1               130  yes      dia1
+# 2           1   t2               122  yes      dia1
+# 3           2   t1               132   no      dia2
+# 4           2   t2               123   no      dia2
+# 5           3   t1               133 <NA>      dia2
+# 6           3   t2               121 <NA>      dia2
+# 7           4   t1               129    n      dia1
+# 8           4   t2               125    n      dia1
+# 9           5   t1               135   no      dia2
+# 10          5   t2               119   no      dia2
+# 11          6   t1               134   ys      dia3
+# 12          6   t2               127   ys      dia3
+# 13          7   t1               140 <NA>      dia3
+# 14          7   t2               125 <NA>      dia3
+# 15          8   t1               140   no      <NA>  # HERE patient_id = 8 is given
+# 16          8   t2               125   no      <NA>  # .. here too...
+
+# Check again for equality:
+merge3 == merge4 # ALL TRUE!!
 
 ##############################################################################
 ### 8.19 EXAMPLE XIX: Deleting Spacing from Character Strings (Text Entries) #
@@ -2158,7 +2312,7 @@ lines_to_filtertest
 #  [1]  1 NA  3 NA  5 NA  7 NA  9 NA 11 NA 13
 
 # Recall alternative without filter function, chapter 8.1:
-t1_alt = table[table$time == "t1",] # placed in row position; don't forget comma
+t1_alt = new_table[new_table$time == "t1",] # placed in row position; don't forget comma
 t1 == t1_alt # All true...
 
 # Test code to understand the loop within the above function
@@ -2185,6 +2339,7 @@ data = as.data.frame(cbind(a,b,c))
 
 # filter NAs
 filter_alt(data,is.na(data$c),TRUE)
+
 ###########################################################################
 ### 9.7 EXAMPLE FUNCTION VII: Replication of lm(y~x) and summary(lm(y~x)) #
 ###########################################################################
@@ -2525,7 +2680,6 @@ fibonacci2(10)
 # 10 Logical Operators and Mathematical Functions #
 ###################################################
 
-
 ##### LOGICAL OPERATORS
 
 #  ==       equivalent
@@ -2575,10 +2729,27 @@ x = -5
 x > 1 & is.numeric(x) || x > 5 & is.numeric(x) # [1] FALSE
 x > 0 & is.numeric(x) || abs(x) <= 4 & is.numeric(x) # [1] FALSE
 
-
 # Any function any()
 any(c(1,2,3) > 4) # [1] FALSE
 
+# Pipe operator
+pipe_object = as.data.frame(c(1,2,3)) # only works with data frames
+# [1] 1 2 3
+pipe_result = pipe_object %>% # or |> ; this line duplicates object given new name
+  sum()
+# [1] 6  
+
+# %in% "in"-Operator, which checks if elements of one vecotr are in another:
+c(1,2,3) %in% c(1,2,3,4,5)
+# [1] TRUE TRUE TRUE
+sum(c(1,2,3) %in% c(1,2,3,4,5))
+# [3]
+
+# Reverse case (sum will be equivalent in both cases:
+c(1,2,3,4,5) %in% c(1,2,3)
+# [1]  TRUE  TRUE  TRUE FALSE FALSE
+sum(c(1,2,3,4,5) %in% c(1,2,3))
+# [1] 3
 
 ##### MATHEMATICAL OPERATORS:
 
@@ -2635,6 +2806,7 @@ abs(c(-1)) # [1] 1
 
 # Round
 round(2.9) # [1] 3
+round(2.4) # [1] 2
 
 # Truncate
 trunc(1.8) # [1] 1
