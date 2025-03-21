@@ -47,9 +47,8 @@
 #library/"readxl")       # read_excel()
 #library("tidytuesdayR") # Resource for plenty of free example data sets
 
-
 # Needed for Rmarkdown example:
-#install.packages(c("gt","kableExtra",))
+#install.packages(c("gt","kableExtra"., "gridExtra"))
 #library("gt") # gt() nice looking tables
 #install.packages("kableExtra")
 #library("kableExtra") # kbl() nice looking tables
@@ -89,7 +88,7 @@ parabola(x)
 9690000000/60/60/24/365
 # [1] 307.2679 # years to reach each transistor
 
-# A RTX 4090 GPU has 79 Billion 
+# A RTX 4090 GPU has 79 Billion transistors
 79000000000/60/24/365
 # [1] 150304.4
 79000000000/60/60/24/365
@@ -252,7 +251,7 @@ mat_bind = cbind(c(1,2,3),c(1,2,3),c(1,2,3))
 # [2,]    2    2    2
 # [3,]    3    3    3
 
-# Note that you can select several rows and colums via
+# Note that you can select several rows and columns via
 mat_bind[c(1,2),1] # first two rows, first column
 # [1] 1 2
 
@@ -343,10 +342,6 @@ string = c("One",2,3)
 # Try to add a 1 to the second element in the string above:
 # string[2]+1
 # Error in string[2] + 1 : non-numeric argument to binary operator
-
-# Character strings have to have ""
-c("object",2,3)
-# [1] "object" "2" "3"
 class(string)
 # [1] "character"
 
@@ -507,11 +502,11 @@ lm(dino$y~dino$x)
 # Full output iincl. t-test etc.
 summary(lm(dino$y~dino$x)) # Slope is not significant...
 
-#### Tidytuesday - weekly free data sets and challanges:
+#### Tidytuesday - weekly free data sets and challenges:
 # install.packages("tidytuesdayR")
 library("tidytuesdayR")
 
-# Load example data set scoony doo:
+# Load example data set scooby doo:
 tt_scooby = tt_load(2021,week=29)
 
 # All Scooby Doo Episodes, whoop!
@@ -583,7 +578,7 @@ result = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired  = TRUE)
 
 
 #######################################################
-### 8.2 EXAMPLE II: Filtering Na's (Non-Trivial Case) #
+### 8.2 EXAMPLE II: Filtering NA's (Non-Trivial Case) #
 #######################################################
 
 # SLIGHTLY DIFFERENT, including NA in the measurements:
@@ -806,6 +801,16 @@ for(i in 1:length(object2[,1])){    # loop over rows; the length of a col tells 
 } # End for i
 
 result
+#      [,1] [,2]
+# [1,]    2    2
+# [2,]    2    2
+# [3,]    2    2
+
+# Note that for both cases the following is enough:
+object+1
+# [1] 2 2 2
+
+object2+1
 #      [,1] [,2]
 # [1,]    2    2
 # [2,]    2    2
@@ -2311,18 +2316,19 @@ for(i in 1:length(new_table$time)){
 lines_to_filtertest
 #  [1]  1 NA  3 NA  5 NA  7 NA  9 NA 11 NA 13
 
+lines_to_filtertest2 = list()
+for(i in 1:length(new_table$time)){
+  if(new_table$time[i] == "t1"){
+    lines_to_filtertest2 = append(lines_to_filtertest2, i) 
+  } # End if
+} # End for i
+unlist(lines_to_filtertest2)
+#  [1]  1  3  5  7  9 11 13
+
+
 # Recall alternative without filter function, chapter 8.1:
 t1_alt = new_table[new_table$time == "t1",] # placed in row position; don't forget comma
 t1 == t1_alt # All true...
-
-# Test code to understand the loop within the above function
-lines_to_filtertest = c()
-for(i in 1:length(new_table$time)){
-  if(new_table$time[i] == "t1"){
-    lines_to_filtertest[i] = i 
-  } # End if
-} # End for i
-#  [1]  1 NA  3 NA  5 NA  7 NA  9 NA 11 NA 13
 
 # The filter function also works for filtering NAs:
 # Columns
@@ -2339,6 +2345,8 @@ data = as.data.frame(cbind(a,b,c))
 
 # filter NAs
 filter_alt(data,is.na(data$c),TRUE)
+
+
 
 ###########################################################################
 ### 9.7 EXAMPLE FUNCTION VII: Replication of lm(y~x) and summary(lm(y~x)) #
@@ -2739,17 +2747,32 @@ pipe_result = pipe_object %>% # or |> ; this line duplicates object given new na
   sum()
 # [1] 6  
 
-# %in% "in"-Operator, which checks if elements of one vecotr are in another:
+# %in% "in"-Operator, which checks if elements of one vector are in another:
 c(1,2,3) %in% c(1,2,3,4,5)
 # [1] TRUE TRUE TRUE
 sum(c(1,2,3) %in% c(1,2,3,4,5))
 # [3]
 
-# Reverse case (sum will be equivalent in both cases:
-c(1,2,3,4,5) %in% c(1,2,3)
-# [1]  TRUE  TRUE  TRUE FALSE FALSE
-sum(c(1,2,3,4,5) %in% c(1,2,3))
-# [1] 3
+# Reverse case (sum will NOT BE equivalent in both cases!!!):
+c(1,2,3,3,5) %in% c(1,2,3)
+# [1]  TRUE  TRUE  TRUE TRUE FALSE
+sum(c(1,2,3,3,5) %in% c(1,2,3))
+# [1] 4
+
+# Relation of %in% to the function duplicated(): 
+duplicated(c(1,2,3,3,5))
+# [1] FALSE FALSE FALSE TRUE FALSE
+
+# The sum of those of TRUE  TRUE  TRUE TRUE FALSE - the sum of  TRUE  TRUE  TRUE  
+#                                                   == FALSE FALSE FALSE TRUE FALSE
+# 4 - 3 = 1
+sum(c(1,2,3,3,5) %in% c(1,2,3)) - sum(c(1,2,3) %in% c(1,2,3,3,5)) == sum(duplicated(c(1,2,3,3,5)))
+# [1] TRUE
+
+# Theoretical alternative to unique function via filtering duplicates:
+test = c(1,2,2,3, "test", "test")
+test[duplicated(test)== FALSE]
+# [1] "1"    "2"    "3"    "test"
 
 ##### MATHEMATICAL OPERATORS:
 
