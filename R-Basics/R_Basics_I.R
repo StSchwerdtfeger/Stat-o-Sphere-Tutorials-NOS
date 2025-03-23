@@ -25,7 +25,7 @@
 # educational purpose; however installing the below makes sure the whole script,
 # exercise and Rmarkdown example can be executed as a whole in one go):
 
-#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR"))
+#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR","imager"))
 # Tidyverse entails among others stringr, dplyr, ggplot
 #library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
 #library("stringi")      # Changing symbol patterns such as Ae to Ä
@@ -33,6 +33,8 @@
 #library("shiny")        # Create and run shiny apps
 #library/"readxl")       # read_excel()
 #library("tidytuesdayR") # Resource for plenty of free example data sets
+#library("imager")       # for load.image() and grayscale()
+
 
 # Needed for Rmarkdown example:
 #install.packages(c("gt","kableExtra"., "gridExtra"))
@@ -2673,8 +2675,10 @@ fibonacci2(10)
 ### 9.10 EXAMPLE FUNCTION X: Fourier Transformation #
 #####################################################
 
+library("ggplot2")
+
 # The following is based on the 3blue1brown tutorial on Fourier Transformation.
-# https://www.youtube.com/watch?v=spUNpyF58BY&t=70s 
+# https://www.youtube.com/watch?v=spUNpyF58BY&t=70s  
 # There is also a python script that produces equivalent results, however the
 # python code is not well documented and therefore hard to read for beginners.
 # You can find the python version here: 
@@ -2712,16 +2716,21 @@ i = complex(real = 0, imaginary = 1) # beware to NOT USE "i" as index variable i
 # Cos wave definition. cos() for all time multiplied by frequency of the cos() wave and 2*pi 
 # for radians period, i.e. normalized time in unit of Hz. 
 # This cosine wave is used in the python script creates a circle when samp_f == freq:
-# g_t = cos(2*pi*freq*time) 
+g_t = cos(2*pi*freq*time) 
 
 # This cosine wave is used in the 3blue1brown video, shifted upwards, creates dented circle at samp_f == freq
-g_t = cos(2*pi*freq*time) + 1 
+#g_t = cos(2*pi*freq*time) + 1 
 
 # More than one frequency
 #freq1 = 3; freq2 = 6
 #amp1 = 1 ; amp2 = 1
-#g_t = amp1*cos(2*pi*freq1*time) + amp1*cos(2*pi*freq2*time) 
+#g_t = amp1*cos(2*pi*freq1*time) + amp1*cos(2*pi*freq2*time)
 
+# Square wave
+#g_t = sin(2*pi*freq*time) + 0*sin(2*2*pi*freq*time) + (1/3)*sin(3*2*pi*freq*time)
+
+# Sawtooth:
+#g_t = sin(2*pi*freq*time)-(1/2)*sin(2*2*pi*freq*time)+(1/3)*sin(3*2*pi*freq*time)
 
 # Plot cosine wave:
 plot(x = time, y = g_t, type = "l", xlab = "Time in Seconds", 
@@ -2811,6 +2820,29 @@ fourier_trans = function(g_t,samp_f,time){
          lty = 1,   # line type of legend (corresponding to plot)
          cex = .75) # size of legend in ratio to standard size
   
+  # Smoothed out version (similar to python version):
+  g_hat_smooth = g_hat_mean
+  for(i in 1:length(g_hat_smooth[,1])){
+    if(g_hat_smooth[i,1]<=max(g_hat_smooth[,1])/2){ # Filter for values below Nyquist frequency
+      g_hat_smooth[i,1] = 0
+    } # End if 
+  } # End for i
+  
+  # Change to data.frame for ggplot and rename columns
+  g_hat_smooth = as.data.frame(g_hat_smooth)
+  colnames(g_hat_smooth) = c("Re","Im")
+  
+  # Bar plot via ggplot
+  bar = ggplot(g_hat_smooth)+ 
+    geom_bar(aes(x=samp_f, y=Re), 
+             stat="identity", # frequencies on y-axis
+             fill="black",  # color bars
+             alpha=0.7)+
+    theme_minimal()+
+    scale_x_continuous(breaks = seq(min(samp_f),max(samp_f),by=.5))
+  # Print ggplot
+  print(bar)
+  
   # Plot original cosine wave:
   plot(x = time, y = g_t, type = "l", xlab = "Time in Seconds", 
        ylab = "g_t = cos(2*pi*freq*time)", 
@@ -2859,6 +2891,53 @@ plots[[30]]
 
 # Plot all plots
 #print(plots)
+
+
+### Looking at the Frequency Space of a JPG Image:
+
+#install.packages("imager")
+library(imager) # for load.image() and grayscale()
+
+# Load image of choice (test_img used here):
+image = load.image("test_img.jpg")
+
+# Turns RGB into gray scale:
+image = grayscale(image) 
+
+# Plot image to test if upload was correct and gray scaling was correct:
+plot(image, main = "Original Image, Grayscaled")
+
+# Perform Fourier Transformation (via Fast Fourier Transformation == fft()):
+image_fft = fft(image)
+
+# Calculate the log scale of the magnitude of the frequency spectrum, 
+# commonly used for better visualization (given wide range and difference 
+# between peaks, which makes visualization harder in a linear y-axis scale;
+# the below therefore compresses larger values). Additionally The "+1" avoids 
+# log(0) situations and also makes no difference for small values! 
+log(1)     # 0.0
+log(1+.25) # 0.2231436  # remains close to .25 (little changes only) 
+log(1+6)   # 1.94591
+log(1+200) # 5.303305   # from 200 to around 5! This value gets highly compressed!
+
+# Mod() can handle complex() numbers and 
+# Mod(z) = sqrt(x^2+y^2) == calculates the magnitude of the frequency domain 
+# (see documentation for details). 
+# Finally the log scale of the magnitude:
+fft_magnitude = log(1 + Mod(image_fft)) 
+#fft_magnitude = Mod(image_fft) # Check without log(1+x)
+
+# Compare plot of original and frequency spectrum image
+par(mfrow = c(2, 2))  # Set up plot grid 1 row 2 cols
+
+# Plot Org. Image and Frequency Domain Image:
+plot(image, main = "Original Image", axes = FALSE)
+plot(fft_magnitude, main = "Frequency Spectrum or Domain / k-Space", axes = FALSE)
+
+# Perform inverse Fourier Transformation to reconstruct original image from frequency domain:
+plot(fft_magnitude, main = "Original Frequency Spectrum or Domain / k-Space", axes = FALSE)
+image_recon = Re(fft(image_fft, inverse = TRUE)) / length(image_fft)
+plot(image_recon, main = "Reconstruction of Orig. Image via Inverse FFT", axes = FALSE)
 
 
 ###################################################
