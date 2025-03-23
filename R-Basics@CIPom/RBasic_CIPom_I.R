@@ -279,6 +279,7 @@ mat_bind = as.data.frame(mat_bind)
 mat_bind[,2]
 # Or we use the dollar sign to call/select a specific row of the table by name
 # We can then also still use the bracket syntax notation:
+mat_bind$V2
 mat_bind$V2[2]
 # you can also call a column by name within the brackets (same would be
 # possible with lines when lines were given names via rownames()...):
@@ -2679,6 +2680,198 @@ fibonacci2 = function(n){
 
 fibonacci2(10)
 # [1]  0  1  1  2  3  5  8 13 21 34
+
+
+#####################################################
+### 9.10 EXAMPLE FUNCTION X: Fourier Transformation #
+#####################################################
+
+# The following is based on the 3blue1brown tutorial on Fourier Transformation.
+# https://www.youtube.com/watch?v=spUNpyF58BY&t=70s 
+# There is also a python script that produces equivalent results, however the
+# python code is not well documented and therefore hard to read for beginners.
+# You can find the python version here: 
+# https://github.com/thatSaneKid/fourier/blob/master/Fourier%20Transform%20-%20A%20Visual%20Introduction.ipynb
+
+# The below code also does not use list types, such as the python version above.
+# The below is a rather direct representation of the mathematical formulas.
+# The python code uses a list (and in R we could do so too) in order to have
+# 100 times (for 100 winding / sampling frequencies) one position for the real
+# and one for the imaginary part. In R this can be extracted from the result
+# of rather directly typing in the formula using Im() and Re() to extract the
+# imaginary and real part for plotting. However, this is only necessary in R
+# using ggplot. The basic plot() function can handle the full complex number
+# by itself via automatically applying Im() and Re(), so only one input,
+# g_t*exp(-2*pi*i*samp_f[i]*t), where g_t = g_t = cos(2*pi*freq*t), is needed
+# for the wound up version of the cos() wave. However, it did not work to plot
+# multiple plots via a for loop using plot() since it kind of messes up the plot
+# options which requires to clear environment... THE REASON was simple but fatal:
+# I have named the index variable in the loop "i", even though i is set below
+# as a constant imaginary number... This mistakes messes up your environment!
+
+# Define the time as a frequency with a certain precision of points (by=):
+time = seq(0,1,by=.0001) # This sets Hz as unit of frequency
+
+# Define wave frequency 
+freq = 3 # == 3 Hz
+
+# Winding / sampling frequency
+samp_f = seq(0,10, by = .1) # from zero to 10 in steps of .1
+length(samp_f) # length 101, so we will only plot up to 9.9 Hz winding freq (same in the python script)
+
+# Set complex number "i":
+i = complex(real = 0, imaginary = 1) # beware to NOT USE "i" as index variable in a for loop from now on!!
+
+# Cos wave definition. cos() for all time multiplied by frequency of the cos() wave and 2*pi 
+# for radians period, i.e. normalized time in unit of Hz. 
+# This cosine wave is used in the python script creates a circle when samp_f == freq:
+# g_t = cos(2*pi*freq*time) 
+
+# This cosine wave is used in the 3blue1brown video, shifted upwards, creates dented circle at samp_f == freq
+g_t = cos(2*pi*freq*time) + 1 
+
+# More than one frequency
+#freq1 = 3; freq2 = 6
+#amp1 = 1 ; amp2 = 1
+#g_t = amp1*cos(2*pi*freq1*time) + amp1*cos(2*pi*freq2*time) 
+
+
+# Plot cosine wave:
+plot(x = time, y = g_t, type = "l", xlab = "Time in Seconds", 
+     ylab = "g_t = cos(2*pi*freq*time)", 
+     col = "deepskyblue3")
+
+# g_t and the code below for our wound up cosine wave regarding one winding/sampling 
+# frequency produce very lengthy vectors. In the below case it's complex numbers, i.e. 
+# coordinates of our polar grid for our wound up cosine wave. Plotting multiple 
+# plots (101) with 10001 paired Re and Im values is a lot. 
+length(g_t*exp(-2*pi*i*samp_f[1]*time))
+# [1] 10001 !!!
+
+
+# Plotting output for each winding frequency is easy with basic plot().
+# Let us have a look at samp_f[30] at first:
+plot(g_t*exp(-2*pi*i*samp_f[30]*time), type = "l", col = "darkviolet", 
+     # Title entails information on winding/sample freq and original cosine freq
+     main = paste("Winding Frequency of", samp_f[30],"Hz", "\n", paste("Cosine Frequency of", freq,"Hz")), 
+     xlab = "Real Numer",
+     ylab = "Imaginary Number") 
+
+# Add center of mass point, which is the average / mean of g_hat = g_t*exp(-2*pi*i*samp_f[30]*time)
+# We have to extract the real and imaginary number in order to get the points coordinates for the polar 
+# plot using Re() and Im():
+points(x = Re(mean(g_t*exp(-2*pi*i*samp_f[30]*time))), Im(mean(g_t*exp(-2*pi*i*samp_f[30]*time))),
+       col = "darkblue", pch = 19)
+
+# Writing a function to do the above for all samp_f:
+fourier_trans = function(g_t,samp_f,time){
+  
+  ### Plot all 101 plots via basic plot(). Use the arrows to mimic a gif of the transition, using different sampling 
+  ### frequencies. Using for loop for the plotting:
+  
+  # Set complex number "i":
+  i = complex(real = 0, imaginary = 1) # beware to NOT USE "i" as index variable in a for loop from now on!!
+  
+  # Min max of each Re and Im for flexible plotting routines (limiting the y- and x-axis of a plot):
+  min_max = matrix(0, ncol = 4, nrow = length(samp_f))
+  for(index in 1:length(samp_f)){
+    min_max[index,1] = min(Re(g_t*exp(-2*pi*i*samp_f[index]*time)))
+    min_max[index,2] = min(Im(g_t*exp(-2*pi*i*samp_f[index]*time)))
+    min_max[index,3] = max(Re(g_t*exp(-2*pi*i*samp_f[index]*time)))
+    min_max[index,4] = max(Im(g_t*exp(-2*pi*i*samp_f[index]*time)))
+  } # End for index
+  
+
+  # Plotting: 
+  for(index in 1:length(samp_f)){ # don't call it i when i was defined above as a constant variable!!!
+    
+    plot(g_t*exp(-2*pi*i*samp_f[index]*time), type = "l", col = "darkorchid4", 
+         # Title entails information on winding/sample freq and original cosine freq
+         main = paste("Winding Frequency of", samp_f[index],"Hz"), 
+         xlab = "Real Numer",
+         ylab = "Imaginary Number",
+         # The python script doesn't do this, always centers the the plot
+         xlim = c(min(min_max[,1]),max(min_max[,3])), # making sure that plot is not out of bounds
+         ylim = c(min(min_max[,2]),max(min_max[,4]))) 
+    
+    # Add center mass point == integral of g_t*exp(-2*pi*i*samp_f[index]*time)
+    points(x = Re(mean(g_t*exp(-2*pi*i*samp_f[index]*time))), Im(mean(g_t*exp(-2*pi*i*samp_f[index]*time))),
+           col = "darkblue", pch = 19)
+    
+  } # End for index
+  
+  # Matrix for all the means of g_hat for Re and Im:
+  g_hat_mean = matrix(0, ncol = 2, nrow = length(samp_f))
+  
+  # Mean of Re and Im for plot of the center of mass further below
+  for(index in 1:length(samp_f)){
+    g_hat_mean[index,1] = Re(mean(g_t*exp(-2*pi*i*samp_f[index]*time)))
+    g_hat_mean[index,2] = Im(mean(g_t*exp(-2*pi*i*samp_f[index]*time)))
+  } # End for index
+  
+  # Function of the center of mass of the wound up graph, peaking at the 
+  # frequency or frequencies of the initial cosine wave!
+  plot(x = samp_f, y = g_hat_mean[,1], type ="l",   # plot of mean(Re)
+       xlab = "Winding Frequency",  # rename labels
+       ylab = "Mean of g_hat(f)",
+       main = "Function of the Center of Mass for each Winding Frequency",
+       col = "deepskyblue3", ylim = c(min(min(g_hat_mean[,1]),min(g_hat_mean[,2])), 
+                                      max(max(g_hat_mean[,1]),max(g_hat_mean[,2]))))
+  lines(x = samp_f, y = g_hat_mean[,2], type = "l", col = "hotpink2") # Add mean(Im) to plot
+  axis(1, at = seq(min(samp_f),max(samp_f), by = 1)) # Adjust x-axis tick mark (every integer step)
+  legend("bottomright",legend = c("Re","Im"),               # add legend
+         col = c("deepskyblue3","hotpink2"),  # legend line color
+         lty = 1,   # line type of legend (corresponding to plot)
+         cex = .75) # size of legend in ratio to standard size
+  
+  # Plot original cosine wave:
+  plot(x = time, y = g_t, type = "l", xlab = "Time in Seconds", 
+       ylab = "g_t = cos(2*pi*freq*time)", 
+       col = "deepskyblue3")
+  
+} # End of function fourier_trans
+
+# Test function
+fourier_trans(g_t,samp_f,time)
+
+
+##### Alternative plotting of wound up cosine wave via ggplot:
+# Turn into data.frame:
+g_hat_mean_df = as.data.frame(g_hat_mean)
+colnames(g_hat_mean_df) = c("Re","Im")
+
+# Set up list, otherwise plotting is not possible using ggplot via a loop:
+plots = list()
+
+# Alternative plot of wound up cosine waves via ggplot():
+for(index in 1:length(samp_f)){ # don't call it i when i was defined above as a constant variable!!!
+  # Create data frame with coordinates of wound up function for respective sampop_f[index]:
+  data = as.data.frame(cbind(Re(g_t*exp(-2*pi*i*samp_f[index]*time)), Im(g_t*exp(-2*pi*i*samp_f[index]*time))))
+  
+  # Adjust colnames:
+  colnames(data) = c("Re","Im")
+  
+  # Extract coordinates for point of central mass:
+  point = g_hat_mean_df[index,]
+  
+  # Plot via ggplot:
+  plots[[index]] =  ggplot(data, aes(x = Re, y = Im)) +
+    geom_path(color = "darkorchid4") +  # Color for line of the plot
+    geom_point(data = point, aes(x = Re, y = Im), # add point of central mass
+               color = "darkblue", size = 3) +  # color and size of the point
+    labs(title = paste("Sample Frequency", samp_freq[index], "Hz"), 
+         x = "Real Number", y = "Imaginary Number") +
+    xlim(c(min(min_max[,1]),max(min_max[,3]))) +  # making sure that plot is not out of bounds
+    ylim(c(min(min_max[,2]),max(min_max[,4]))) +  # and not just centralized
+    theme_minimal() # white instead of grey background
+  
+} # End for index
+
+# Look at single plot:
+plots[[30]]
+
+# Plot all plots
+#print(plots)
 
 
 ###################################################
