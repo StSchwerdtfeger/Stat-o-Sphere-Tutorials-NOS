@@ -25,15 +25,16 @@
 # educational purpose; however installing the below makes sure the whole script,
 # exercise and Rmarkdown example can be executed as a whole in one go):
 
-#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR","imager"))
+#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR","imager","magick"))
 # Tidyverse entails among others stringr, dplyr, ggplot
 #library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
-#library("stringi")      # Changing symbol patterns such as Ae to Ä
+#library("stringi")      # changing symbol patterns such as Ae to Ä
 #library("effsize")      # cohen.d() for the exercise
 #library("shiny")        # Create and run shiny apps
 #library/"readxl")       # read_excel()
-#library("tidytuesdayR") # Resource for plenty of free example data sets
+#library("tidytuesdayR") # resource for plenty of free example data sets
 #library("imager")       # for load.image() and grayscale()
+#library("magick")       # for creating .gif of plots
 
 
 # Needed for Rmarkdown example:
@@ -2855,9 +2856,27 @@ fourier_trans(g_t,samp_f,time)
 
 
 ##### Alternative plotting of wound up cosine wave via ggplot:
+# Matrix for all the means of g_hat for Re and Im:
+g_hat_mean = matrix(0, ncol = 2, nrow = length(samp_f))
+
+# Mean of Re and Im for plot of the center of mass further below
+for(index in 1:length(samp_f)){
+  g_hat_mean[index,1] = Re(mean(g_t*exp(-2*pi*i*samp_f[index]*time)))
+  g_hat_mean[index,2] = Im(mean(g_t*exp(-2*pi*i*samp_f[index]*time)))
+} # End for index
+
 # Turn into data.frame:
 g_hat_mean_df = as.data.frame(g_hat_mean)
 colnames(g_hat_mean_df) = c("Re","Im")
+
+# Min max of each Re and Im for flexible plotting routines (limiting the y- and x-axis of a plot):
+min_max = matrix(0, ncol = 4, nrow = length(samp_f))
+for(index in 1:length(samp_f)){
+  min_max[index,1] = min(Re(g_t*exp(-2*pi*i*samp_f[index]*time)))
+  min_max[index,2] = min(Im(g_t*exp(-2*pi*i*samp_f[index]*time)))
+  min_max[index,3] = max(Re(g_t*exp(-2*pi*i*samp_f[index]*time)))
+  min_max[index,4] = max(Im(g_t*exp(-2*pi*i*samp_f[index]*time)))
+} # End for index
 
 # Set up list, otherwise plotting is not possible using ggplot via a loop:
 plots = list()
@@ -2878,7 +2897,7 @@ for(index in 1:length(samp_f)){ # don't call it i when i was defined above as a 
     geom_path(color = "darkorchid4") +  # Color for line of the plot
     geom_point(data = point, aes(x = Re, y = Im), # add point of central mass
                color = "darkblue", size = 3) +  # color and size of the point
-    labs(title = paste("Sample Frequency", samp_freq[index], "Hz"), 
+    labs(title = paste("Sample Frequency", samp_f[index], "Hz"), 
          x = "Real Number", y = "Imaginary Number") +
     xlim(c(min(min_max[,1]),max(min_max[,3]))) +  # making sure that plot is not out of bounds
     ylim(c(min(min_max[,2]),max(min_max[,4]))) +  # and not just centralized
@@ -2891,6 +2910,21 @@ plots[[30]]
 
 # Plot all plots
 #print(plots)
+
+# Create gif all the plots above:
+#install.packages("magick")
+library("magick")
+
+# Convert plots to image. This works a little weird: First you
+# create img_plot and execute an image_graph object.
+img_plot = image_graph(width=318,height=362, res = 96)
+# Then you just print all the plots onto it, so to speak:
+print(plots)
+# Then you create an animation object:
+anime = image_animate(image_join(img_plot), fps = 5)
+
+# Export .gif image
+image_write(anime, "fft_animation.gif")
 
 
 ### Looking at the Frequency Space of a JPG Image:
