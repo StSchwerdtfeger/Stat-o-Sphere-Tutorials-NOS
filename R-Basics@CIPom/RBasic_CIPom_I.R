@@ -479,7 +479,7 @@ data()                     # View all available data sets
 library(dplyr)             # open/activate/load package
 #data(starwars)            # load data set
 #View(starwars)            # view via RStudio viewer
-#?starwars                  # view documentation
+#?starwars                 # view documentation
 
 # Another fun and insightful package:
 # install.packages("datasauRus")
@@ -1248,8 +1248,8 @@ test_multi = as.data.frame(cbind(c("criteria","criteria",3),c(1,"criteria",3),c(
 # 3        3        3  0
 
 # Here V3 now entails the entry "criteria fulfilled" only   
-# when two criterias are fulfilled!! Via the operator & below.
-# You could also use | which functions as "or" if thats what you need...
+# when two criteria are fulfilled!! Via the operator & below.
+# You could also use | which functions as "or" if that's what you need...
 for(i in 1:length(test_multi$V1)){ # cols have same length, same result with V2 or V3 
   if(test_multi$V1[i] == "criteria" & test_multi$V2[i] == "criteria"){
     test_multi$V3[i] = "criteria fulfilled"
@@ -1280,7 +1280,7 @@ table = as.data.frame(cbind(code,count))
 # 4    c     5
 # 5    a    44
 
-# Sort by count, decreasing (here you have to change the classe of the column count!):
+# Sort by count, decreasing (here you have to change the classes of the column count!):
 table[order(as.numeric(table$count), decreasing = TRUE),]
 #   code count
 # 5    a    44
@@ -1481,12 +1481,12 @@ filtering = function(x,y){ # x = id column vector; y = full data set (i.e., give
                                           #  value in column vector with the ids,
       if(x[j] == inter2$x[i]){            # if the i_dth value is equivalent to 
                                           # the evaluated explicit duplicate id values:
-        blank[j] = 1   # then / in such a case assing a 1 to the redundant binary/logical column.
+        blank[j] = 1   # then / in such a case assign a 1 to the redundant binary/logical column.
       } # End if       # now any duplicate and the value that is duplicated are tagged by a logical!
     } # End for j
   } # End for i
   
-  data_frame = cbind(y,blank)   # Now combinde the redundant binary column 
+  data_frame = cbind(y,blank)   # Now combine the redundant binary column 
   # with the whole data frame that carries 
   # the id column
   data_frame = as.data.frame(data_frame)       # turn it into a data frame
@@ -1519,7 +1519,7 @@ test_dup = as.data.frame(cbind(c("id10","id12","id10","id14","id15","id16"),
 # id10 has a duplicate. We want to delete both, i.d., row 1 and 3:
 filtering(test_dup$V1,test_dup)
 
-# Row 1 and 3, i.e. id10 has been deleted. I was was lazy
+# Row 1 and 3, i.e. id10 has been deleted. I was lazy
 # so the redundant column "blank" remains and only entails  
 # zeros, since all lines that marked duplicate and the value 
 # that was duplicated with a 1 have been deleted...
@@ -1994,7 +1994,7 @@ merge == join # all true
 # [13,]       TRUE TRUE              TRUE   NA      TRUE
 # [14,]       TRUE TRUE              TRUE   NA      TRUE
 
-# IMPORTANT!! Note that merge drops thos lines with values in patient_id
+# IMPORTANT!! Note that merge drops those lines with values in patient_id
 # that are not present in both sets!!
 
 # Create table one (Example from 8.1) WITH PATIENT ID 8 ADDED!
@@ -2553,12 +2553,12 @@ xnPLUS2
 
 xnPLUS3 = .65*xnPLUS2*(1-xnPLUS2)
 xnPLUS3
-# .05241314 => further decreas!
+# .05241314 => further decrease!
 
 # If I'd go on with this a couple of years, around 15,
 # the population will die. 
 
-# So eventually, if one plays around with LAMBDA (remeber between 0 and 1)
+# So eventually, if one plays around with LAMBDA (remember between 0 and 1)
 # at some values of LAMBDA funky things will happen!
 
 xnPLUS1 = 3.2*.5*(1-.5)
@@ -2591,7 +2591,7 @@ xnPLUS7
 
 # If you do the same thing with LAMBDA being 3.5, then you will get
 # cycle of 4!! What happens when you go roughly above 3.59 for LAMBDA is,
-# that the behaviour gets chaotic!! The further you get to 3.59 the faster 
+# that the behavior gets chaotic!! The further you get to 3.59 the faster 
 # and the more cycles one gets, which are actually doubling!
 # So Feigenbaum got involved in the 70s and wanted to know how
 # far LAMDA has to change for that to happen.
@@ -3117,7 +3117,7 @@ any(c(1,2,3) > 4) # [1] FALSE
 pipe_object = as.data.frame(c(1,2,3)) # only works with data frames
 # [1] 1 2 3
 pipe_result = pipe_object %>% # or |> ; this line duplicates object given new name
-  sum()
+  sum() # no input neaded, since object from line before is parsed into it directly
 # [1] 6  
 
 # %in% "in"-Operator, which checks if elements of one vector are in another:
@@ -3330,7 +3330,7 @@ ui = fluidPage(
 ############ Server entails all the functions and code that is executed in the background
 server = function(input, output) {
   
-  # Define how the iput is processed and what is plotted: 
+  # Define how the input is processed and what is plotted: 
   output$curves = renderPlot({ # THIS IS WHERE WE NEED the output name..
     
     # Prob. dens. function (could also use dnorm()):
