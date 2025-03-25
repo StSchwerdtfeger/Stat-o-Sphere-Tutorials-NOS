@@ -17,7 +17,7 @@
 #         Tutorial Script        #
 #               by               #
 #     Steffen Schwerdtfeger      # 
-#            12.2023             #
+#       12.2023 - 03.2025        #
 ##################################
 ##################################
 
@@ -38,22 +38,23 @@
 # educational purpose; however installing the below makes sure the whole script,
 # exercise and Rmarkdown example can be executed as a whole in one go):
 
-#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR","imager","magick"))
+#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR","imager","magick", "oro.dicom"))
 # Tidyverse entails among others stringr, dplyr, ggplot
-#library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
-#library("stringi")      # Changing symbol patterns such as Ae to Ä
-#library("effsize")      # cohen.d() for the exercise
-#library("shiny")        # Create and run shiny apps
-#library/"readxl")       # read_excel()
-#library("tidytuesdayR") # Resource for plenty of free example data sets
-#library("imager")       # for load.image() and grayscale()
-#library("magick")       # for creating .gif of plots
+library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
+library("stringi")      # changing symbol patterns such as Ae to Ä
+library("effsize")      # cohen.d() for the exercise
+library("shiny")        # create and run shiny apps
+library("readxl")       # read_excel()
+library("tidytuesdayR") # resource for plenty of free example data sets
+library("imager")       # for load.image(), grayscale() and image()
+library("magick")       # for creating .gif of plots
+library("oro.dicom")    # for importing DICOM files, chapter 9.10 FFT MRI example
 
 
 # Needed for Rmarkdown example:
 #install.packages(c("gt","kableExtra"., "gridExtra"))
 #library("gt") # gt() nice looking tables
-#install.packages("kableExtra")
+#install.packages("kableExtra") 
 #library("kableExtra") # kbl() nice looking tables
 #install.packages("gridExtra") 
 #library("gridExtra") # grid.arrange() multiple plot on one page
@@ -311,9 +312,12 @@ character = c("one", "two", "three")
 numeric1 = c(1,2,3)
 numeric2 = c(3,2,1)
 
-# First turn one vector into a data frame:
-data_frame = as.data.frame(character) 
+# Use data.frame()
+data_frame = data.frame(character,numeric1,numeric2)
 
+
+# Alternative: First turn one vector into a data frame:
+data_frame = as.data.frame(character) 
 # And then add the others, so they are binded not at the atomic
 # but molecular level, so to speak, and hence get correct class 
 # assigned automatically and need not to be changed. Note that
@@ -329,7 +333,7 @@ is.numeric(data_frame$numeric1)
 is.numeric(data_frame$numeric2)
 # [1] TRUE # Col 1 is character the others numeric: molecular data frame!
 
-# In comparison to binding on the atomic levels:
+# In comparison to binding on the atomic levels via cbind() first:
 data_frame_atomic = as.data.frame(cbind(character,numeric1,numeric2))
 is.character(data_frame_atomic$character)
 # [1] TRUE
@@ -534,15 +538,8 @@ fam = c("yes", "yes", "no", "no", NA, NA, "n","n","no","no","ys", "ys", NA, NA)
 time = c("t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2","t1","t2")
 measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 
-# cbind() which concatenates vectors column-wise, then format into a data frame:
-table = as.data.frame(cbind(patient_id,time,measurement_sysRR,fam))
-
-# ...or via the below in order to keep class integrity, since via cbind()
-# columns are binded on a atomic level, such that given one character entry
-# all entries will be characters. This can be avoided by turning one column
-# into a data frame and then add the others via cbind().
-table = as.data.frame(patient_id)
-table = cbind(table,time,measurement_sysRR,fam)
+# data.frame() which concatenates vectors column-wise, as cbind():
+table = data.frame(patient_id,time,measurement_sysRR,fam)
 
 # install.packages("dplyr")  # install package
 library(dplyr)             # load/activate package
@@ -1352,6 +1349,8 @@ print(table_new)
 decode = c("") # empty vector
 table_new = as.data.frame(cbind(code,count,decode))
 
+# The below for loop is not optimal, since it loops over each vector, where
+# a table would be enough - see next example:
 decode = c("Something1","Something2","Something3")
 codes = c("a","b","c")
 for(i in 1:length(table_new$code)){ # loop over table column
@@ -2689,7 +2688,8 @@ fibonacci2(10)
 ### 9.10 EXAMPLE FUNCTION X: Fourier Transformation #
 #####################################################
 
-library("ggplot2")
+# For plotting:
+library("ggplot2") # entailed in tidyverse
 
 # The following is based on the 3blue1brown tutorial on Fourier Transformation.
 # https://www.youtube.com/watch?v=spUNpyF58BY&t=70s  
@@ -2747,9 +2747,9 @@ g_t = cos(2*pi*freq*time)
 #g_t = sin(2*pi*freq*time)-(1/2)*sin(2*2*pi*freq*time)+(1/3)*sin(3*2*pi*freq*time)
 
 # Plot cosine wave:
-plot(x = time, y = g_t, type = "l", xlab = "Time in Seconds", 
+plot(x = time, y = g_t, type = "l", xlab = paste("Time in Seconds", "\n",freq,"periods in 1 Second ==",freq,"Hz"), 
      ylab = "g_t = cos(2*pi*freq*time)", 
-     col = "deepskyblue3")
+     col = "deepskyblue3") 
 
 # g_t and the code below for our wound up cosine wave regarding one winding/sampling 
 # frequency produce very lengthy vectors. In the below case it's complex numbers, i.e. 
@@ -2858,14 +2858,16 @@ fourier_trans = function(g_t,samp_f,time){
   print(bar)
   
   # Plot original cosine wave:
-  plot(x = time, y = g_t, type = "l", xlab = "Time in Seconds", 
+  plot(x = time, y = g_t, type = "l", xlab = paste("Time in Seconds", "\n",
+                                                   freq,"periods in 1 Second ==",freq,"Hz"), 
        ylab = "g_t = cos(2*pi*freq*time)", 
-       col = "deepskyblue3")
+       col = "deepskyblue3") 
+  
   
 } # End of function fourier_trans
 
-# Test function
-fourier_trans(g_t,samp_f,time)
+# Test function (UNCOMMENT TO TEST FUNCTION!! UNCOMMENT TO TEST FUNCTION!! UNCOMMENT TO TEST FUNCTION!!)
+#fourier_trans(g_t,samp_f,time)
 
 
 ##### Alternative plotting of wound up cosine wave via ggplot:
@@ -2928,16 +2930,18 @@ plots[[30]]
 #install.packages("magick")
 library("magick")
 
+# UNCOMMENT TO EXECUTE BELOW!
+
 # Convert plots to image. This works a little weird: First you
 # create img_plot and execute an image_graph object.
-img_plot = image_graph(width=318,height=362, res = 96)
+#img_plot = image_graph(width=318,height=362, res = 96)
 # Then you just print all the plots onto it, so to speak:
-print(plots)
+#print(plots)
 # Then you create an animation object:
-anime = image_animate(image_join(img_plot), fps = 5)
+#anime = image_animate(image_join(img_plot), fps = 5)
 
 # Export .gif image
-image_write(anime, "fft_animation.gif")
+#image_write(anime, "fft_animation.gif")
 
 
 ### Looking at the Frequency Space of a JPG Image:
@@ -2972,7 +2976,7 @@ log(1+200) # 5.303305   # from 200 to around 5! This value gets highly compresse
 # (see documentation for details). 
 # Finally the log scale of the magnitude:
 fft_magnitude = log(1 + Mod(image_fft)) 
-#fft_magnitude = Mod(image_fft) # Check without log(1+x)
+#fft_magnitude = Mod(image_fft) # Check result without log(1+x)
 
 # Compare plot of original and frequency spectrum image
 par(mfrow = c(2, 2))  # Set up plot grid 1 row 2 cols
@@ -2985,6 +2989,69 @@ plot(fft_magnitude, main = "Frequency Spectrum or Domain / k-Space", axes = FALS
 plot(fft_magnitude, main = "Original Frequency Spectrum or Domain / k-Space", axes = FALSE)
 image_recon = Re(fft(image_fft, inverse = TRUE)) / length(image_fft)
 plot(image_recon, main = "Reconstruction of Orig. Image via Inverse FFT", axes = FALSE)
+
+# Reset plot grid to 1x1:
+par(mfrow = c(1, 1))  
+
+### SAME USING MRI DICOM FILES:
+# Install oro.dicom to read .dcm files:
+#install.packages("oro.dicom")
+library("oro.dicom")
+
+# Load example data: 
+data = readDICOMFile("kspace/example_sts.dcm")
+test=data$hdr
+# Load example data from k-space explorer
+# https://github.com/birogeri/kspace-explorer/blob/master/images/default.dcm
+#data = readDICOMFile("kspace/default.dcm")
+
+# Plot original DICOM image:
+image(t(data$img), col = grey(0:64/64), axes = FALSE,
+      main = "Original DICOM Image")
+
+# Perform fft on data:
+kspace = fft(data$img)
+
+# k-space without fftshift(), again we use log magnitude and + 1
+# Lowest frequency is placed in the periphery/corners, highest frequency in the middle:
+# k-space images in Neuroscience are usually shown differently: 
+image(log(1 + Mod(kspace)), col = grey.colors(256), axes = FALSE, main = "k-Space without shift/reshaping")
+
+
+# The below function will reshape in the following way (compare
+# Matlab documentation of fftshift() that inspired the below function
+# https://de.mathworks.com/help/matlab/ref/fftshift.html):
+
+#
+#
+#     A   B                      D   C  
+#
+#     C   D    transformed to:   B   A  
+# 
+#
+
+#  fftshift() Matlab style (requires dims to be integer when divided by 2):
+fftshift = function(kspace) {  
+  rows = nrow(kspace) # Evaluate n of rows
+  cols = ncol(kspace) # ... n of cols
+  reshape_row = c((rows/2+1):rows, 1:(rows/2))  # rows/2+1 so it starts at first position second half
+                                                # not last position of first half!
+  reshape_col = c((cols/2+1):cols, 1:(cols/2))  # same here...
+  kspace[reshape_row,reshape_col]               # reshape k-space
+} # End of function fftshift()
+
+# Shifted k-space image (log magnitude + 1):
+kspace_shifted = fftshift(kspace)
+
+# Plot shifted/reshaped image, no with low frequencies in the center, instead the
+# output matrix coners:
+image(log(1 + Mod(kspace_shifted)), col = grey.colors(256), axes = FALSE, 
+      main = "Reshaped k-space")
+
+# Reconstructing original image from k-space via IFT (includes normalization factor): 
+IFT_image = Re(fft(kspace, inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey.colors(256), main = "Reconstructed Image via inverse FFT", axes = FALSE)
+
 
 
 ###################################################
