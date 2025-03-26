@@ -12,8 +12,10 @@
 library(tidyverse)
 # install.packages("caret") # May demand R 4.4.x 
 library(caret)
+# install.packages("effsize)
+library(effsize)
 # install.packages("shiny") # Shiny app
-library("shiny")
+library(shiny)
 
 ###### Benfords law example, number between 0 and 10: 
 n = seq(0,10,by=.1)
@@ -154,6 +156,9 @@ posterior
 ###############################
 # Example COVID19 Quick Tests #
 ###############################
+
+# install.packages("caret") # May demand R 4.4.x 
+library(caret)
 
 # Contingency table / confusion matrix of our COVID19 test-kit example
 true_pos = 144
@@ -482,7 +487,7 @@ server = function(input, output) {
 ##### and it then says "Run App" (which just executes the whole script). 
 ##### Some of you might want to use it, so I set the below as comment...
 
-# shinyApp(ui = ui, server = server) 
+#shinyApp(ui = ui, server = server) 
 
 
 # Consider the following cases:
@@ -500,7 +505,6 @@ server = function(input, output) {
 
 # Sample sizes from 0 to 1000 in steps of 10:
 n = seq(0,1000, by = 10)
-
 # Initialice empty vector for the different t-/z-values, given different sizes of n
 t_val = c()
 
@@ -751,7 +755,7 @@ abline(lm(dino$y~dino$x))
 cups = c(0, 1, 2, 3.5, 4.8, 5.2, 6, 6.9, 8.5, 9.1, 9.9,
          0, .6, 2.6, 3.1, 4.8, 6.9, 7.1, 7.5, 8.5, 9.9, 9.9,
          0, .2, 2.9, 2.9, 4.9, 5.2, 6.9, 7.1, 7.3, 9, 9.8)
-
+   
 # Time passed for each run of measurements (cups), abbreviated:
 time = c(0:10,0:10,0:10) # technically 3 days in the life of Lady Meow
 
@@ -759,7 +763,7 @@ time = c(0:10,0:10,0:10) # technically 3 days in the life of Lady Meow
 plot(x=time, y=cups,
      ylab = "Cups of Tea", xlab= "Hours passed")
 # Play around with possible values of a and b (re-run plot() to reset):
-abline(a = 0, b = .9)
+abline(a = 0, b = 1)
 abline(a = .5, b = 1.2)
 abline(a = .23, b = 1.0082, col = "darkgreen")
 abline(a = 0 , b = 1, col = "blue")
