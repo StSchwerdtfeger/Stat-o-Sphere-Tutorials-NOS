@@ -268,7 +268,33 @@ reformat = as.data.frame(cbind(patient_id, sysRR_t1, sysRR_t2, fam, RRdiff))
 # 11         11      134      122            yes      0
 # 12         12      144      130            yes      0
 
-# Add sysRR difference in new column:
+##### Alternative via merge() - good for large data sets with plenty columns:
+# Trim t2 to only have cols patient_id and measurement_sysRR:
+t2_trim = select(t2,patient_id,measurement_sysRR)
+# Merge t1 minus time column and t2_trim:
+reformat2 = merge(t1[,-2], t2_trim, by = "patient_id")
+
+# Check for equivalence (re-order columns and add RRdiff to reformat2 first):
+reformat2 = reformat2[,c(1,2,4,3)]
+reformat2 = cbind(reformat2,RRdiff)
+reformat == reformat2
+
+#       patient_id sysRR_t1 sysRR_t2  fam RRdiff
+# [1,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [2,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [3,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [4,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [5,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [6,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [7,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [8,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [9,]        TRUE     TRUE     TRUE TRUE   TRUE
+# [10,]       TRUE     TRUE     TRUE TRUE   TRUE
+# [11,]       TRUE     TRUE     TRUE TRUE   TRUE
+# [12,]       TRUE     TRUE     TRUE TRUE   TRUE
+
+
+##### Add sysRR difference in new column:
 for(i in 1:length(reformat[,1])){
   reformat$RRdiff[i] = as.numeric(reformat$sysRR_t2[i]) - as.numeric(reformat$sysRR_t1[i])
 } # End for i
@@ -327,7 +353,6 @@ diff_10plus = reformat[abs(as.numeric(reformat$RRdiff)) >= 10,]
 length(diff_10plus[,1])
 # [1] 5
 # => five patient_ids with RR difference >= 10
-
 
 
 ####### Create a nice table for export (e)):
