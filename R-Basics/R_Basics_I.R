@@ -25,6 +25,7 @@
 # educational purpose; however installing the below makes sure the whole script,
 # exercise and Rmarkdown example can be executed as a whole in one go):
 
+# UNCOMMENT FOLLOWING LINE AND EXECUTE TO INSTALL ALL OF THE BELOW PACKAGES:
 #install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR","imager","magick", "oro.dicom"))
 # Tidyverse entails among others stringr, dplyr, ggplot
 library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
@@ -37,9 +38,8 @@ library("imager")       # for load.image(), grayscale() and image()
 library("magick")       # for creating .gif of plots
 library("oro.dicom")    # for importing DICOM files, chapter 9.10 FFT MRI example
 
-
 # Needed for Rmarkdown example:
-#install.packages(c("gt","kableExtra"., "gridExtra"))
+#install.packages(c("gt","kableExtra", "gridExtra"))
 #library("gt") # gt() nice looking tables
 #install.packages("kableExtra") 
 #library("kableExtra") # kbl() nice looking tables
@@ -2986,13 +2986,13 @@ par(mfrow = c(1, 1))
 library("oro.dicom")
 
 # Load example data: 
-data = readDICOMFile("kspace/example_sts.dcm")
-test=data$hdr
+#data = readDICOMFile("kspace/example_sts.dcm")
+
 # Load example data from k-space explorer
 # https://github.com/birogeri/kspace-explorer/blob/master/images/default.dcm
-#data = readDICOMFile("kspace/default.dcm")
+data = readDICOMFile("kspace/default.dcm")
 
-# Plot original DICOM image:
+# Plot original DICOM image (with dark color scheme grey(0:64/64), grey.color(256)):
 image(t(data$img), col = grey(0:64/64), axes = FALSE,
       main = "Original DICOM Image")
 
@@ -3018,10 +3018,11 @@ image(log(1 + Mod(kspace)), col = grey.colors(256), axes = FALSE, main = "k-Spac
 #
 
 #  fftshift() Matlab style (requires dims to be integer when divided by 2):
-fftshift = function(kspace) {  
+fftshift = function(kspace) {  #
+  # For better readability - could also be done via ncol() and nrow()
   rows = nrow(kspace) # Evaluate n of rows
   cols = ncol(kspace) # ... n of cols
-  reshape_row = c((rows/2+1):rows, 1:(rows/2))  # rows/2+1 so it starts at first position second half
+    reshape_row = c((rows/2+1):rows, 1:(rows/2))  # rows/2+1 so it starts at first position second half
                                                 # not last position of first half!
   reshape_col = c((cols/2+1):cols, 1:(cols/2))  # same here...
   kspace[reshape_row,reshape_col]               # reshape k-space
