@@ -44,4 +44,21 @@ table = table[,-c(1)]
 # 3 Test3 See
 
 
+####### Decode vector (d)):
+test = c("test1", "test2", "test3")
+
+# Decode via loop (overwrites column "code"):
+for(i in 1:length(test)){
+  if(test[i] == "test1"){
+    test[i] = "Something1"
+  } # End if "a"
+  else if(test[i] == "test2"){
+    test[i] = "Something2"
+  } # End if "b"
+  else if(test[i] == "test3"){
+    test[i] = "Something3"
+  } # End if "c"
+} # End for i
+
+
 
