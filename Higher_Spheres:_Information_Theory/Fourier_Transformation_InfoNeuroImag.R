@@ -2,7 +2,7 @@
 #  Higher Spheres: Fourier Transformation in  #
 #   Information Technology and Neuroimaging   #
 #                      by                     #
-#            Steffen Schwerdtfeger            #
+#    Steffen Schwerdtfeger & Adam Kallaß      #
 #                   04.2025                   #
 #            Stat-o-Sphere at JNOS            #
 ###############################################
@@ -15,12 +15,13 @@
 # https://github.com/StSchwerdtfeger 
 
 ###### Necessary packages: 
-#install.packages("pracma","ggplot2","magick","oro.dicom","imager")
+#install.packages("pracma","ggplot2","magick","oro.dicom","imager","rgl")
 library("pracma")    # for angle(), optional... Arg() or atan2() works as well...
 library("ggplot2")   # entailed in tidyverse
 library("magick")    # creating .gif
 library("oro.dicom") # loading DICOM files
 library("imager")    # for load.imag()
+library("rgl")       # for persp3d()
 
 
 #################################
@@ -94,6 +95,45 @@ x1 = (-4 + sqrt((-4)^2-4*(-2)*(-4))) / (2*-(2))
 x2 = (-(-4) - sqrt((-4)^2-4*(-2)*(-4))) / (2*(-2))
 (-4)^2-4*(-2)*(-4)
 # [1] -16
+
+# Plot parabola and its complex roots (will show a mirrored parabola!) by
+# mapping its complex roots onto the y-axis:
+x = seq(-10,10,by = .1) # possible x-values 
+y = x^2+1 # our parabola function 
+c = (x*complex(real = 0, imaginary = 1))^2+1
+# Plot with color blind friendly color palette:
+palette.colors(palette = "Okabe-Ito")
+plot(x,y, ylim = c(-20,20),xlim = c(-15,15), type = "l", col = "#0072B2")
+abline(h=0,v=0) # add x and y axis
+# Add complex root of x^2+1 to plot
+lines(x,Re(c), col = "#F0E442")
+# Add legend:
+legend("bottomright", col = c("#0072B2","#F0E442"),
+       lty =1,
+       legend = c("root","complex root"), cex = .5)
+
+#install.packages("rgl")
+library(rgl) # for persp3d()
+
+# Looking at the real part of the parabola in the complex plane:
+x = seq(-20, 20, length.out = 200) # possible x-values
+y = seq(-20, 20, length.out = 200) # possible y-values
+z = outer(x, y, function(x, y) (Re((x+y*complex(real=0,imaginary =1))^2 + 1)))
+
+# Use persp3d from rgl
+persp3d(x, y, z,
+        col = "lightblue", alpha = 0.8,
+        xlab = "x", ylab = "y", zlab = "Re(z)")
+
+# Looking at the imaginary part of the parabola in the complex plane:
+x = seq(-20, 20, length.out = 200) # possible x-values
+y = seq(-20, 20, length.out = 200) # possible y-values
+#z = outer(x, y, function(x, y) (Im((x+y*complex(real=0,imaginary =1))^2 + 1)))
+
+# Use persp3d from rgl
+# persp3d(x, y, z,
+#         col = "lightblue", alpha = 0.8,
+#         xlab = "x", ylab = "y", zlab = "Im(z)")
 
 
 ################################################################################################
@@ -346,7 +386,6 @@ exp(2*pi*i*.25) == cos(2*pi*.25)+i*sin(2*pi*.25)
 
 # Rest grid to 1x1:
 par(mfrow = c(1,1))
-
 
 
 
@@ -648,10 +687,10 @@ wave4hz = cos(2*pi*time*4)
 wave8hz = cos(2*pi*time*8)
 wave16hz = cos(2*pi*time*16)
 plot(wave1hz, type = "l", col = "blue")
-lines(wave2hz, type = "l", col = "green", add = TRUE) # set add = TRUE to add plot
-lines(wave4hz, type = "l", col = "lightblue", add = TRUE)
-lines(wave8hz, type = "l", col = "darkviolet", add = TRUE)
-lines(wave16hz, type = "l", col = "orange", add = TRUE)
+lines(wave2hz, type = "l", col = "green") 
+lines(wave4hz, type = "l", col = "lightblue")
+lines(wave8hz, type = "l", col = "darkviolet")
+lines(wave16hz, type = "l", col = "orange")
 
 ### Looking at the Frequency Space of a JPG Image:
 
@@ -991,7 +1030,7 @@ par(mfrow = c(1,1))
 # Plot frequency phase and amplitude as wave:
 time = seq(0,1,length.out = 100)
 wave = magnitude*cos(2*pi*time+phase)
-wave = magnitude*cos((2*pi/2)*(fxfy_res[1]*x+fxfy_res[2]*y))+phase
+#wave = magnitude*cos((2*pi/2)*(fxfy_res[1]*x+fxfy_res[2]*y))+phase
 plot(wave, type = "l") # Here phase only shift from left to right, and a angle of pi of the sine wave
 
 
@@ -1054,41 +1093,6 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 
 # Reset grid
 par(mfrow=c(1,1))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#install.packages("plot3D")
-library(plot3D)
-#scatter3D(x,y,z)
-
-# Bose-Einstein Condensate and Schrödinger's Wave (with disclaimer on Schrödinger):
-#install.packages("rgl")
-library("rgl")
-#plot3d(x,y,z)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
