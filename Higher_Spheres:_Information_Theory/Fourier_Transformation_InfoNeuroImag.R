@@ -20,8 +20,8 @@ library("pracma")    # for angle(), optional... Arg() or atan2() works as well..
 library("ggplot2")   # entailed in tidyverse
 library("magick")    # creating .gif
 library("oro.dicom") # loading DICOM files
-library("imager")    # for load.imag()
-library("rgl")       # for persp3d()
+library("imager")    # for load.image()
+library("rgl")       # for persp3d(), interactive 3D plot
 
 
 #################################
@@ -71,12 +71,12 @@ quad_form(2,4,2)
 # Set up sequence of values (you may need to adjust for different quad. equations):
 x = seq(-6,4,by=.01)
 # Example = -2*x^2 - 4 * x - 4 
-quad_equ(x=x,a=-2,b=-4,c=-2)
+quad_equ(x = x,a = -2,b = -4,c = -2)
 # Plot example quad equation - we can see that the function does not cross the 
 # x-axis, so there should be no result using our quadratic formula:
-plot(x = x, y = quad_equ(x=x,a=-2,b=-4,c=-4), type = "l", ylim = c(-40,10))
-abline(v=0)
-abline(h=0)
+plot(x = x, y = quad_equ(x = x,a = -2,b = -4,c = -4), type = "l", ylim = c(-40,10))
+abline(v = 0)
+abline(h = 0)
 
 # In this case we get a NaN as result:
 quad_form(-2,-4,-4)
@@ -96,22 +96,31 @@ x2 = (-(-4) - sqrt((-4)^2-4*(-2)*(-4))) / (2*(-2))
 (-4)^2-4*(-2)*(-4)
 # [1] -16
 
+
+##############################################################################
+# 1.1.1 Optional: The Real Part of a Parabolas Function in the Complex Plane #
+##############################################################################
+
 # Plot parabola and its complex roots (will show a mirrored parabola!) by
 # mapping its complex roots onto the y-axis:
 x = seq(-10,10,by = .1) # possible x-values 
 y = x^2+1 # our parabola function 
 c = (x*complex(real = 0, imaginary = 1))^2+1
+
 # Plot with color blind friendly color palette:
 palette.colors(palette = "Okabe-Ito")
 plot(x,y, ylim = c(-20,20),xlim = c(-15,15), type = "l", col = "#0072B2")
 abline(h=0,v=0) # add x and y axis
+
 # Add complex root of x^2+1 to plot
 lines(x,Re(c), col = "#F0E442")
+
 # Add legend:
 legend("bottomright", col = c("#0072B2","#F0E442"),
        lty =1,
        legend = c("root","complex root"), cex = .5)
 
+# Plot real part of 4D parabola (x, y, Re(), Im() = 4D):
 #install.packages("rgl")
 library(rgl) # for persp3d()
 
@@ -196,7 +205,7 @@ grid2Dcomp()
 # It basically tilts by 90° every time we multiply the previous result with i
 # (again, starting with 1*i):
 1i
-1*i # also possible
+1*i # also possible after i was defined as an object, as done further above
 # [1] 0+1i # == i
 arrows(x0=0,y0=0,x1=Re(0+1*i), y = Im(0+1*i), col = "darkviolet")
 text(x=.6,y=1,"1*i = 0+1i")
@@ -314,7 +323,6 @@ par(mfrow = c(1,1))
 theta = 20 # for 20°
 exp(i*theta) == cos(theta)+i*sin(theta) 
 # 0.4080821+0.9129453i ==  0.4080821 + i * 0.9129453
-
 
 
 ###### Plot exp(2*pi*time*i) from different perspectives of the dimensions Re(), Im() and for each time:
@@ -1093,7 +1101,6 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 
 # Reset grid
 par(mfrow=c(1,1))
-
 
 
 
