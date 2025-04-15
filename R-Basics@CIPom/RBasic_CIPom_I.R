@@ -38,8 +38,9 @@
 # educational purpose; however installing the below makes sure the whole script,
 # exercise and Rmarkdown example can be executed as a whole in one go):
 
+# UNCOMMENT FOLLOWING LINE AND EXECUTE TO INSTALL ALL OF THE BELOW PACKAGES:
 #install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR","imager","magick", "oro.dicom"))
-# Tidyverse entails among others stringr, dplyr, ggplot
+# Tidyverse entails among others the packages stringr, dplyr, ggplot, readr
 library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
 library("stringi")      # changing symbol patterns such as Ae to Ä
 library("effsize")      # cohen.d() for the exercise
@@ -47,12 +48,11 @@ library("shiny")        # create and run shiny apps
 library("readxl")       # read_excel()
 library("tidytuesdayR") # resource for plenty of free example data sets
 library("imager")       # for load.image(), grayscale() and image()
-library("magick")       # for creating .gif of plots
+library("magick")       # for creating .gif of several plots
 library("oro.dicom")    # for importing DICOM files, chapter 9.10 FFT MRI example
 
-
 # Needed for Rmarkdown example:
-#install.packages(c("gt","kableExtra"., "gridExtra"))
+#install.packages(c("gt","kableExtra", "gridExtra"))
 #library("gt") # gt() nice looking tables
 #install.packages("kableExtra") 
 #library("kableExtra") # kbl() nice looking tables
@@ -100,8 +100,8 @@ parabola(x)
 
 
 #### Code benchmarks are not of concern, except for ML/AI or fMRI analysis and such:
-# y=c(rnorm(1000000,mean=35,sd=4))
 # x=c(rnorm(1000000,mean=22,sd=6))
+# y=c(rnorm(1000000,mean=35,sd=4))
 
 # linear regression with 1 Million data points:
 # lm(y~x) # instant result with my computer...
@@ -223,10 +223,6 @@ vec[2] # index 2 == second element of the vector
 vec[2] = 4
 # [1] 1 4 3
 
-# Check which class our vector is using the class() function:
-class(vec)
-is.numeric(vec)
-
 # Turn vector into a matrix
 mat = as.matrix(vec)
 #      [,1]
@@ -238,10 +234,11 @@ mat = as.matrix(vec)
 mat[3]
 # or, since there is now also an index for the first and only column:
 # Scheme = mat[row,column]
-mat[2,1]
+mat[2,]
 # [1] 4
 
-mat2 = as.matrix(t(vec))  
+mat2 = as.matrix(t(vec))
+mat2[,2]
 # t() == transpose == tilting a vector (different with matrices!!!)
 #      [,1] [,2] [,3]
 # [1,]    1    2    3 
@@ -255,9 +252,20 @@ mat_bind = cbind(c(1,2,3),c(1,2,3),c(1,2,3))
 # [2,]    2    2    2
 # [3,]    3    3    3
 
+mat_bind2 = rbind(c(1,2,3),c(1,2,3),c(1,2,3))
+#      [,1] [,2] [,3]
+# [1,]    1    2    3
+# [2,]    1    2    3
+# [3,]    1    2    3
+
+
 # Note that you can select several rows and columns via
 mat_bind[c(1,2),1] # first two rows, first column
 # [1] 1 2
+
+# Check class of our vector using the class() function:
+class(vec)
+is.numeric(vec)
 
 # Transforming an atomic matrix table into a "molecular" data table.
 # Here the columns can have different classes, each column for itself
@@ -324,8 +332,6 @@ data_frame = as.data.frame(character)
 # the below also demonstrates how to use cbind() to add a vector 
 # to an existing table:
 data_frame = cbind(data_frame,numeric1, numeric2)
-# or just:
-data_frame = data.frame(character,numeric1,numeric2)
 is.character(data_frame$character)
 # [1] TRUE 
 is.numeric(data_frame$numeric1)
@@ -383,6 +389,7 @@ test = as.numeric(test)
 # Below uses a trick: 1 or 0 at the beginning and defining dimension
 # fills up the array with either 1 or 0:
 array(1, dim = c(3,3,3))
+
 # , , 1
 
 #      [,1] [,2] [,3]
@@ -450,7 +457,7 @@ getwd() # No input needed!! Shows path assigned, e.g., for a project or standard
 # that getwd() shows as output, then you can use a shortcut using the
 # file name only:
 dino = read.csv("dino_csv.csv")
-plot(x = dino$x,y = dino$y)
+plot(x = dino$x, y = dino$y)
 
 # Load Excel file:
 # install.packages("readxl") # also within "tidyverse"
@@ -543,6 +550,7 @@ table = data.frame(patient_id,time,measurement_sysRR,fam)
 
 # install.packages("dplyr")  # install package
 library(dplyr)             # load/activate package
+
 # Filter function: filter(data_object, column_name == "entry") or != for unequal
 t1 = filter(table, time == "t1")
 t1 = filter(table, time != "t2") # alternative
@@ -558,8 +566,10 @@ filter(table, fam == "ys" | fam == "yes")
 
 # From there we could go on an explore the data:
 # Simple plotting example (note that the code is spread over two lines!!!):
-plot(x = t1$patient_id,y = t1$measurement_sysRR, ylim=c(100,150), 
-     col = "blue", ylab = "sysRR")
+plot(x = t1$patient_id,y = t1$measurement_sysRR, 
+     ylim=c(100,150), 
+     col = "blue", 
+     ylab = "sysRR")
 points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
 
 # ... and perform a paired/dependent t-test):
@@ -643,6 +653,9 @@ is.na(new_table$measurement_sysRRalt)
 # Note that in order to get the frequency of NA's you can do the following:
 sum(is.na(new_table$measurement_sysRRalt)*1)
 # [1] 2
+summary(as.numeric(new_table$measurement_sysRRalt))
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+#   119.0   124.2   128.5   128.6   133.2   140.0       2 
 
 # Using the which() function linguistically corresponds to our question:
 # In which lines are NAs? Here we execute the is.na() function within which():
@@ -913,7 +926,7 @@ fin_table_alt = new_table
 
 # Use the unique() function to show all individual entries (without duplicates so to speak)
 unique(fin_table_alt$fam)
-# [1] "yes" NA    "no"  "ys" 
+# [1] "yes" "no"  NA    "n"   "ys" 
 
 # Locate all entries of a column matching a specific criteria, here "ys"
 which(fin_table_alt$fam =="ys")
@@ -934,6 +947,7 @@ unique(fin_table_alt$fam)
 pie(table(fin_table_alt$fam))
 
 #### Get last name only, which is first position!
+library("stringr") # part of tidyverse
 name = c("Name Surname","Name Surname","Name Surname")
 surname = c("","","")
 names = cbind(name,surname)
@@ -1038,6 +1052,8 @@ sum(c(1,2,3,3,5) %in% c(1,2,3)) - sum(c(1,2,3) %in% c(1,2,3,3,5)) == sum(duplica
 #############################################################################################
 
 library("tidyverse") # needed to create tibble data tables.
+
+mean(c(1,NA,3), na.rm = TRUE)
 
 # Simple tibble table:
 tibble_test = as.tibble(cbind(c(1,2,3), c("a","b","c"), c("ey","bee","see")))
@@ -2662,9 +2678,9 @@ fibonacci1 = function(n){
   return(fn)
 } # End of function
 
-fibonacci1(10)
-# [1]  0  1  1  2  3  5  8 13 21 34
-
+fibonacci1(20)
+# [1]    0    1    1    2    3    5    8   13   21   34   55   89  144  233  377  610  987 1597
+# [19] 2584 4181
 
 # A little shorter version:
 fibonacci2 = function(n){
@@ -2680,9 +2696,15 @@ fibonacci2 = function(n){
   return(fn)
 } # End of function
 
-fibonacci2(10)
-# [1]  0  1  1  2  3  5  8 13 21 34
+fibonacci2(20)
+# [1]    0    1    1    2    3    5    8   13   21   34   55   89  144  233  377  610  987 1597
+# [19] 2584 4181
 
+# Golden ratio can be obtained, when values are high enough via f(x_i)-f(x_i-1): G.R. == around 1.618
+4181/2584
+# [1] 1.618034
+2584/1597
+# [1] 1.618034
 
 #####################################################
 ### 9.10 EXAMPLE FUNCTION X: Fourier Transformation #
@@ -2737,7 +2759,7 @@ g_t = cos(2*pi*freq*time)
 
 # More than one frequency
 #freq1 = 3; freq2 = 6
-#amp1 = 1 ; amp2 = 1
+#amp1 = 3 ; amp2 = 2
 #g_t = amp1*cos(2*pi*freq1*time) + amp1*cos(2*pi*freq2*time)
 
 # Square wave
@@ -2836,9 +2858,9 @@ fourier_trans = function(g_t,samp_f,time){
   
   # Smoothed out version (similar to python version):
   g_hat_smooth = g_hat_mean
-  for(i in 1:length(g_hat_smooth[,1])){
-    if(g_hat_smooth[i,1]<=max(g_hat_smooth[,1])/2){ # Filter for values below Nyquist frequency
-      g_hat_smooth[i,1] = 0
+  for(index in 1:length(g_hat_smooth[,1])){
+    if(g_hat_smooth[index,1]<=max(g_hat_smooth[,1])/2){ # Filter for values below Nyquist frequency
+      g_hat_smooth[index,1] = 0
     } # End if 
   } # End for i
   
@@ -2851,9 +2873,9 @@ fourier_trans = function(g_t,samp_f,time){
     geom_bar(aes(x=samp_f, y=Re), 
              stat="identity", # frequencies on y-axis
              fill="black",  # color bars
-             alpha=0.7)+
-    theme_minimal()+
-    scale_x_continuous(breaks = seq(min(samp_f),max(samp_f),by=.5))
+             alpha=0.7)+ # opacity
+    theme_minimal()+ # white instead of grey background
+    scale_x_continuous(breaks = seq(min(samp_f),max(samp_f),by=.5)) # adjust breaks x-axis tick marks
   # Print ggplot
   print(bar)
   
@@ -2868,6 +2890,7 @@ fourier_trans = function(g_t,samp_f,time){
 
 # Test function (UNCOMMENT TO TEST FUNCTION!! UNCOMMENT TO TEST FUNCTION!! UNCOMMENT TO TEST FUNCTION!!)
 #fourier_trans(g_t,samp_f,time)
+
 
 
 ##### Alternative plotting of wound up cosine wave via ggplot:
@@ -2947,7 +2970,7 @@ library("magick")
 ### Looking at the Frequency Space of a JPG Image:
 
 #install.packages("imager")
-library(imager) # for load.image() and grayscale()
+library("imager") # for load.image() and grayscale()
 
 # Load image of choice (test_img used here):
 image = load.image("test_img.jpg")
@@ -3000,12 +3023,13 @@ library("oro.dicom")
 
 # Load example data: 
 data = readDICOMFile("kspace/example_sts.dcm")
-test=data$hdr
+
 # Load example data from k-space explorer
 # https://github.com/birogeri/kspace-explorer/blob/master/images/default.dcm
-#data = readDICOMFile("kspace/default.dcm")
+#data = readDICOMFile("kspace/example_sts.dcm")
 
-# Plot original DICOM image:
+
+# Plot original DICOM image (with dark color scheme grey(0:64/64), grey.color(256)):
 image(t(data$img), col = grey(0:64/64), axes = FALSE,
       main = "Original DICOM Image")
 
@@ -3031,10 +3055,11 @@ image(log(1 + Mod(kspace)), col = grey.colors(256), axes = FALSE, main = "k-Spac
 #
 
 #  fftshift() Matlab style (requires dims to be integer when divided by 2):
-fftshift = function(kspace) {  
+fftshift = function(kspace) {  #
+  # For better readability - could also be done via ncol() and nrow()
   rows = nrow(kspace) # Evaluate n of rows
   cols = ncol(kspace) # ... n of cols
-  reshape_row = c((rows/2+1):rows, 1:(rows/2))  # rows/2+1 so it starts at first position second half
+    reshape_row = c((rows/2+1):rows, 1:(rows/2))  # rows/2+1 so it starts at first position second half
                                                 # not last position of first half!
   reshape_col = c((cols/2+1):cols, 1:(cols/2))  # same here...
   kspace[reshape_row,reshape_col]               # reshape k-space
@@ -3043,8 +3068,8 @@ fftshift = function(kspace) {
 # Shifted k-space image (log magnitude + 1):
 kspace_shifted = fftshift(kspace)
 
-# Plot shifted/reshaped image, no with low frequencies in the center, instead the
-# output matrix coners:
+# Plot shifted/reshaped image, now with low frequencies in the center, instead the
+# output matrix corners:
 image(log(1 + Mod(kspace_shifted)), col = grey.colors(256), axes = FALSE, 
       main = "Reshaped k-space")
 
