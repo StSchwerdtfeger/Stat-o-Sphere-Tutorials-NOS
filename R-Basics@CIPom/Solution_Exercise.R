@@ -54,7 +54,8 @@ t2
 # Check for normal distribution: 
 plot(density(t1$measurement_sysRR))
 plot(density(t2$measurement_sysRR))
-# I find it always hard to exactly tell visually in this case....
+# I find it always hard to exactly tell what is "more" normal distributed visually,
+# e.g. in this case....
 
 # Check with shapiro.test():
 shapiro.test(t1$measurement_sysRR)
@@ -62,6 +63,30 @@ shapiro.test(t2$measurement_sysRR)
 # => both have a p-value > .05 
 # => if the values were non-normal distr., then a non-parametric Wilcoxon signed 
 #    rank test would be the choice in this case... 
+
+# Optionally here is some code that shows how to plot the 
+# density plots next to each other an on top of another:
+
+# Set plot grid 1x2:
+par(mfrow = c(1,2))
+plot(density(t1$measurement_sysRR), ylim = c(0,.12))
+plot(density(t2$measurement_sysRR), ylim = c(0,.12))
+
+# Reset plot grid:
+par(mfrow = c(1,1))
+# Plot density functions ontop of another. Note that the information
+# on bandwidth only refers to t1 density, but could be extracted fro  density(), see below:
+plot(density(t1$measurement_sysRR), ylim = c(0,.12))
+lines(density(t2$measurement_sysRR))
+
+## With this code you can adjust the x-label via parameter xlab = within plot() and via as.character()...
+density1 = density(t1$measurement_sysRR)
+density1$bw
+# [1] 2.655919
+density2 = density(t2$measurement_sysRR)
+density2$bw
+# [1] 1.843254
+
 
 ######## Perform paired/dependent t-test: Note that input is t.test(t2,t1,paired=TRUE) (c)):
 result_t_test = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE)
@@ -171,11 +196,17 @@ table(frequencies$fam)
 
 # Alternative way:
 table(data$fam)/2
-# SAME RESULT just somehow sorte differently
+# SAME RESULT 
 #     no not specified           yes 
 #      4             2             6
 
-# NBefore exporting the table, check in console if your table is fully cleaned...
+# The latter is only possible, given every patient ID occurs twice. Check by also using
+# the table() function:
+table(data$patient_id)
+# 1  2  3  4  5  6  7  8  9 10 11 12 
+# 2  2  2  2  2  2  2  2  2  2  2  2
+
+# Before exporting the table, check in console if your table is fully cleaned...
 data 
 
 # > data 
@@ -294,7 +325,8 @@ reformat == reformat2
 # [12,]       TRUE     TRUE     TRUE TRUE   TRUE
 
 
-##### Add sysRR difference in new column:
+##### Add sysRR difference in new column (sipler way shown below, but this way its 
+##### most similar to an algorithm by hand and should just serve just as another for loop example :
 for(i in 1:length(reformat[,1])){
   reformat$RRdiff[i] = as.numeric(reformat$sysRR_t2[i]) - as.numeric(reformat$sysRR_t1[i])
 } # End for i
@@ -318,9 +350,7 @@ reformat
 
 # I'd say reformatting in the above way is rather unusual, since conversion is mostly 
 # from wide to long format. However, this exercise size shows you how to reverse
-# the actions of tha long format function. 
-
-
+# the actions of the long format function. 
 
 ######## Alternative easier way of adding a column with diff values (d)):
 RRdiff_alt = as.numeric(reformat$sysRR_t2)-as.numeric(reformat$sysRR_t1)
@@ -408,7 +438,7 @@ long_format = melt(long_reformat, id.vars = "patient_id",
 # Alternative via gather() which does not require an id column
 # install.packages("tidyr")  # or load tidyverse
 library(tidyr) # within tidyverse
-# Here the paramters key and value create new column names for the reshaped table.
+# Here the parameters key and value create new column names for the reshaped table.
 # Below I chose time for either sysRR_t1 and sysRR_t2 as entry. Values creates a
 # column with the actual values, which are here the actual sysRRs from t1 and t2,
 # so this column is called sysRR.
