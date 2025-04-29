@@ -17,7 +17,7 @@
 #         Tutorial Script        #
 #               by               #
 #     Steffen Schwerdtfeger      # 
-#       12.2023 - 03.2025        #
+#       12.2023 - 05.2025        #
 ##################################
 ##################################
 
@@ -63,6 +63,16 @@ library("oro.dicom")    # for importing DICOM files, chapter 9.10 FFT MRI exampl
 # 1 What is the Function of a Computer? — A Short Introduction #
 # into the History of Programming Languages                    #
 ################################################################
+
+# Go to Tools -> Global Options -> Appearance to change RStudio appearance and colour coding.
+# I am using the theme "Dracula"
+
+# ⠀⠀⠀⠀⣀⣤⣤⣶⣾⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣶⣶⣦⣤⣀⠀⠀⠀⠀⠀
+# ⣀⣴⣶⣿⣿⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣴⣿⣿⣿⣿⣿⣿⣷⣦⣄⡀
+# ⠁⠀⠀⠈⠉⠛⣿⣿⣿⣿⣿⣷⣦⣀⢠⣆⣸⡆⢀⣤⣾⣿⣿⣿⣿⣿⠟⠋⠉⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠸⠿⠿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠿⠏⠀⠀⠀⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠻⣿⣿⣿⣿⠿⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 
 # BEST START WITH CHAPTER 3 when you are completely new to programming / R, 
 # the below is just some Code upfront that is shown in the introduction. 
@@ -482,7 +492,7 @@ library("readr") # package also within "tidyverse"
 
 # Install package for further data sets:
 # install.packages("dplyr") # (dplyr also used for data cleaning)
-data()                     # View all available data sets
+#data()                     # View all available data sets (UNCOMMENT TO VIEW TABLE WITH ALL DATA)
 library(dplyr)             # open/activate/load package
 #data(starwars)            # load data set
 #View(starwars)            # view via RStudio viewer
@@ -874,7 +884,7 @@ test1 = new_table %>%
 # na.omit() # be careful with this function!!!
 # and no %>% at the end, otherwise "+" in console!!!!
 
-# Note that the filter() function here does not need the input for the table,
+# Note that the filter() function here does not need an input for the data table,
 # it is already passed on from the previous piped line... This can be 
 # confusing as a beginner, when starting with piped functions and then wanting 
 # to use each function for itself.
@@ -895,7 +905,7 @@ new_table %>%
 # Casual way we have gone through before via $ and cbind()
 new_table2 = as.data.frame(cbind(new_table$patient_id,new_table$time))
 
-# Scheme: select(data_table, colname1, colname2) or more columns of course...
+# Scheme: select(data_table, colname1, colname2....) or more columns of course...
 new_table3 = select(new_table, patient_id, time)
 
 # Check for equivalence:
@@ -927,6 +937,11 @@ fin_table_alt = new_table
 # Use the unique() function to show all individual entries (without duplicates so to speak)
 unique(fin_table_alt$fam)
 # [1] "yes" "no"  NA    "n"   "ys" 
+
+# Theoretical alternative to unique function via filtering duplicates; see chapter 10 for more on duplicated():
+test = c(1,2,2,3, "test", "test")
+test[duplicated(test)== FALSE]
+# [1] "1"    "2"    "3"    "test"
 
 # Locate all entries of a column matching a specific criteria, here "ys"
 which(fin_table_alt$fam =="ys")
@@ -1366,7 +1381,9 @@ decode = c("") # empty vector
 table_new = as.data.frame(cbind(code,count,decode))
 
 # The below for loop is not optimal, since it loops over each vector, where
-# a table would be enough - see next example:
+# a table instead of two vectors would be enough / is better - see next example,
+# with only one nested for loop. However, the below entails a complex if() argument,
+# which can serve as an example for that:
 decode = c("Something1","Something2","Something3")
 codes = c("a","b","c")
 for(i in 1:length(table_new$code)){ # loop over table column
