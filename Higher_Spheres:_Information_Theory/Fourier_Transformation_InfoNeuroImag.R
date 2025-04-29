@@ -15,22 +15,29 @@
 # https://github.com/StSchwerdtfeger 
 
 ###### Necessary packages: 
+# UNCOMMENT next line, to install all necessary packages:
 #install.packages("pracma","ggplot2","magick","oro.dicom","imager","rgl")
 library("pracma")    # for angle(), optional... Arg() or atan2() works as well...
 library("ggplot2")   # entailed in tidyverse
 library("magick")    # creating .gif
 library("oro.dicom") # loading DICOM files
-library("imager")    # for load.image()
+library("imager")    # for load.image() - JPG images
 library("rgl")       # for persp3d(), interactive 3D plot
+
+
+# USE A R PROJECT WITH THIS SCRIPT AND PLACE THE DICOM AND JPG FILE THAT COMES WITH
+# THIS TUTORIAL IN YOUR WORKING DIRECTORY FOLDER, THEN THE SCRIPT SHOULD BE
+# FULLY EXECUTABLE WITHOUT ANY FURTHER TWEAKING OF THE SCRIPT!
 
 
 #################################
 # 1 Introducing Complex Numbers #
 #################################
 
-#########################################################################################
-# 1.1 History of Complex Numbers Concerning Solutions for Quadratic and Cubic Equations #
-#########################################################################################
+#####################################################################
+# 1.1 History of Complex Numbers Concerning Solutions for Quadratic #
+#     and Cubic Equations with the Root of Negative Values          #
+#####################################################################
 
 # The square root of -1 is not defined, but can be calculated via
 # complex numbers, in fact i = sqrt(-1) and i^2 = -1
@@ -38,8 +45,14 @@ library("rgl")       # for persp3d(), interactive 3D plot
 sqrt(-1)
 # [1] NaN # The square root of -1 is an issue of definition, since nothing squared equals -1 
 
+1*1
+# [1] 1
+(-1)*(-1)
+# [1] 1
 
-# This problem occurs when trying to solve some quadratic equations:
+# This problem occurs when trying to solve some quadratic equations.
+# Let us firtst look at an example that causes no problem, i.e., does
+# not entail a negative sqare root:
 # Example = 2*x^2 + 4 * x + 2 
 
 # Set up quadratic equation of the form a*x^2 + b*x + c
@@ -62,11 +75,11 @@ quad_form = function(a,b,c){
   x1 = (-b + sqrt(b^2-4*a*c)) / (2*a)
   x2 = (-b - sqrt(b^2-4*a*c)) / (2*a)
   return(c(x1,x2))
-} # End of quad_equ
+} # End of quad_form
 
 quad_form(2,4,2)
 # [1] -1 -1 # both results are the same, so in this case there is only one point  
-            # crossing or touching the x-axis at y = 0. 
+            # crossing or better: touching the x-axis at y = 0. 
 
 # Set up sequence of values (you may need to adjust for different quad. equations):
 x = seq(-6,4,by=.01)
@@ -107,7 +120,7 @@ x = seq(-10,10,by = .1) # possible x-values
 y = x^2+1 # our parabola function 
 c = (x*complex(real = 0, imaginary = 1))^2+1
 
-# Plot with color blind friendly color palette:
+# Plot with colour blind friendly color palette:
 palette.colors(palette = "Okabe-Ito")
 plot(x,y, ylim = c(-20,20),xlim = c(-15,15), type = "l", col = "#0072B2")
 abline(h=0,v=0) # add x and y axis
@@ -118,7 +131,7 @@ lines(x,Re(c), col = "#F0E442")
 # Add legend:
 legend("bottomright", col = c("#0072B2","#F0E442"),
        lty =1,
-       legend = c("root","complex root"), cex = .5)
+       legend = c("f(x)","complex root"), cex = .5)
 
 # Plot real part of 4D parabola (x, y, Re(), Im() = 4D):
 #install.packages("rgl")
@@ -135,19 +148,17 @@ persp3d(x, y, z,
         xlab = "x", ylab = "y", zlab = "Re(z)")
 
 # Looking at the imaginary part of the parabola in the complex plane:
-x = seq(-20, 20, length.out = 200) # possible x-values
-y = seq(-20, 20, length.out = 200) # possible y-values
 #z = outer(x, y, function(x, y) (Im((x+y*complex(real=0,imaginary =1))^2 + 1)))
 
 # Use persp3d from rgl
-# persp3d(x, y, z,
-#         col = "lightblue", alpha = 0.8,
-#         xlab = "x", ylab = "y", zlab = "Im(z)")
+#persp3d(x, y, z,
+#        col = "lightblue", alpha = 0.8,
+#        xlab = "x", ylab = "y", zlab = "Im(z)")
 
 
-################################################################################################
-# 1.2 Relating Complex Numbers to Rotation of Vectors or Rotating the Coordinate System Itself #
-################################################################################################
+###################################################################################################
+# 1.2 Relating Complex Numbers to Rotation of Vectors or to Rotating the Coordinate System Itself #
+###################################################################################################
 
 # Complex numbers is a combination of real numbers (1,1.777,-4, 1/2)
 # Create a complex number using complex()
@@ -236,7 +247,7 @@ grid2Dcomp()
 arrows(x0=0,y0=0,x1=Re(2+2*i), y = Im(2+2*i))
 # Draw angle using exp(angle*i): 
 angle = seq(0,Arg(2+2*i),by = .001)
-lines(exp(angle*i), col = "darkviolet")
+lines(exp(angle*i), col = "darkviolet") # used e^Arg*i to create angle circle part in the plot below!
 text(x = 2,y = .5, paste("Arg =", round(Arg(2+2*i),3), "rad", "\n", "= ", (Arg(2+2*i)*180/pi),"°"), col = "darkviolet")
 # Draw line for Modulus:
 segments(x0=0,y0=0, x1=Im(2+2i),y=Re(2+2i), col = "darkgreen")
@@ -244,6 +255,9 @@ text(x =.75,y = 1.5, paste("Mod = ", round(Mod(2+1i),3)), col = "darkgreen")
 # Label z = c = 2 + 2i:
 text(x = Re(2+2i)+.2, y = Im(2+2i)+.2, "z = 2+2i")
 
+#  Note that 45° or 0.785... rad from Arg(2+2*i) is equivalent to 1/4*pi:
+Arg(2+2*i) == (1/4) * pi # see further below for details on Arg() function...
+# [1] TRUE
 
 ##### Special characteristics of Euler's number e = 2.718282...
 seq = seq(-4,4, by = .01)
@@ -312,14 +326,14 @@ for(index in 1:length(steps)){ # CAVE: DON'T CALL IT "i" HERE, when i = complex(
          x1 = Re(exp(-2*pi*time[length(time)]*i)), 
          y1 = Im(exp(-2*pi*time[length(time)]*i)),  # dependent on Re() and Im() of last element of time
          col = "darkviolet", lty = "dashed")  
-  # Add value ofe^2*pi*i*time[length(time)]
-  text(x = 0, y = -1.5, paste("e^2*pi*i*",time[length(time)], "Hz"))
+  # Add value of e^2*pi*i*time[length(time)]
+  text(x = 0, y = -1.5, paste("e^(-2)*pi*i*",time[length(time)], "Hz"))
 } # End for i
 
 # Reset grid
 par(mfrow = c(1,1))
 
-# Relation to e^i*Arg(0+1i)
+# Relation to e^i*Arg(0+1i) or *theta (angle instead of argument):
 theta = 20 # for 20°
 exp(i*theta) == cos(theta)+i*sin(theta) 
 # 0.4080821+0.9129453i ==  0.4080821 + i * 0.9129453
@@ -359,6 +373,9 @@ lines(.5*exp(angle*i), col = "violet") # angle circle
 lines(1*exp(angle*i), col = "violet")  # matching circle and sine/cosine wave for Hz = .25
 segments(x0=0,y0=0,x1=1,y1=0)          # draw line from Re() = 0 to Re() = 1 and 0 on th Im() plane
 
+# Note the equality of a quarter circle rotation to 1*pi:
+Arg(exp(2*pi*.25*i))*2 == pi
+
 # Add text for Arg and Angle in Degrees:
 text(x = .6,y = .6, paste("Arg = ", round(Arg(exp(2*pi*.25*i)),3),"rad", "\n", "=", 
                           (Arg(exp(2*pi*.25*i))*180/pi),"°"), col = "violet", cex=1)
@@ -372,7 +389,7 @@ text(x =-.4,y = .5, paste("Mod = ", round(Mod(exp(2*pi*.25*i)),3)), col = "darkg
 text(x = Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)), "z = exp(2*pi*.25*i)")
 
 # Plot corresponding sine wave:
-plot(z,y, xlab = paste("time = 0-1Hz","\n","i*sine(2*pi*time)"), ylab = "Im(exp(2*pi*time*i))", type="l")
+plot(z,y, xlab = paste("time = 0-1Hz","\n","i*sine(2*pi*time)"), ylab = "Im(exp(2*pi*time*i))", type = "l")
 
 # Add line from 0-.25 Hz on the sine wave, corresponding to Arg = 90°;
 # Setup new shortened sequence:
@@ -383,7 +400,7 @@ lines(x2,y2,col = "violet") # use lines to add to add line from 0-.25Hz to exist
 
 # Use rev(range(z)) to reverse y-axis; in this case necessary for the cosine wave plot
 # below exp(2*pi*time*i):
-plot(x,z, xlab =paste("Im(exp(2*pi*time*i)","\n", "cosine(2*pi*time)"), ylab = "time = 0-1Hz",type="l", ylim = rev(range(z)))
+plot(x,z, xlab = paste("Re(exp(2*pi*time*i)","\n", "cosine(2*pi*time)"), ylab = "time = 0-1Hz",type = "l", ylim = rev(range(z)))
 # Setup sequence for cosine wave 0-.25Hz:
 x3 = Re(exp(2*pi*time2*i)) 
 y3 = time2
@@ -791,7 +808,7 @@ image(log(1 + Mod(kspace)), col = grey.colors(256), axes = FALSE, main = "k-Spac
 # 
 #
 
-#  fftshift() Matlab style (requires dims to be integer when divided by 2):
+#  fftshift() Matlab style (requires dims to be an integer when divided by 2):
 fftshift = function(kspace) {  #
   # For better readability - could also be done via ncol() and nrow()
   rows = nrow(kspace) # Evaluate n of rows
@@ -988,8 +1005,8 @@ pxy = nrow(kspace)/2+4 # for ky = -4
 pxx = nrow(kspace)/2+25
 pxy = nrow(kspace)/2-25
 
-# Plot shifted/reshaped image, no with low frequencies in the center, instead the
-# output matrix coners:
+# Plot shifted/reshaped image, now with low frequencies in the center, instead the
+# output matrix corners:
 image(log(1 + Mod(kspace_shifted)), col = grey(0:64/64), axes = FALSE, 
       main = "Reshaped k-space")
 abline(h = 0.5, v = .5)
@@ -1022,7 +1039,7 @@ fxfy = function(pxx,pxy, nrow){
 # Use function
 fxfy_res = fxfy(pxx,pxy,length(kspace[,1]))
 
-# Calculate magnitude and phase: 
+# Calculate log magnitude and phase: 
 magnitude = log(1+Mod(kspace_shifted[pxx,pxy]))
 phase = Arg(kspace_shifted[pxx,pxy])
 
@@ -1101,8 +1118,3 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 
 # Reset grid
 par(mfrow=c(1,1))
-
-
-
-
-
