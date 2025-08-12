@@ -1,9 +1,11 @@
 ###############################################
-#  Higher Spheres: Fourier Transformation in  #
-#   Information Technology and Neuroimaging   #
-#                      by                     #
-#    Steffen Schwerdtfeger & Adam Kallaß      #
-#                   04.2025                   #
+#      Higher Spheres: Complex Signals I:     #
+#   Introducing Complex Numbers, the Fourier  #
+# Series / Transformation and its Application #
+#        in Information Technology            #
+#                     by                      #
+#           Steffen Schwerdtfeger             #
+#                   08.2025                   #
 #            Stat-o-Sphere at JNOS            #
 ###############################################
 
@@ -16,14 +18,14 @@
 
 ###### Necessary packages: 
 # UNCOMMENT next line, to install all necessary packages:
-#install.packages("pracma","ggplot2","magick","oro.dicom","imager","rgl")
+#install.packages("pracma","ggplot2","magick","oro.dicom","imager","rgl","plotly")
 library("pracma")    # for angle(), optional... Arg() or atan2() works as well...
 library("ggplot2")   # entailed in tidyverse
 library("magick")    # creating .gif
 library("oro.dicom") # loading DICOM files
-library("imager")    # for load.image() - JPG images
-library("rgl")       # for persp3d(), interactive 3D plot
-
+library("imager")    # for load.image() - JPG images NEEDS DX11 (WIN) or Xquartz (Mac)!!
+library("rgl")       # for persp3d(), interactive 3D plot of surfaces
+library("plotly")    # for plot_ly() 3D plot of lines
 
 # USE A R PROJECT WITH THIS SCRIPT AND PLACE THE DICOM AND JPG FILE THAT COMES WITH
 # THIS TUTORIAL IN YOUR WORKING DIRECTORY FOLDER, THEN THE SCRIPT SHOULD BE
@@ -33,7 +35,6 @@ library("rgl")       # for persp3d(), interactive 3D plot
 #################################
 # 1 Introducing Complex Numbers #
 #################################
-
 #####################################################################
 # 1.1 History of Complex Numbers Concerning Solutions for Quadratic #
 #     and Cubic Equations with the Root of Negative Values          #
@@ -41,7 +42,6 @@ library("rgl")       # for persp3d(), interactive 3D plot
 
 # The square root of -1 is not defined, but can be calculated via
 # complex numbers, in fact i = sqrt(-1) and i^2 = -1
-# sqrt(-1)
 sqrt(-1)
 # [1] NaN # The square root of -1 is an issue of definition, since nothing squared equals -1 
 
@@ -51,8 +51,8 @@ sqrt(-1)
 # [1] 1
 
 # This problem occurs when trying to solve some quadratic equations.
-# Let us firtst look at an example that causes no problem, i.e., does
-# not entail a negative sqare root:
+# Let us first look at an example that causes no problem, i.e., does
+# not entail a negative square root:
 # Example = 2*x^2 + 4 * x + 2 
 
 # Set up quadratic equation of the form a*x^2 + b*x + c
@@ -109,51 +109,44 @@ x2 = (-(-4) - sqrt((-4)^2-4*(-2)*(-4))) / (2*(-2))
 (-4)^2-4*(-2)*(-4)
 # [1] -16
 
+# In the case of cubic equations, we can see that they always cross the x-axis
+# at some point, so we would not expect the square root of a negative as an 
+# indicator for a lack of crossing points with the x-axis. However, it can be 
+# shown that certain techniques lead to cases where the square root of negatives
+# cancel each other out but are present.
 
-##############################################################################
-# 1.1.1 Optional: The Real Part of a Parabolas Function in the Complex Plane #
-##############################################################################
+# Cubic equation function("a" can't be zero, since then it would
+# not be a cubic equation anymore!):
+cubic_equ = function(x,a,b,c,d){
+  fx = a * x^3 + b * x^2 + c * x + d
+  return(fx)
+} # End of quad_equ
 
-# Plot parabola and its complex roots (will show a mirrored parabola!) by
-# mapping its complex roots onto the y-axis:
-x = seq(-10,10,by = .1) # possible x-values 
-y = x^2+1 # our parabola function 
-c = (x*complex(real = 0, imaginary = 1))^2+1
+#### Plot of 2*x^3+0*x^2-5*x+10
+x = seq(-3,3,.1)
+plot(x = x, y = cubic_equ(x,2,0,-5,10), type = "l")
+abline(h = 0, v = 0)
 
-# Plot with colour blind friendly color palette:
-palette.colors(palette = "Okabe-Ito")
-plot(x,y, ylim = c(-20,20),xlim = c(-15,15), type = "l", col = "#0072B2")
-abline(h=0,v=0) # add x and y axis
+#### Finding the roots of a cubic equation via linear algebra by
+#### finding the eigenvalues of a companion matrix:
 
-# Add complex root of x^2+1 to plot
-lines(x,Re(c), col = "#F0E442")
-
-# Add legend:
-legend("bottomright", col = c("#0072B2","#F0E442"),
-       lty =1,
-       legend = c("f(x)","complex root"), cex = .5)
-
-# Plot real part of 4D parabola (x, y, Re(), Im() = 4D):
-#install.packages("rgl")
-library(rgl) # for persp3d()
-
-# Looking at the real part of the parabola in the complex plane:
-x = seq(-20, 20, length.out = 200) # possible x-values
-y = seq(-20, 20, length.out = 200) # possible y-values
-z = outer(x, y, function(x, y) (Re((x+y*complex(real=0,imaginary =1))^2 + 1)))
-
-# Use persp3d from rgl
-persp3d(x, y, z,
-        col = "lightblue", alpha = 0.8,
-        xlab = "x", ylab = "y", zlab = "Re(z)")
-
-# Looking at the imaginary part of the parabola in the complex plane:
-#z = outer(x, y, function(x, y) (Im((x+y*complex(real=0,imaginary =1))^2 + 1)))
-
-# Use persp3d from rgl
-#persp3d(x, y, z,
-#        col = "lightblue", alpha = 0.8,
-#        xlab = "x", ylab = "y", zlab = "Im(z)")
+# Note that the variable "a" can't be 0, since it would 
+# not be a cubic equation anymore!
+cubic_roots_la = function(a,b,c,d){
+  # Create a so-called companion matrix:
+  comp_mat = matrix(c(0,0,(-d/a),
+                      1,0,(-c/a),
+                      0,1,(-b/a)), ncol = 3, byrow = TRUE)
+                    # Finding the eigenvalues of the above comp_mat is equivalent 
+                    # to finding the roots of a polynomial by using the QR method vi eigen()
+                    roots = eigen(comp_mat)$values
+                    return(roots)
+} # End of cubic_formula
+ 
+# Test function:
+cubic_roots_la(2, 0, -5, 10)
+# [1] -2.187603+0.00000i  1.093801+1.04365i  1.093801-1.04365i
+# The first result has 0i and is therefore the only real number solution!
 
 
 ###################################################################################################
@@ -190,8 +183,8 @@ grid2Dcomp = function() {
 # Create fresh grid
 grid2Dcomp()
 
-# Complex numbers behave a lot like vectors, but the 
-# second axes is not part of the "real" number plane: 
+# Complex numbers behave a lot like vectors (at least when it comes to
+# addition of vectors), but the second axes is not part of the "real" number plane: 
 # 2 + 1i
 arrows(x0=0,y0=0,x1=Re(2+0*i), y = Im(2+0*i), col = "darkviolet")
 text(x = Re(2+0i),y = Im(2+0i)-.5, "2+0i ~ (2|0)")
@@ -208,6 +201,9 @@ text(x = Re(2+2i)+.2,y = Im(2+2i)+.3, paste("2+0i + 0+2i","\n","= 2+2i", "~ (2|2
 ###############################################################################
 # 1.3 The Relation Between Trigonometry, Euler's Identity and Complex Numbers #
 ###############################################################################
+#########################################################################
+# 1.3.1 Complex Numbers and 90° Rotations — First Hints of Trigonometry #
+#########################################################################
 
 # Create fresh grid
 grid2Dcomp()
@@ -259,7 +255,16 @@ text(x = Re(2+2i)+.2, y = Im(2+2i)+.2, "z = 2+2i")
 Arg(2+2*i) == (1/4) * pi # see further below for details on Arg() function...
 # [1] TRUE
 
-##### Special characteristics of Euler's number e = 2.718282...
+#####################################################################
+# 1.3.2 The Nature of Euler’s Number — Growth, Trigonometry and the #
+#       Taylor/Maclaurin Series of Euler’s Number                   #
+#####################################################################
+
+# e upt to 20 decimal spaces:
+sprintf("%.20f",exp(1))
+# [1] "2.71828182845904509080"
+
+##### Special characteristics of Euler's number e = 2.718281...
 seq = seq(-4,4, by = .01)
 plot(x = seq, y = exp(seq), type = "l")
 # forming coordinate system (+x,-x,+y)
@@ -282,7 +287,7 @@ y_coordinate = exp(1)
 # [1] 2.718282 = Euler's number e.
 
 # We can add the respective tangent at exp(y)
-# point with a slope = e^x. In case you wonder:
+# point with a slope = e^x. In case you wonder
 # the linear function x does not need to be defined in curve().
 curve(exp(1)*x,-3,3, add = TRUE)
 
@@ -292,30 +297,196 @@ integrate(expo_fun, lower = -Inf, upper = 1)
 # 2.718282 with absolute error < 0.00015
 # = e again.
 
-##### Euler's formula in the real plain, regular trigonometry:
+# The relation between e^{x*Arg} sin and cos in the real plain, 
+# regular trigonometry. We will soon see a similar formula just including
+# the imaginary number i, which is then referred to as Euler's formula,
+# connecting trigonometry and complex numbers:
 exp(2*Arg(exp(2))) == cos(Arg(exp(2)))+sin(Arg(exp(2)))
+
+# Example for factorials
+3*2*1 == factorial(3)
+# [1] TRUE
+
+# Euler's number via 1+sum(1/n!) for n -> inf. Below we will
+# go up to n_max = 100 
+fact_max = c(1:100)
+# Initialize result object:
+euler = 1 # it's 1, since it starts with 1/1!, 
+          # which equals 1 and then 1/2! ... + 1/n!
+for(index in 1:100){
+  euler = euler + (1/factorial(fact_max[index]))
+} # End for i
+euler
+# [1] 2.718282
+
+# Check for equivalence to exp(1), rounded to 5 decimal spaces:
+round(euler, 5) == round(exp(1), 5)
+# [1] TRUE
+
+##### Function that calculates e^x via the formula
+# e^x = 1+x + x^2/2! ... x^n/n! - Taylor/Maclaurin Series
+# turning our function e^x into a series of polynomials:
+ex_tayl = function(x,length_series){
+  # Recursive addition of x^i/i!:
+  for(i in 1:length_series){
+    if(i == 1){
+      base = 1+x
+    } # End if i == 1
+    else if(i > 1){
+      base = base + (x^i/factorial(i)) 
+    } # End else  
+  } # End for i
+  return(base)
+} # End of function
+
+# Showing that both results in 2.71828... (rounded to 5 decimal spaces):
+round(ex_tayl(1,1000),5) == round(exp(1),5) && round(ex_tayl(1,1000),5) == round(euler,5)
+# [1] TRUE
+
+# Function that plots the Taylor Polynomial Series e^x via the formula
+# e^x = 1+x + x^2/2! ... x^n/n! up to a certain number n. It works
+# as the function before, just that x is not a single value but a series
+# of values created via seq() that can be used to plot the respective 
+# polynomial functions up to n:
+ex_tayl_plot = function(length_series){
+  # Recursive addition of x^i/i!:
+  x = seq(from = -10,to = 10,by = .1)
+  for(i in 1:length_series){
+    if(i == 1){
+      base = 1+x
+    } # End if i == 1
+    else if(i > 1){
+      base = base + (x^i/factorial(i)) 
+    } # End else  
+  } # End for i
+  
+  # Plot resulting polynomial up to defined length of the series:
+  plot(x,base, type = "l", col = "green", ylim = c(-50,50), ylab = "y", main = paste("Taylor Series for n =",length_series))
+  lines(x = x, y = exp(x)) # add e^x
+  abline(h=0,v=0)          # add axes
+  
+  return(base)
+} # End of ex_tayl_plot
+
+# Plot for the case of n = 2, n = 3, n = 5, n = 100:
+par(mfrow = c(2,2))
+ex_tayl_plot(2);ex_tayl_plot(3);ex_tayl_plot(10);ex_tayl_plot(100)
+par(mfrow = c(1,1))
+
+# Approximating cos() via Taylor/Maclaurin Series:
+cos_tayl = function(length_series){ # where n and the factorial is even
+  # Create a sequence of even numbers up to length_series, no 
+  # matter if the input length_series is odd or even.
+  if(length_series == 1){
+    n = c(0,length_series+1)
+  } # End if length series == 1
+  else if((length_series) %% 2 == 0){ 
+    n = c(0,seq(2, length_series, by = 2))
+  } # if length_series is a even number
+  else if((length_series) %% 2 != 0) {
+    n = c(0,seq(2, (length_series-1), by = 2))
+  } # End else if length_series is odd
+  
+  # Actual Taylor/Maclaurin Series for cos(x):
+  # Recursive addition of x^i/i!:
+  x = seq(from = -10,to = 10,by = .1)
+  for(i in 1:length(n)){ # loops over the length of n, not length_series as before!
+    if(i == 1){
+      base = 1
+    } # End if i == 1
+    else if((i %% 2) == 0 && i != 1){ # If division by two gives remainder of 0 a number is even!
+      base = base - (x^n[i]/factorial(n[i])) 
+    } # End else if i even
+    else if((i %% 2) != 0){ # If division by two gives remainder != 0 a number is odd!
+      base = base + (x^n[i]/factorial(n[i])) # same as before just + instead of -
+    } # End else if i odd
+  } # End for i
+  
+  # Plot resulting polynomial up to defined length of the series:
+  plot(x,base, type = "l", col = "green", ylim = c(-5,5), ylab = "y", main = paste("Taylor Series for n =",n[length(n)]))
+  lines(x = x, y = cos(x)) # add cos(x)
+  abline(h=0,v=0)          # add axes
+  return(base)
+} # End of cos_tayl
+
+# Plot results
+par(mfrow = c(2,2))
+cos_tayl(1);cos_tayl(4);cos_tayl(10);cos_tayl(20)
+par(mfrow = c(1,1))
+
+
+# Approximating sin() via Taylor/Maclaurin Series:
+sin_tayl = function(length_series){ # where n and the factorial is even
+  # Create a sequence of even numbers up to length_series, no 
+  # matter if the input length_series is odd or even.
+  if(length_series == 1 || length_series == 2){
+    n = c(1,3)
+  } # End if length series == 0 or == 2
+  else if((length_series) %% 2 == 0 && length_series > 2){ 
+    n = c(seq(1, length_series+1, by = 2))
+  } # if length_series is a even number
+  else if((length_series) %% 2 != 0) {
+    n = c(seq(1, (length_series), by = 2))
+  } # End else if length_series is odd
+  
+  # Actual Taylor/Maclaurin Series for sin(x):
+  # Recursive addition of x^i/i!:
+  x = seq(from = -10,to = 10,by = .1)
+  for(i in 1:length(n)){ # loops over the length of n, not length_series as before!
+    if(i == 1){
+      base = x
+    } # End if i == 1
+    else if((i %% 2) == 0 && i != 1){ # If division by two gives remainder of 0 a number is even!
+      base = base - (x^n[i]/factorial(n[i])) 
+    } # End else if i even
+    else if((i %% 2) != 0){ # If division by two gives remainder != 0 a number is odd!
+      base = base + (x^n[i]/factorial(n[i])) # same as before just + instead of -
+    } # End else if i odd
+  } # End for i
+  
+  # Plot resulting polynomial up to defined length of the series:
+  plot(x,base, type = "l", col = "green", ylim = c(-5,5), ylab = "y", main = paste("Taylor Series for n =",n[length(n)]))
+  lines(x = x, y = sin(x)) # add sin(x)
+  abline(h=0,v=0)          # add axes
+  return(base)
+} # End of sin_tayl
+
+# Plot results
+par(mfrow = c(2,2))
+sin_tayl(1);sin_tayl(5);sin_tayl(11);sin_tayl(21)
+par(mfrow = c(1,1))
+
+
+#######################################################################
+# 1.3.3 Euler’s Identity and Euler’s Formula — Trigonometry Involving #
+# Complex Numbers and Euler’s number.                                 #
+#######################################################################
 
 ##### Euler's identity:
 # We have to use Re(), since b entails is a tiny remnant number,
 # probably added somewhere in "background code", which we could
 # also round though using the round() function:
+exp(i*pi)
+# -1+1.224606e-16i # bi ~ 0i 
+# Alternative via extracting the real part only:
 Re(exp(i*pi)) == -1
 # [1] TRUE
+# Version via rounding, such that 1.224606e-16i == 0*i
 round(exp(i*pi)) == -1
 # [1] TRUE
 
+# Equivalence to zero:
 Re(exp(i*pi)) + 1 == 0
 # [1] TRUE
 round(exp(i*pi)) + 1 == 0
 # [1] TRUE
 
-
-# Set up grid for four plots
+# Set up grid for four plots:
 par(mfrow = c(2,2))
 
-# Set time from 0 to 1 for Hz = 1 second
+# Set time from 0 to 1 for Hz = 1 second:
 steps = c(0,.25,.5,1)
-for(index in 1:length(steps)){ # CAVE: DON'T CALL IT "i" HERE, when i = complex(imaginary = 1,real = 0) 
+for(index in 1:length(steps)){ # CAVE: DON'T CALL INDEX "i" HERE, when i = complex(imaginary = 1,real = 0) 
   time = seq(0,steps[index],by=.001)
   i = complex(imaginary = 1, real = 0)
   plot(exp(-2*pi*time*i), type = "l", 
@@ -333,32 +504,41 @@ for(index in 1:length(steps)){ # CAVE: DON'T CALL IT "i" HERE, when i = complex(
 # Reset grid
 par(mfrow = c(1,1))
 
-# Relation to e^i*Arg(0+1i) or *theta (angle instead of argument):
+
+#### Relation to e^i*Arg(0+1i) or *theta (angle instead of argument):
 theta = 20 # for 20°
 exp(i*theta) == cos(theta)+i*sin(theta) 
 # 0.4080821+0.9129453i ==  0.4080821 + i * 0.9129453
 
 
-###### Plot exp(2*pi*time*i) from different perspectives of the dimensions Re(), Im() and for each time:
-# Set up sequence 0-1Hz
+#### Showing that the Taylor and Maclaurin series of cos()+i*sin() = e^ix, 
+# where x = seq(from = -10,to = 10,by = .1); result is rounded to 5 decimal spaces:
+round(cos_tayl(100) + complex(real=0,imaginary=1)*sin_tayl(100),5) == round(exp(complex(real=0,imaginary=1)*seq(from = -10,to = 10,by = .1)),5)
+
+
+#### Plot exp(2*pi*time*i) from different perspectives of the dimensions Re(), Im() and for each time:
+# Set up sequence 0-1Hz:
 time = seq(0,1, by= .001)
 x = Re(exp(2*pi*time*i)) # x-axis = real dimension
 y = Im(exp(2*pi*time*i)) # y-axis = imaginary / complex domain
 z = time                 # temporal dimension 
 
 
-# Base plot perspectives triplet with exp(2*pi*time*i), where time = 0-1Hz:
+### Base plot perspectives triplet with exp(2*pi*time*i), where time = 0-1Hz:
 par(mfrow = c(2,2))
+
 # exp(2*pi*time*i)
 plot(x,y, xlab = "Re(exp(2*pi*time*i))", ylab = "Im(exp(2*pi*time*i))",type="l")
+
 # Sine(2*pi*time*i)
 plot(z,y, xlab = paste("time = 0-1Hz","\n", "i*sine(2*pi*t)"), ylab = "Im(exp(2*pi*time*i))",type="l")
+
 # Cosine(2*pi*time*i)
 plot(x,z, xlab = paste("Re(exp(2*pi*time*i))","\n", "cosine(2*pi*t)"), ylab = "time = 0-1Hz", type="l")
 
 
-##### Base plot perspectives triplet with exp(2*pi*time*i), where time = 0-1Hz,
-##### Including a sequence of 0-.25 Hz on the circle:
+#### Base plot perspectives triplet with exp(2*pi*time*i), where time = 0-1Hz,
+#### Including a sequence of 0-.25 Hz on the circle:
 par(mfrow = c(2,2))
 
 # Plot exp(2*pi*time*i)
@@ -413,14 +593,277 @@ exp(2*pi*i*.25) == cos(2*pi*.25)+i*sin(2*pi*.25)
 par(mfrow = c(1,1))
 
 
+#############################################################################
+# 1.4 The Real Part of a Parabolas Function in the Complex Plane (Optional) #
+#############################################################################
+
+# Plot parabola and its complex roots (will show a mirrored parabola!) by
+# mapping its complex roots onto the y-axis:
+x = seq(-10,10,by = .1) # possible x-values 
+y = x^2+1 # our regular parabola function 
+c = (x*complex(real = 0, imaginary = 1))^2+1
+
+# Plot with colour blind friendly color palette:
+palette.colors(palette = "Okabe-Ito")
+plot(x,y, ylim = c(-20,20),xlim = c(-15,15), type = "l", col = "#0072B2")
+abline(h=0,v=0) # add x and y axis
+
+# Add complex root of x^2+1 to plot
+lines(x,Re(c), col = "#F0E442")
+
+# Add legend:
+legend("bottomright", col = c("#0072B2","#F0E442"),
+       lty =1,
+       legend = c("f(x)","complex root"), cex = .5)
+
+# Parabola x^2 + constant:
+# Using regular quad_form() function gives NaN for x^2+1.
+# Let us see how it evolves:
+quad_form(a = 1,b = 0,c = -2)
+# [1] 1.414214 -1.414214
+quad_form(a = 1,b = 0,c = -1)
+# [1] 1 -1
+quad_form(a = 1,b = 0,c = 0)
+# [1] 0 0
+quad_form(a = 1,b = 0,c = +1)
+# [1] NaN NaN
+
+# Adjust quad_form function for applying the quadratic formula to complex numbers:
+quad_form_adj = function(a,b,c){
+  out1=b^2-4*a*c
+  out2=b^2-4*a*c
+  i = complex(real=0,imaginary=1)
+  x1 = (-b + i*sqrt(abs(out1))) / (2*a)
+  x2 = (-b - i*sqrt(abs(out2))) / (2*a)
+  return(c(x1,x2))
+} # End of quad_form
+
+# Test adjusted function with x^2+1
+quad_form_adj(a = 1,b = 0,c = 1)
+# [1] 0+1i 0-1i
+
+# We can now add the points (x=1|y=0) and (x=-1|y=0) to the previous plot:
+points(x = Im(quad_form_adj(a = 1,b = 0,c = 1)),y = Re(quad_form_adj(a = 1,b = 0,c = 1)), pch=16, col = "darkblue")
+
+# Used for 3d scatterplot:
+library(plotly)
+
+# Plot regular parabola x^2 + 1:
+x = seq(-10, 10, length.out = 100)
+y = x^2 + 1 # our regular parabola function x^2 + 1
+c = x*0 # Whole sequence is 0, since a regular parabola only rests on the real number plane.
+
+# Plot complex root of the parabola x^2 + 1:
+x = seq(-10, 10, length.out = 100)
+xc = x*0
+yc = Re((x*complex(real = 0, imaginary = 1))^2+1) # this time yc == 0
+cc = x
+
+# Create 3D plot UNCOMMENT TO RUN!!!!!!!:
+#plot = plot_ly(x = ~x, y = ~y, z = ~c, type = 'scatter3d', mode = 'lines')
+#plot %>% add_trace(x = ~xc, y = ~yc, z = ~cc, type = 'scatter3d', mode = 'lines')%>%layout(scene = list(camera = list(eye = list(x = 1, y = 2, z = -3))))
+
+# Plot real part of 4D parabola (x, y, Re(), Im() = 4D):
+#install.packages("rgl")
+library(rgl) # for persp3d()
+
+# Looking at the real part of the parabola in the complex plane:
+x = seq(-20, 20, length.out = 200) # possible x-values
+y = seq(-20, 20, length.out = 200) # possible y-values
+z = outer(x, y, function(x, y) (Re((x+y*complex(real=0,imaginary =1))^2 + 1)))
+
+# Use persp3d from rgl
+persp3d(x, y, z,
+        col = "lightblue", alpha = 0.8,
+        xlab = "x", ylab = "y", zlab = "Re(z)")
+
+# Looking at the imaginary part of the parabola in the complex plane:
+#z = outer(x, y, function(x, y) (Im((x+y*complex(real=0,imaginary =1))^2 + 1)))
+
+# Use persp3d from rgl
+#persp3d(x, y, z,
+#        col = "lightblue", alpha = 0.8,
+#        xlab = "x", ylab = "y", zlab = "Im(z)")
+
+
 
 ############################
 # 2 Fourier Transformation #
 ############################
+#########################################################################################
+# 2.1 Fourier Series of a Signal — Approximation of Functions via Summing up Sine Waves #
+#########################################################################################
 
-#############################################################################
-# 2.1 Sampling a Frequency as Winding up a Signal onto to the Complex Plane #
-#############################################################################
+# Plot a Square wave:
+time = seq(0,4*pi, by = .001)
+# Sign of a sine wave:
+square = sign(sin(time)) # time*frequency
+plot(time,square, type = "l")
+abline(h=0) # add x-axis at y = 0
+
+# Since we are about to calculate the integral of functions, we need
+# a square wave function in order to use the integrate function, since it
+# does not work using sign(cos(time)) within integrate():
+square_wave = function(time){
+  sign(cos(time))
+} # End of function
+
+# Function to evaluate Fourier series of a function:
+fourier_series = function(n, time_max, fun){
+  #### Create respective sequence for x:
+  time = seq(-time_max,time_max,by =.001)
+
+  #### Coefficients:
+  # Amplitude a for 0:
+  a_0 = (1/2)*(1/time_max)*integrate(fun, lower = -time_max, upper = time_max)$value
+  
+  # Amplitude a (cosine part) for n:
+  a_n_fun = function(n){
+    intermediate_fun_a = function(x){fun(x)*cos((n*pi*x)/time_max)}
+    1/time_max*integrate(intermediate_fun_a, lower = -time_max, upper = time_max)$value
+  } # End of function
+  
+  # Amplitude b (sine part) for n:
+  b_n_fun = function(n){
+    intermediate_fun_b = function(x){fun(x)*sin((n*pi*x)/time_max)}
+    1/time_max*integrate(intermediate_fun_b, lower = -time_max, upper = time_max)$value 
+  } # End of function
+  
+  #### Actual Fourier Series calculated with coefficients:
+  series = a_0
+  for(n_index in 1:n){
+    series  = series + a_n_fun(n_index) * cos((n_index*pi*time) / time_max) + b_n_fun(n_index) * sin((n_index*pi*time) / time_max)
+  } # End for index
+  return(series)
+} #  End of function
+
+### Test function with square_wave() and plot results:
+plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3),ylab ="Amplitude", main = "n = 20", xlab = "periods in pi")
+abline(h=0)
+lines(seq(-pi,pi,by =.001), fourier_series(n = 20, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
+
+### Test for different sizes of n -- n= c(1,10,20,80)
+# Set 2*2 grid:
+par(mfrow = c(2,2))
+# n = 1
+plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3), ylab ="Amplitude", main = "n = 1", xlab = "-pi to pi")
+abline(h=0)
+lines(seq(-pi,pi,by =.001), fourier_series(n = 1, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
+# n = 10
+plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3), ylab ="", main = "n = 10", xlab = "-pi to pi")
+abline(h=0)
+lines(seq(-pi,pi,by =.001), fourier_series(n = 10, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
+# n = 20
+plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3), ylab ="Amplitude", main = "n = 20", xlab = "-pi to pi")
+abline(h=0)
+lines(seq(-pi,pi,by =.001), fourier_series(n = 20, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
+# n = 80
+plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3), ylab ="", main = "n = 80", xlab = "-pi to pi")
+abline(h=0)
+lines(seq(-pi,pi,by =.001), fourier_series(n = 80, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
+# Reset plot 
+par(mfrow = c(1,1))
+
+
+### Test for orthogonality of cosine and sine:
+x = seq(-2*pi, 2*pi, by = .0001)
+g = function(x){cos(x)*sin(x)}
+
+# Integrate g (it will also work given m or n, except they are equal):
+integrate(g,lower = -2*pi, upper = 2*pi)
+# 0 with absolute error < 4.5e-14
+
+# For the discrete set it will not be zero but a very small value:
+sum(g(x))
+# [1] -1.037524e-05
+# The above value gets smaller approaching 0 the finer our 
+# seq of x will be, above by = .0001
+
+# Plot of cosine and sine and sum/integral of 
+# cosine*sine - the dot product of sine and cosine: 
+plot(x,cos(x), type = "l", col = "blue", ylab = "") # cos
+lines(x,sin(x), type = "l", col = "green")          # sine
+lines(x, g(x), type = "l", col = "deeppink")        # sin*cos
+abline(h=0,v=0)
+# The integral of g(x) = integral of cos*sin will be zero, since the 
+# positive and negative areas under the curve cancel each other out.
+
+### Test for orthogonality of cosine and cosine where m == n (here both 1):
+x = seq(-2*pi, 2*pi, by = .0001)
+g_mn = function(x){cos(x)*cos(x)} # with m and n being both 1
+
+# The integral ob g_mn equals the absolute value of L = time_max of the interval,
+# i.e., in this case 2*pi
+integrate(g_mn,lower = -2*pi, upper = 2*pi)$value == 2*pi
+# [1] TRUE
+
+# For the discrete set it will not be zero but a very small value:
+sum(g_mn(x))
+# [1] 62832.15
+# Summing for the discrete case does not work in this case, however, 
+# the value divided by 20k somehow roughly results in pi...
+
+# Plot of cosine and sine and sum/integral of 
+# cosine*sine - the dot product of sine and cosine: 
+plot(x,cos(x), type = "l", col = "blue", ylab = "") # cos
+lines(x, g_mn(x), type = "l", col = "deeppink")     # sin*cos
+abline(h=0,v=0)
+# The integral of g(x) = integral of cos*cos will be clearly above 0 in this case!
+
+
+#### Uncovering the meaning of the dot product and orthogonality, 
+# starting with linear algebra:
+grid2Dcomp()
+
+# Add two vectors that are in fact orthogonal (90° angle):
+arrows(x0=0,y0=0,x1=2, y = 0, col = "darkviolet")
+arrows(x0=0,y0=0,x1=0, y = 2, col = "darkviolet")
+arrows(x0=0,y0=0,x1=-2, y = 0, col = "darkviolet")
+text(x = 1, y = 2, "v1 = c(0,2)")
+text(x = 2, y = -.5, "v2 = c(2,0)")
+text(x = -2, y = -.5, "v3 = c(-2,0)")
+
+# Two different ways to calculate the inner product in linear algebra:
+# Via multiplying an then summing vectors:
+sum(c(0,2)*c(2,0)) == 0 
+# [1] TRUE # as we can see, they are orthogonal
+
+# What R does is essentially this: multiplying vector 
+# elements with the same index and summing the results:
+0*2 + 2*0 == 0
+# [1] TRUE
+
+# Second method via angle/radians, here 90°, i.e. orthogonality:
+Mod(c(0,2))*Mod(c(2,0))*cos(90*pi/180) == c(0,0)
+# [1] TRUE TRUE
+
+
+### Dot product for equivalent vectors:
+sum(c(0,1)*c(0,1)) == 1
+# [1] TRUE
+sum(c(0,2)*c(0,2)) == 4
+# [1] TRUE
+
+### Orthogonal vectors:
+sum(c(1,0)*c(0,1)) == 0 && sum(c(2,0)*c(0,2)) == 0  
+# [1] TRUE
+
+### Opposite vectors:
+sum(c(0,1)*c(0,-1)) == -1
+# [1] TRUE
+sum(c(0,2)*c(0,-2)) == -4
+# [1] TRUE
+
+#### For pi/2, where a cosine wave and the square wave overlap:
+square_wave(pi/2)*cos((1*pi*(pi/2))/pi)
+# [1] 6.123032e-17 # roughly zero
+all.equal(0, square_wave(pi/2)*cos((1*pi*(pi/2))/pi))
+# [1] TRUE
+
+
+###############################################################################
+# 2.2.x Sampling a Frequency as Winding up a Signal onto to the Complex Plane #
+###############################################################################
 
 
 # The following is based on the 3blue1brown tutorial on Fourier Transformation.
@@ -444,7 +887,7 @@ length(samp_f) # length 101, so we will only plot up to 9.9 Hz winding freq (sam
 i = complex(real = 0, imaginary = 1) # beware to NOT USE "i" as index variable in a for loop from now on!!
 
 # Cos wave definition. cos() for all time multiplied by frequency of the cos() wave and 2*pi 
-# for radians period, i.e. normalized time in unit of Hz. 
+# for radiant period, i.e. normalized time in unit of Hz. 
 # This cosine wave is used in the python script creates a circle when samp_f == freq:
 # Define wave frequency 
 freq = 3 # == 3 Hz
@@ -469,15 +912,22 @@ plot(x = time, y = g_t, type = "l", xlab = paste("Time in Seconds", "\n",freq,"p
      ylab = "g_t = cos(2*pi*freq*time)", 
      col = "deepskyblue3") 
 
-# g_t and the code below for our wound up cosine wave regarding one winding/sampling 
-# frequency produce very lengthy vectors. In the below case it's complex numbers, i.e. 
-# coordinates of our polar grid for our wound up cosine wave. Plotting multiple 
-# plots (101) with 10001 paired Re and Im values is a lot. 
-length(g_t*exp(-2*pi*i*samp_f[1]*time))
-# [1] 10001 !!!
-
-
+# Comparing our cosine wave with 0Hz and 2.9Hz sampling frequency:
+par(mfrow = c(1,2))
 # Plotting output for each winding frequency is easy with basic plot().
+# Let us have a look at samp_f[1] at first:
+plot(g_t*exp(-2*pi*i*samp_f[1]*time), type = "l", col = "darkviolet", 
+     # Title entails information on winding/sample freq and original cosine freq
+     main = paste("Winding Frequency of", samp_f[30],"Hz", "\n", paste("Cosine Frequency of", freq,"Hz")), 
+     xlab = "Real Numer",
+     ylab = "Imaginary Number") 
+
+# Add center of mass point, which is the average / mean of g_hat = g_t*exp(-2*pi*i*samp_f[30]*time)
+# We have to extract the real and imaginary number in order to get the points coordinates for the polar 
+# plot using Re() and Im():
+points(x = Re(mean(g_t*exp(-2*pi*i*samp_f[1]*time))), Im(mean(g_t*exp(-2*pi*i*samp_f[1]*time))),
+       col = "darkblue", pch = 19)
+
 # Let us have a look at samp_f[30] at first:
 plot(g_t*exp(-2*pi*i*samp_f[30]*time), type = "l", col = "darkviolet", 
      # Title entails information on winding/sample freq and original cosine freq
@@ -485,10 +935,24 @@ plot(g_t*exp(-2*pi*i*samp_f[30]*time), type = "l", col = "darkviolet",
      xlab = "Real Numer",
      ylab = "Imaginary Number") 
 
-##### Now we look at a sampling frequency of 0, .25, 1 and 1.5 Hz:
-# Set plot grid:
-par(mfrow=c(2,2))
+# Add center of mass point, which is the average / mean of g_hat = g_t*exp(-2*pi*i*samp_f[30]*time)
+# We have to extract the real and imaginary number in order to get the points coordinates for the polar 
+# plot using Re() and Im():
+points(x = Re(mean(g_t*exp(-2*pi*i*samp_f[30]*time))), Im(mean(g_t*exp(-2*pi*i*samp_f[30]*time))),
+       col = "darkblue", pch = 19)
+# Reset grid:
+par(mfrow = c(1,1))
 
+# g_t and the code below for our wound up cosine wave regarding one winding/sampling 
+# frequency produce very lengthy vectors. In the below case it's complex numbers, i.e. 
+# coordinates of our polar grid for our wound up cosine wave. Plotting multiple 
+# plots (101) with 10001 paired Re and Im values is a lot. 
+length(g_t*exp(-2*pi*i*samp_f[1]*time))
+# [1] 10001 !!!
+
+##### Now we look at a sampling frequency of 0, .25, 1 and 1.5 Hz:
+# Set plot grid and sampling frequencies:
+par(mfrow=c(2,2))
 samp_freq = c(0,.25,1,1.75)
 # Let us have a look at samp_f = 0 at first. NOTE THAT WE ADDED A CONSTANT OF 1, so that 
 # our wound up cosine wave gets shifted to the right (as in the 3blue1brown videp):
@@ -502,13 +966,6 @@ for(index in 1:length(samp_freq)){
        ylim = c(-2,2),
        xlim = c(-2,2)) 
 } #End for index
-
-
-# Add centre of mass point, which is the average / mean of g_hat = g_t*exp(-2*pi*i*samp_f[30]*time)
-# We have to extract the real and imaginary number in order to get the points coordinates for the polar 
-# plot using Re() and Im():
-points(x = Re(mean(g_t*exp(-2*pi*i*samp_f[30]*time))), Im(mean(g_t*exp(-2*pi*i*samp_f[30]*time))),
-       col = "darkblue", pch = 19)
 
 # Reset plot grid
 par(mfrow = c(1,1))
@@ -536,7 +993,7 @@ fourier_trans = function(g_t,samp_f,time){
   for(index in 1:length(samp_f)){ # don't call it i when i was defined above as a constant variable!!!
     
     plot(g_t*exp(-2*pi*i*samp_f[index]*time), type = "l", col = "darkorchid4", 
-         # Title entails information on winding/sample freq and original cosine freq
+         # Title entails information on winding/sample freq and original cosine freq:
          main = paste("Winding Frequency of", samp_f[index],"Hz"), 
          xlab = "Real Numer",
          ylab = "Imaginary Number",
@@ -582,11 +1039,11 @@ fourier_trans = function(g_t,samp_f,time){
     } # End if 
   } # End for i
   
-  # Change to data.frame for ggplot and rename columns
+  # Change to data.frame for ggplot and rename columns:
   g_hat_smooth = as.data.frame(g_hat_smooth)
   colnames(g_hat_smooth) = c("Re","Im")
   
-  # Bar plot via ggplot
+  # Bar plot via ggplot:
   bar = ggplot(g_hat_smooth)+ 
     geom_bar(aes(x=samp_f, y=Re), 
              stat="identity", # frequencies on y-axis
@@ -616,9 +1073,9 @@ fourier_trans = function(g_t,samp_f,time){
 #fourier_trans(g_t,samp_f,time)
 
 
-########################################################################
-# 2.2 Creating a .gif Animation of Successively Winding Up Cos(2*pi*t) #
-########################################################################
+##########################################################################
+# 2.2.3 Creating a .gif Animation of Successively Winding Up Cos(2*pi*t) #
+##########################################################################
 
 ##### Alternative plotting of wound up cosine wave via ggplot:
 # Matrix for all the means of g_hat for Re and Im:
@@ -647,8 +1104,8 @@ for(index in 1:length(samp_f)){
 plots = list()
 
 # Alternative plot of wound up cosine waves via ggplot():
-for(index in 1:length(samp_f)){ # don't call it i when i was defined above as a constant variable!!!
-  # Create data frame with coordinates of wound up function for respective sampop_f[index]:
+for(index in 1:length(samp_f)){ # don't call it "i" when "i" was defined above as a constant variable!!!
+  # Create data frame with coordinates of wound up function for respective samp_f[index]:
   data = as.data.frame(cbind(Re(g_t*exp(-2*pi*i*samp_f[index]*time)), Im(g_t*exp(-2*pi*i*samp_f[index]*time))))
   
   # Adjust colnames:
@@ -673,7 +1130,7 @@ for(index in 1:length(samp_f)){ # don't call it i when i was defined above as a 
 # Look at single plot:
 plots[[30]]
 
-# Plot all plots
+# Plot all plots 
 #print(plots)
 
 # Create gif all the plots above:
@@ -694,18 +1151,28 @@ library("magick")
 #image_write(anime, "fft_animation.gif")
 
 
+######################################################
+# 2.3 Fast Fourier Transformation (Cooley-Tukey FFT) #
+######################################################
 
-#############################################################
-# 3 Using the fft() in R Applied to the Data of a JPG image #
-#############################################################
+# Comparing N^2 and N*log_2 of N - below an example for 64 data points:
+n = 64 
+n^2
+# [1] 4096
+n*log2(n)
+# [384]
 
-# Reset grid
-par(mfrow=c(1,1))
-
+# Presented as plot of functions:
+n = c(1:100)
+nsquare = n^2
+nlog2n = n*log2(n)
+plot(n, nsquare, type = "l", col = "blue", ylab = "Number of Calculations")
+lines(n, nlog2n, type = "l", col = "deeppink")
+  
+#### Overlapping of cosine waves, as in the Veritasium video:
 # time seq from 0 to 1Hz 
 time = seq(0,1,by = .0001)
 
-# overalapping of cosine waves, as in the Veritasium video:
 wave1hz = cos(2*pi*time*1)
 wave2hz = cos(2*pi*time*2)
 wave4hz = cos(2*pi*time*4)
@@ -716,6 +1183,285 @@ lines(wave2hz, type = "l", col = "green")
 lines(wave4hz, type = "l", col = "lightblue")
 lines(wave8hz, type = "l", col = "darkviolet")
 lines(wave16hz, type = "l", col = "orange")
+
+#### Arithmetics with vectors of unequal length, where v1 is not a multiple of v2:
+c(1,1) + c(1,2,3)
+# [1] 2 3 4
+# Warning:
+# In c(1, 1) + c(1, 2, 3) : longer object length is not a multiple of shorter object length
+c(1,1) * c(1,2,3)
+# [1] 1 2 3
+# Warning:
+# In c(1, 1) * c(1, 2, 3) : longer object length is not a multiple of shorter object length
+
+#### Arithmetics with vectors of unequal length, where v2 has twice the length of v1:
+c(1,1) + c(1,2,3,4)
+# [1] 2 3 4 5
+c(1,1) * c(1,2,3,4)
+# [1] 1 2 3 4
+
+#### Example Cooley Tukey FFT function, based on Wikipedia pseudo code:
+ct_fft = function(signal) {
+  # Base case
+  if (length(signal) == 1){ 
+    return(signal)  # trivial DFT base case with length(signal) == 1
+  } # End if length(signal) == 1
+
+  else{
+    # Recursive FFT on the even and odd index parts of the input:
+    even_val = ct_fft(signal[seq(1,length(signal),by = 2)])  # DFT of even indices
+    odd_val  = ct_fft(signal[seq(2,length(signal),by = 2)])  # DFT of odd indices
+    
+    # Twiddle factor = exp((-2*i * pi * k)/ length(signal)) - below 2i instead of 2*i!
+    k = c(0:((length(signal)/2)-1)) # integer from 0 to (N/2)-1  
+    twiddle_factor = exp((-2i*pi*k)/length(signal))
+    
+    # Combining the DFT of the two halves:
+    even_plus = even_val + twiddle_factor*odd_val
+    even_minus = even_val - twiddle_factor*odd_val
+  } # End else
+  return(c(even_plus, even_minus)) # vector with results
+} # End of function ct_fft()
+
+# Sine wave with freq of 2 as test signal with length 8^2:
+x = seq(0,2*pi, length.out = 64) # make sure N == power of 2, here 8^2!
+signal = sin(x*2) # our example signal
+
+# Check for equality:
+all.equal(ct_fft(signal), fft(signal)) # Some minor deviations, so == does not result in all TRUE!
+# [1] TRUE
+
+#### Discrete Fourier Transformation:
+d_ft = function(signal){
+  k = c(0:(length(signal)-1)) 
+  i = complex(real=0,imaginary=1)
+  result = 0
+  # Looping over k (harmonics):
+  for(index in 0:(length(signal)-1)){ # Here the index is part of the formula
+    # referring to the time-step/domain
+    # and has to start with zero - R vectors 
+    # start with one, so it needs some work around!
+    result[index+1] = sum(signal*exp((-2*pi*i*index*k)/length(signal)))
+  }# End for index
+  return(result)
+} # End of d_ft
+
+#### Understanding k^th harmonics of a signal:
+x = seq(0,2*pi, length.out = 16) # make sure N == power of 2, here 4^2!
+x2 = seq(0,2*pi, length.out = 1000) # for lines() plot of k^th freq with higher resolution
+signal = sin(x*2) # our example signal
+k = c(0:((length(signal)/2)-1)) # integer from 0 to (N/2)-1 
+
+# Plot discrete data points:
+plot(x, signal, ylab = "sine(x*2)", xlab = paste("Discrete Sampling Points of the Signal incl. k^th Harmonic.","\n","N_signal = 16. We see 7 sine waves, since k[1]=0."))
+
+# In the case of a sine wave as signal, we can see that the k^th harmonic 
+# with a frequency of 2 lays exactly on all the points of our initial signal sin(x*2):
+for(index in 1:length(k)){
+  lines(x2,sin(x2*k[index]), col = "deeppink")
+} # End for index
+
+#### Plot frequency domain of ct_fft(signal):
+plot(c(1:length(ct_fft(signal)))-1,abs(ct_fft(signal)), type="l")
+
+# Index of value with the highest magnitude. Index = Freq, since we work with 
+# integer frequencies: 
+which.max(abs(ct_fft(signal)))-1 # minus 1 to compensate for index starting with 1!
+# [1] 2
+
+#### Alternative formula for Fourier series of sine wave sin(-2*pi*2*x):
+all.equal(Re((exp(2*pi*i*2*x)-exp(-2*pi*i*2*x))/2*i), sin(-2*pi*2*x))
+# [1] TRUE
+Re((exp(2*pi*i*2*x)-exp(-2*pi*i*2*x))/2*i) == sin(-2*pi*2*x)
+# => Also all TRUE
+
+#### To get rid of the symmetry we can just plot half of the frequency domain:
+plot((c(1:length(ct_fft(signal)))-1)[1:length(signal)/2],abs(ct_fft(signal))[1:length(signal)/2], type="l")
+
+#### Alternative with adjusted x-axis using 1D fftshift matlab style:
+#### Function based on Matlab documentation: https://de.mathworks.com/help/matlab/ref/fftshift.html
+fftshift1D = function(signal){
+  x = c(1:length(signal))
+  if((length(x) %% 2) == 0){
+    xshift = x[c((length(x)/2+1):length(x),c(1:(length(x)/2)))]
+  } # End if even
+  else if((length(x) %% 2) != 0){
+    xshift = x[c(ceiling(length(x)/2+1):length(x),c(1:ceiling((length(x)/2))))]
+  } # End else if odd
+  fftshift1D = signal[xshift] 
+  return(fftshift1D)
+} # End of fftshift1D
+
+# Adjust x-axis tick-marks:
+x_axis_shift_fft = function(x){
+  n = length(x)
+  xshift = (c((-(n/2):((n/2)-1)))*n/2/n)*2 # n/2 = Shannon-Nyquist Freq.
+                  # xshift = multiply tick-marks by 2, to 
+                  # compensate for index starting with 1; 
+                  # unshifted x-axis -1 to compensate for index starting with 1...
+} # End of x_axis_shift_fft
+
+#### Adjusted plot for positive and negative frequencies (cat silhouette?): 
+plot(x_axis_shift_fft(x), Re(fftshift1D(ct_fft(signal))), type = "l", xaxt = "n")
+# Adjust tick marks to show every tick mark step; first turn of tick marks of 
+# plot() via xaxt = "n":
+axis(1, at= seq(min(x_axis_shift_fft(x)),max(x_axis_shift_fft(x),by=1)))
+
+### Function for the inverse discrete Fourier transformation:
+inverse_d_ft = function(ft){
+  k = c(0:(length(ft)-1)) 
+  i = complex(real=0,imaginary=1)
+  result = 0
+  # Looping over k (harmonics):
+  for(index in 0:(length(ft)-1)){ # as DFT, but ft as input, 1/N as factor and +2*pi (!) etc.:
+    result[index+1] = (1/length(ft))*sum(ft*exp((+2*pi*i*index*k)/length(ft)))
+  }# End for index
+  return(result)
+} # End of inverse_d_ft
+
+# Reconstruct original sine wave from complex numbers from DFT/FFT/FT:
+xift = seq(0,2*pi, length.out = 1000) # for better resolution of IFT signal
+signal = sin(xift*2) # our example signal
+plot(xift, inverse_d_ft(d_ft(signal)), type = "l")
+abline(h=0) # add axis at y=0
+
+# Check for equality of the signal and the IFT of the signal:
+all.equal(signal,Re(inverse_d_ft(d_ft(signal))))
+# [1] TRUE
+
+
+#######################################
+# 2.3.1 Benchmarking FFT and DFT in R #
+#######################################
+
+#### Benchmark test ct_fft() with fft() an regular d_ft():
+# New example sine wave signal with larger length:
+x = seq(0,2*pi, length.out = 1024) # make sure N == power of 2
+signal = sin(x*2) # our example signal
+
+# Execute the next lines all at once!!!!!!
+start_ct_fft = Sys.time()
+ct_fft(signal)
+end_ct_fft = Sys.time()
+
+# Calculate time difference; note that there is a little error rate, so
+# results differ when benchmarking / executing the code:
+time_bench_ct_fft = end_ct_fft - start_ct_fft
+# Time difference of Time difference of 0.07637405 secs 
+
+#### Same with fft() R function:
+start_fft = Sys.time()
+fft(signal)
+end_fft = Sys.time()
+time_bench_fft = end_fft - start_fft
+# Time difference of 0.02464104 secs # faster than ct_fft().
+
+#### Benchmark regular d_ft:  
+start_ft = Sys.time()
+d_ft(signal)
+end_ft = Sys.time()
+time_bench_ft = end_ft - start_ft
+# Time difference of 0.132072 secs # much slower than .07 for ct_fft() and .2 secs fft()
+
+# Check for equality for all three methods:
+all.equal(ct_fft(signal),fft(signal))
+# [1] TRUE
+all.equal(ct_fft(signal),d_ft(signal))
+# [1] TRUE
+all.equal(d_ft(signal),fft(signal))
+# [1] TRUE
+
+
+#################################################
+# 2.4 Sinc Function — the FT of a Rect Function #
+#################################################
+
+# Sinc function - un-normalized:
+sinc_fun = function(x){
+  sinc_res = sin(x)/x
+  return(sinc_res)
+} # End of sinc_fun
+
+# Plot un-normalized sinc function:
+x = seq(-8*pi,8*pi, length.out = 4*1024)
+y = sinc_fun(x)
+plot(x,y, type = "l", col ="blue", ylab = "Sine Cardinal")
+abline(h=0,v=0)
+
+# Sinc function - normalized by pi:
+sinc_fun_norm = function(x){
+  sinc_res = sin(pi*x)/(pi*x)
+  return(sinc_res)
+} # End of sinc_fun
+
+# Add normalized sinc function to precious plot
+lines(x,sinc_fun_norm(x), col = "deeppink", type = "l" )
+
+# Rect function, i.e. single pulse square wave (non-periodic!):
+rect_fun = function(x){
+  rect_res = x
+  for(index in 1:length(x)){
+    if(abs(x[index]) > .5){
+      rect_res[index] = 0
+    } # End if   
+    else if(round(abs(x[index]),1) <= .5){
+      rect_res[index] = 1
+    } # End else if
+  } # End for index
+  return(rect_res)
+} # End of rect_fun
+
+# Plot rect_fun with xlim from -1 to 1:
+plot(x,rect_fun(x), type = "l", xlim = c(-1,1))
+
+### Calculate quasi-CTFT - FT of rect_fun:
+x = seq(-2*pi,2*pi, by = .001)
+freq_range = seq(-2*pi,2*pi,by = .01)
+# Initialize empty vector:
+signalFT = c()
+for (index in 1:length(freq_range)){
+  signalFT[index] = sum(rect_fun(x)*exp(-2i*pi*freq_range[index]*x))/length(x)
+} # End for index
+
+# Plot FT of rect_fun => sinc_fun; x-axis divided by 10 for freqsteps of .01:
+plot(x_axis_shift_fft(c(1:length(signalFT)))/10,signalFT, type = "l", main = "CTFT of rect(x) Function == sinc(x)", col = "deeppink")
+abline(h=0,v=0)
+
+### Calculate quasi-inverse-CTFT - IFT of FT of rect_fun:
+x = seq(-2*pi,2*pi, by = .001)
+freq_range = seq(-2*pi,2*pi,by = .01)
+# Initialize empty vector:
+IFTofSignalFT = c()
+for (index in 1:length(x)){
+  IFTofSignalFT[index] = sum(signalFT*exp(2i*pi*freq_range*x[index]))/length(x)
+} # End for index
+
+# Plot IFT of FT of rect_fun; x-axis divided by 1000 for time-steps of .001:
+plot(x_axis_shift_fft(c(1:length(x)))/1000,IFTofSignalFT, type = "l", xlim = c(-2,2), main = "ICTFT of the CTFT of the rect(x) Function", col = "deeppink")
+abline(h=0,v=0)
+
+### Calculate CTFT of sinc(x) itself => also results in rect(x):
+x = seq(-2*pi,2*pi, by = .001)
+freq_range = seq(-2*pi,2*pi,by = .01)
+# Initialize empty vector:
+FTsinc = c()
+for (index in 1:length(freq_range)){
+  FTsinc[index] = sum(sinc_fun(x)*exp(-2i*pi*freq_range[index]*x))/length(x)
+} # End for index
+
+# Plot FT of sinc(x)
+plot(x_axis_shift_fft(c(1:length(FTsinc))),FTsinc, type = "l",xlim = c(-50,50) ,main = "CTFT of sinc(x) Function == rect(x)", col = "deeppink")
+abline(h=0,v=0)
+
+
+
+###########################################################
+# 3 2D Fourier Transformation and a FFT on a 2D JPG Image #
+###########################################################
+
+
+
+
 
 ### Looking at the Frequency Space of a JPG Image:
 
@@ -778,7 +1524,7 @@ library("oro.dicom")
 
 # Load example data: 
 data = readDICOMFile("kspace/example_sts.dcm")
-
+data$hdr
 # Load example data from k-space explorer
 # https://github.com/birogeri/kspace-explorer/blob/master/images/default.dcm
 #data = readDICOMFile("kspace/default.dcm")
@@ -790,7 +1536,7 @@ image(t(data$img), col = grey(0:64/64), axes = FALSE,
 # Perform fft on data:
 kspace = fft(data$img)
 
-# k-space without fftshift(), again we use log magnitude and + 1
+# k-space without fftshift2D(), again we use log magnitude and + 1
 # Lowest frequency is placed in the periphery/corners, highest frequency in the middle:
 # k-space images in Neuroscience are usually shown differently: 
 image(log(1 + Mod(kspace)), col = grey.colors(256), axes = FALSE, main = "k-Space without shift/reshaping")
@@ -808,8 +1554,8 @@ image(log(1 + Mod(kspace)), col = grey.colors(256), axes = FALSE, main = "k-Spac
 # 
 #
 
-#  fftshift() Matlab style (requires dims to be an integer when divided by 2):
-fftshift = function(kspace) {  #
+#  2D fftshift() Matlab style (requires dims to be an integer when divided by 2):
+fftshift2D = function(kspace) {  #
   # For better readability - could also be done via ncol() and nrow()
   rows = nrow(kspace) # Evaluate n of rows
   cols = ncol(kspace) # ... n of cols
@@ -817,10 +1563,10 @@ fftshift = function(kspace) {  #
   # not last position of first half!
   reshape_col = c((cols/2+1):cols, 1:(cols/2))  # same here...
   kspace[reshape_row,reshape_col]               # reshape k-space
-} # End of function fftshift()
+} # End of function fftshift2D()
 
 # Shifted k-space image (log magnitude + 1):
-kspace_shifted = fftshift(kspace)
+kspace_shifted = fftshift2D(kspace)
 
 # Plot shifted/reshaped image, now with low frequencies in the center, instead the
 # output matrix corners:
@@ -1069,6 +1815,7 @@ par(mfrow = c(1, 2))
 
 # Reconstructing original image from k-space via IFT (includes normalization factor): 
 IFT_image = Re(fft(kspace, inverse = TRUE) / length(kspace))
+
 image(t(IFT_image), col = grey(0:64/64), main = "Reconstructed Image via inverse FFT", axes = FALSE)
 
 
@@ -1101,6 +1848,70 @@ rangey = 1:nrow(kspace)
 IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row/col = 1:nrow/ncol"), axes = FALSE)
 
+# Only one line and the other entries are set to 0:
+kspace2 = kspace
+kspace2[2:nrow(kspace2),2:ncol(kspace2)] = 0
+
+IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("First line, rest = 0"), axes = FALSE)
+
+# Only first two lines and the other entries are set to 0:
+kspace2 = kspace
+kspace2[3:nrow(kspace2),2:ncol(kspace2)] = 0
+
+IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("First two lines, rest = 0"), axes = FALSE)
+
+# Only first 10 lines and the other entries are set to 0:
+kspace2 = kspace
+kspace2[11:nrow(kspace2),2:ncol(kspace2)] = 0
+
+IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("First 10 lines, rest = 0"), axes = FALSE)
+
+# Only first 20 lines and the other entries are set to 0:
+kspace2 = kspace
+kspace2[21:nrow(kspace2),2:ncol(kspace2)] = 0
+
+IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("First 20 lines, rest = 0"), axes = FALSE)
+
+
+# Only first two entries and all other entries are set to 0:
+kspace2 = kspace
+kspace2[3:length(kspace2)] = 0 
+
+IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("First two entries, rest = 0"), axes = FALSE)
+
+
+# Only one value in the center area ([129,129]) is above 0:
+kspace2 = kspace
+kspace2[1:(.5*nrow(kspace2)), 1:ncol(kspace2)] = 0 
+kspace2[(2+.5*nrow(kspace2)):nrow(kspace2), 1:ncol(kspace2)] = 0 
+kspace2[1+.5*nrow(kspace2),.5*nrow(kspace2)] = 0
+kspace2[1+.5*nrow(kspace2),1:(.5*ncol(kspace2))] = 0
+kspace2[1+.5*nrow(kspace2),(2+.5*ncol(kspace2)):ncol(kspace2)] = 0
+
+IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("Entry [129,129], rest = 0"), axes = FALSE)
+
+# Only entry [(.75*nrow(kspace2)),128] and all other entries are set to 0:
+kspace2 = kspace
+kspace2[1:length(kspace2)] = 0 
+kspace2[(.75*nrow(kspace2)),128] = kspace[(.75*nrow(kspace2)),128]
+
+IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("Enrtry [(.75*nrow(kspace2)),128], rest = 0"), axes = FALSE)
+
+# Only entry [(.5*nrow(kspace2)),2*128] and all other entries are set to 0:
+kspace2 = kspace
+kspace2[1:length(kspace2)] = 0 
+kspace2[(.5*nrow(kspace2)),2*128] = kspace[(.75*nrow(kspace2)),128]
+
+IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("Enrtry [(.5*nrow(kspace2)),2*128], rest = 0"), axes = FALSE)
+
 
 #### Set plot grid to 1x2:
 par(mfrow = c(1, 2))  
@@ -1118,3 +1929,5 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 
 # Reset grid
 par(mfrow=c(1,1))
+
+
