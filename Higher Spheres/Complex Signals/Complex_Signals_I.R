@@ -5,7 +5,7 @@
 #          in Information Technology          #
 #                     by                      #
 #           Steffen Schwerdtfeger             #
-#                   08.2025                   #
+#                  08.2025                    #
 #            Stat-o-Sphere at JNOS            #
 ###############################################
 
@@ -1929,6 +1929,7 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 
 # Reset grid
 par(mfrow=c(1,1))
+
 
 
 
