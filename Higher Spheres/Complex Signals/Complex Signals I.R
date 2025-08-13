@@ -2,7 +2,7 @@
 #      Higher Spheres: Complex Signals I:     #
 #   Introducing Complex Numbers, the Fourier  #
 # Series / Transformation and its Application #
-#        in Information Technology            #
+#          in Information Technology          #
 #                     by                      #
 #           Steffen Schwerdtfeger             #
 #                   08.2025                   #
@@ -1929,6 +1929,7 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 
 # Reset grid
 par(mfrow=c(1,1))
+
 
 
 
