@@ -1372,9 +1372,10 @@ all.equal(d_ft(signal),fft(signal))
 # [1] TRUE
 
 
-#################################################
-# 2.4 Sinc Function — the FT of a Rect Function #
-#################################################
+########################################################
+# 2.4 The Relation between Rect and Sinc Functions and #
+# Their Use for Low-Pass Fourier Space Filtering       #
+########################################################
 
 # Sinc function - un-normalized:
 sinc_fun = function(x){
@@ -1396,6 +1397,17 @@ sinc_fun_norm = function(x){
 
 # Add normalized sinc function to precious plot
 lines(x,sinc_fun_norm(x), col = "deeppink", type = "l" )
+
+# Plot of normalized sinc function and cos(x); ylim was adjusted:
+plot(x,sinc_fun(x), type = "l", col ="blue", ylab = "Sine Cardinal", ylim = c(-1,1))
+abline(h=0,v=0)
+lines(x,cos(x), type="l")
+
+# Plot of normalized sinc function and sin(x); ylim was adjusted:
+plot(x,sinc_fun(x), type = "l", col ="blue", ylab = "Sine Cardinal", ylim = c(-1,1))
+abline(h=0,v=0)
+lines(x,sin(x), type="l")
+
 
 # Rect function, i.e. single pulse square wave (non-periodic!):
 rect_fun = function(x){
@@ -1929,11 +1941,4 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 
 # Reset grid
 par(mfrow=c(1,1))
-
-
-
-
-
-
-
 
