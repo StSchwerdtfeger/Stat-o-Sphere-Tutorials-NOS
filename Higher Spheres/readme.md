@@ -1,0 +1,1 @@
+“Higher Spheres” is the name of our second tutorial series covering more advanced or special methods and topics within statistics, computational neuroscience and other closely related fields. The structure of the tutorials however will follow the structure of our other series, so don’t be afraid to dip into new spheres of mathematics and programming.
