@@ -18,7 +18,7 @@
 
 ###### Necessary packages: 
 # UNCOMMENT next line, to install all necessary packages:
-#install.packages("pracma","ggplot2","magick","oro.dicom","imager","rgl","plotly")
+#install.packages("pracma","ggplot2","magick","oro.dicom","imager","rgl","plotly","patchwork")
 library("pracma")    # for angle(), optional... Arg() or atan2() works as well...
 library("ggplot2")   # entailed in tidyverse
 library("magick")    # creating .gif
@@ -26,6 +26,7 @@ library("oro.dicom") # loading DICOM files
 library("imager")    # for load.image() - JPG images NEEDS DX11 (WIN) or Xquartz (Mac)!!
 library("rgl")       # for persp3d(), interactive 3D plot of surfaces
 library("plotly")    # for plot_ly() 3D plot of lines
+library("patchwork") # for simple grid syntax for more than 1 plot in .gif (alternative to e.g. grid.extra())
 
 # USE A R PROJECT WITH THIS SCRIPT AND PLACE THE DICOM AND JPG FILE THAT COMES WITH
 # THIS TUTORIAL IN YOUR WORKING DIRECTORY FOLDER, THEN THE SCRIPT SHOULD BE
@@ -254,6 +255,35 @@ text(x = Re(2+2i)+.2, y = Im(2+2i)+.2, "z = 2+2i")
 #  Note that 45° or 0.785... rad from Arg(2+2*i) is equivalent to 1/4*pi:
 Arg(2+2*i) == (1/4) * pi # see further below for details on Arg() function...
 # [1] TRUE
+
+####### Conjugate of a complex number:
+z = 2+2i
+# [1] 2+2i
+z_conj = Conj(z)
+# [1] 2-2i
+
+# Set fresh grid:
+grid2Dcomp()
+# Draw 2 + 2i and its conjugate:
+arrows(x0=0,y0=0,x1=Re(2+2*i), y = Im(2+2*i))
+arrows(x0=0,y0=0,x1=Re(2+2*i), y = Im(2-2*i)) # just change the sign from + to - !
+# Draw angle using exp(angle*i): 
+angle = seq(0,Arg(2+2*i),by = .001)
+lines(exp(angle*i), col = "darkviolet") # used e^Arg*i to create angle circle part in the plot below!
+lines(exp(angle*-i), col = "darkviolet") # coonjugate angle e^Arg*-i 
+text(x = 2.2,y = .5, paste("Arg =", round(Arg(2+2*i),3), "rad", "\n", "= ", (Arg(2+2*i)*180/pi),"°"), col = "darkviolet")
+text(x = 2.2,y = -.5, paste("Arg =", round(Arg(2-2*i),3), "rad", "\n", "= ", (Arg(2-2*i)*180/pi),"°"), col = "darkviolet") # Conjugate
+# Draw line for Modulus:
+# Conjugate HERE 2+2i needed for the Re() part... Better use Conj() function in R
+segments(x0=0,y0=0, x1=Im(2+2i),y=Re(2+2i), col = "darkgreen")
+segments(x0=0,y0=0, x1=Im(2+2i),y=Re(2-2i), col = "darkgreen") 
+segments(x0=0,y0=0, x1=Re(Conj(2+2i)),y=Im(Conj(2+2i)), col = "darkgreen") #
+text(x =.75,y = 1.5, paste("Mod = ", round(Mod(2+1i),3)), col = "darkgreen")
+text(x =.75,y = -1.5, paste("Mod = ", round(Mod(2-1i),3)), col = "darkgreen") # Conjugate
+# Label z = c = 2 + 2i:
+text(x = Re(2+2i)+.7, y = Im(2+2i)+.2, "z = 2+2i")
+text(x = Re(2-2i)+.7, y = Im(2-2i)+.2, expression(paste(bar(z)," = 2-2i")))
+
 
 #####################################################################
 # 1.3.2 The Nature of Euler’s Number — Growth, Trigonometry and the #
@@ -918,7 +948,7 @@ par(mfrow = c(1,2))
 # Let us have a look at samp_f[1] at first:
 plot(g_t*exp(-2*pi*i*samp_f[1]*time), type = "l", col = "darkviolet", 
      # Title entails information on winding/sample freq and original cosine freq
-     main = paste("Winding Frequency of", samp_f[30],"Hz", "\n", paste("Cosine Frequency of", freq,"Hz")), 
+     main = paste("Winding Frequency of", samp_f[1],"Hz", "\n", paste("Cosine Frequency of", freq,"Hz")), 
      xlab = "Real Numer",
      ylab = "Imaginary Number") 
 
@@ -1301,7 +1331,7 @@ x_axis_shift_fft = function(x){
                   # unshifted x-axis -1 to compensate for index starting with 1...
 } # End of x_axis_shift_fft
 
-#### Adjusted plot for positive and negative frequencies (cat silhouette?): 
+#### Adjusted plot for positive and negative frequencies (cat silhouette? batman?): 
 plot(x_axis_shift_fft(x), Re(fftshift1D(ct_fft(signal))), type = "l", xaxt = "n")
 # Adjust tick marks to show every tick mark step; first turn of tick marks of 
 # plot() via xaxt = "n":
@@ -1372,10 +1402,11 @@ all.equal(d_ft(signal),fft(signal))
 # [1] TRUE
 
 
-########################################################
-# 2.4 The Relation between Rect and Sinc Functions and #
-# Their Use for Low-Pass Fourier Space Filtering       #
-########################################################
+#############################################################
+# 2.4 The Relation between Rect and Sinc Functions and      #
+# Their Use for Low-Pass Fourier Space Filtering (incl.     #
+# Convolutions and the Riemann Sum Approximation of a CTFT) #      
+#############################################################
 
 # Sinc function - un-normalized:
 sinc_fun = function(x){
@@ -1395,21 +1426,63 @@ sinc_fun_norm = function(x){
   return(sinc_res)
 } # End of sinc_fun
 
-# Add normalized sinc function to precious plot
+# Add normalized sinc function to previous plot
 lines(x,sinc_fun_norm(x), col = "deeppink", type = "l" )
 
-# Plot of normalized sinc function and cos(x); ylim was adjusted:
+# Sinc can also be written as sine(x)* 1/x, which explains why
+# the oscillation is decreasing the further away x is from the center:
+par(mfrow = c(1,2))
+plot(x, sin(x), type = "l", col = "blue", xlim = c(-4,4), main = "sin(x)")
+plot(x, 1/x, type ="l", col = "blue",xlim = c(-.5,.5), main = "1/x")
+par(mfrow = c(1,1))
+
+# Plot of un-normalized sinc function and cos(x); ylim was adjusted:
 plot(x,sinc_fun(x), type = "l", col ="blue", ylab = "Sine Cardinal", ylim = c(-1,1))
 abline(h=0,v=0)
+# Add cosine wave:
 lines(x,cos(x), type="l")
 
-# Plot of normalized sinc function and sin(x); ylim was adjusted:
+# Intersections of cosine at index*pi:
+for(index in 1:7){ # 
+  points(x=+index*pi,y=0) # for the positive
+  points(x=-index*pi,y=0) # and negative values of x
+} # End for index
+
+# Plot of un-normalized sinc function and sin(x); ylim was adjusted:
 plot(x,sinc_fun(x), type = "l", col ="blue", ylab = "Sine Cardinal", ylim = c(-1,1))
 abline(h=0,v=0)
+# Add sine wave:
 lines(x,sin(x), type="l")
 
+for(index in 1:7){ # 
+  points(x=+index*pi,y=0) # for the positive
+  points(x=-index*pi,y=0) # and negative values of x
+} # End for index
 
-# Rect function, i.e. single pulse square wave (non-periodic!):
+# Integral of sinc(x) from -Inf to Inf  == pi!:
+sinc_integ = integrate(sinc_fun, lower = 0, upper = 425*pi)$value
+# [1] 1.571545
+# RESULTS in an error, saying it is "probably divergent" when integrating from -Inf to Inf!
+all.equal(sinc_integ,(1/2)*pi)
+# [1] "Mean relative difference: 0.0004765778" # => only little difference
+# Alternative via Si() sinc integral function from the pracma package:
+all.equal(Si(100000*pi),.5*pi)
+# [1] "Mean relative difference: 2.026428e-06"
+
+# Interestingly, when we stretch out the function, e.g. sin(x/3)/(x/3), we also get 
+# a result of pi for the whole integral:
+sinc_stretch3 = function(x){
+  res=sin(x/3)/(x/3) 
+  res2 = res*sin(x)/x
+  return(res2)
+} # End of sinc_stretch3
+sinc_integ_stretch2 = integrate(sinc_stretch3, lower = 0, upper = 400*pi)$value
+all.equal(sinc_integ_stretch2,.5*pi)
+# [1] "Mean relative difference: 1.179127e-06" => roughly .5*pi
+
+
+# Rect function, i.e. single pulse square wave (non-periodic!) with 
+# a width of -.5 to .5:
 rect_fun = function(x){
   rect_res = x
   for(index in 1:length(x)){
@@ -1426,30 +1499,31 @@ rect_fun = function(x){
 # Plot rect_fun with xlim from -1 to 1:
 plot(x,rect_fun(x), type = "l", xlim = c(-1,1))
 
-### Calculate quasi-CTFT - FT of rect_fun:
+### Calculate quasi-CTFT - FT of rect_fun (using Riemann sum approx.):
 x = seq(-2*pi,2*pi, by = .001)
 freq_range = seq(-2*pi,2*pi,by = .01)
+
 # Initialize empty vector:
 signalFT = c()
 for (index in 1:length(freq_range)){
-  signalFT[index] = sum(rect_fun(x)*exp(-2i*pi*freq_range[index]*x))/length(x)
+  signalFT[index] = sum(rect_fun(x)*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
 } # End for index
 
-# Plot FT of rect_fun => sinc_fun; x-axis divided by 10 for freqsteps of .01:
-plot(x_axis_shift_fft(c(1:length(signalFT)))/10,signalFT, type = "l", main = "CTFT of rect(x) Function == sinc(x)", col = "deeppink")
+# Plot FT of rect_fun => sinc_fun:
+plot(x_axis_shift_fft(c(1:length(signalFT))),signalFT, type = "l", main = "CTFT of rect(x) Function == sinc(x)", col = "deeppink")
 abline(h=0,v=0)
 
-### Calculate quasi-inverse-CTFT - IFT of FT of rect_fun:
+### Calculate inverse-CTFT - IFT of FT of rect_fun (via Riemann sum approx. using delta omega!):
 x = seq(-2*pi,2*pi, by = .001)
 freq_range = seq(-2*pi,2*pi,by = .01)
 # Initialize empty vector:
 IFTofSignalFT = c()
 for (index in 1:length(x)){
-  IFTofSignalFT[index] = sum(signalFT*exp(2i*pi*freq_range*x[index]))/length(x)
+  IFTofSignalFT[index] = sum(signalFT*exp(2i*pi*freq_range*x[index]))*(freq_range[2]-freq_range[1])
 } # End for index
 
-# Plot IFT of FT of rect_fun; x-axis divided by 1000 for time-steps of .001:
-plot(x_axis_shift_fft(c(1:length(x)))/1000,IFTofSignalFT, type = "l", xlim = c(-2,2), main = "ICTFT of the CTFT of the rect(x) Function", col = "deeppink")
+# Plot IFT of FT of rect_fun; x-axis multiplied by delta x this time for time-steps of .001:
+plot(x_axis_shift_fft(c(1:length(x)))*(x[2]-x[1]),IFTofSignalFT, type = "l", xlim = c(-2,2), main = "ICTFT of the CTFT of the rect(x) Function", col = "deeppink")
 abline(h=0,v=0)
 
 ### Calculate CTFT of sinc(x) itself => also results in rect(x):
@@ -1458,13 +1532,283 @@ freq_range = seq(-2*pi,2*pi,by = .01)
 # Initialize empty vector:
 FTsinc = c()
 for (index in 1:length(freq_range)){
-  FTsinc[index] = sum(sinc_fun(x)*exp(-2i*pi*freq_range[index]*x))/length(x)
+  FTsinc[index] = sum(sinc_fun(x)*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
 } # End for index
 
 # Plot FT of sinc(x)
-plot(x_axis_shift_fft(c(1:length(FTsinc))),FTsinc, type = "l",xlim = c(-50,50) ,main = "CTFT of sinc(x) Function == rect(x)", col = "deeppink")
+plot(x_axis_shift_fft(c(1:length(FTsinc))),FTsinc*(x[2]-x[1]), type = "l",xlim = c(-50,50) ,main = "CTFT of sinc(x) Function == rect(x)", col = "deeppink")
 abline(h=0,v=0)
 
+####
+#### Animation of convolution of rect(x) and rect(x):
+####
+x = seq(-.5*pi,.5*pi, length.out = 300)
+shift_x = x[seq(1,length(x), by= 5)]
+f1_vec = rect_fun(x)
+f2_vec = rect_fun(x)
+
+### Fast Fourier Convolution Algorithm:
+### Showing again that IFT{FFT(a)*FFT(b)} == convolution of a and b:
+
+# Create vector with the successive convolution values x-x_tau for animation:
+# Convolution CTFT Riemann sum approx. for f1 and f2:
+freq_range  = x
+FT_f1 = c()
+for(index in 1:length(freq_range)){
+  FT_f1[index] = sum(f1_vec*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+FT_f2 = c()
+for(index in 1:length(freq_range)){
+  FT_f2[index] = sum(f2_vec*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+
+# IFT of the product of the CTFT of a and b:
+conv_f1_f2 = c()
+for(index in 1:length(x)){
+  conv_f1_f2[index] = sum((FT_f1*FT_f1)*exp(2i*pi*freq_range*x[index]))*(freq_range[2]-freq_range[1])
+} # End for index
+
+# Create list with convolution of successive length, i.e., first only 1 value then the first 2
+# then the first 3 up to all 300:
+conv_x_minus_tau = list()
+for(index in 1:length(x)){ # actually x tau, but when x same length then x as object enough!
+  conv_x_minus_tau[[index]] = data.frame(x=x[1:index],y=Re(conv_f1_f2[1:index]))
+} # End for i
+
+# Only every 5th list for animation:
+conv_anim = list()
+steps = seq(1,length(conv_x_minus_tau), by = 5)
+for(index in 1:length(steps)){
+  conv_anim[[index]] = conv_x_minus_tau[[steps[index]]]
+} # End for index
+
+# Create data frame of f1 and f2 and only 
+f1 = data.frame(x,f1_vec)
+colnames(f1) = c("x","y")
+f2 = data.frame(x,f2_vec)
+colnames(f2) = c("x","y")
+
+# Create empty plot lists:
+plots_shift = list() # For plot of f2 shifting over steady f1
+plots_conv = list()  # For plots of respective convolution
+plots_grid = list()  # For the plot grid of the two above plot lists
+
+# For loop to create all the plots for the .gif:
+for(index in 1:length(shift_x)){
+  # Create objects with coordinates of the shifted function and convolution at x+index:
+  data_shift = data.frame(cbind(round(x+shift_x[index],2),f2[,2])) # round x for .gif plots!
+  colnames(data_shift) = c("x","y")
+  
+  # Plot a(tau) * b(x+index - tau): 
+  plots_shift[[index]] =  ggplot(f1, aes(x = x, y = y)) +
+    geom_path(color = "darkorchid4") +  # Color for line of the plot for f1
+    geom_line(data = data_shift, aes(x = x, y = y), # add shifting of f2
+              color = "blue") +  # color and size of the point
+    labs(title = paste("Shift of f2(", data_shift[index,1], "-tau) over f1(tau)."), 
+         x = "tau", y = "rect(x)") +
+    xlim(c((min(f1$x)-1),(max(f1$x)+1))) +  # making sure that plot window is fixed
+    ylim(c(-.1,2.1)) + 
+    theme_minimal() # white instead of grey background
+  
+  
+  # Pot of convolution following successive shift of f2
+  plots_conv[[index]] = ggplot(conv_anim[[index]], aes(x=x,y=y))+
+    geom_path(color = "deeppink") +  # Color for line of the plot
+    xlim(c((min(f1$x)-1),(max(f1$x)+1))) +  # making sure that plot window is fixed
+    ylim(c(-.1,2.1)) + 
+    labs(title = paste("Convolution of f1(tau) and f2(", data_shift[index,1], "-tau)."), 
+         x = "tau", y = "Convolution") +
+    theme_minimal() # white instead of grey background
+  
+  plots_grid[[index]] = plots_shift[[index]] / plots_conv[[index]]
+} # End for index
+
+# Convert plots to image. UNCOMMENT TO RUN AND CREATE GIF!!!!!!!
+img_plot_conv = image_graph(width=400,height=400, res = 96)
+# Print plots onto img_plot object
+print(plots_grid)
+# Then you create an animation object:
+anime = image_animate(image_join(img_plot_conv), fps = 2)
+# Export .gif image
+image_write(anime, "conv_anim.gif")
+
+
+### Showing again that IFT{FFT(a)*FFT(b)} == convolution of a and b:
+x = seq(-pi,pi, by = .001)
+freq_range = seq(-2*pi,2*pi,by = .01)
+a = rect_fun(x)
+b = x^2 # parabola
+
+# CTFT Riemann sum approx. for a and b:
+FT_a = c()
+for(index in 1:length(freq_range)){
+  FT_a[index] = sum(a*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+FT_b = c()
+for(index in 1:length(freq_range)){
+  FT_b[index] = sum(b*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+
+# IFT of the product of the CTFT of a and b:
+conv_a_b = c()
+for(index in 1:length(x)){
+  conv_a_b[index] = sum((FT_a*FT_b)*exp(2i*pi*freq_range*x[index]))*(freq_range[2]-freq_range[1])
+} # End for index
+
+# Convolution of rect(x) and x^2
+plot(x,conv_a_b, type ="l", main = "Convolution of rect(x) and x^2 via Riemann Sum Approx.")
+
+# IN CASE YOU RAN THE WHOLE SCRIPT you might need to turn of imager
+# since it also has a convolve function and masks convolve from "stats":
+detach("package:imager", unload = TRUE)
+
+# Comparing above approach via using convolve() in R:
+conv = convolve(a,rev(b), type = "open")*(x[2]-x[1]) # incl. delta x
+x_adj = x_axis_shift_fft(c(1:length(conv)))
+x_adj_scale = x_adj*(x[2]-x[1]) # multiply by delta x not delta x_adj!!
+# Plot of Addition of rect(x) and x^2 
+plot(x_adj_scale,conv, type = "l", main = "Convolution of rect(x) and x^2")
+lines(x, conv_a_b, type="l", col = "blue")
+
+# Compare convolution with addition:
+par(mfrow=c(2,2))
+# Plot of rect(x):
+plot(x,a, type = "l", main  = "rect(x)", xlim = c(-4,4))
+# Plot of x^2:
+plot(x,b, type = "l", main  = "x^2")
+# Plot of convolution of rect(x) and x^2:
+conv = convolve(a,rev(b),type = "open")*(x[2]-x[1]) 
+x_adj = x_axis_shift_fft(c(1:length(conv)))
+x_adj_scale = x_adj*(x[2]-x[1]) # multiply by delta x not delta x_adj!!
+# Plot of Addition of rect(x) and x^2 
+plot(x_adj_scale,conv, type = "l", main = "Convolution of rect(x) and x^2")
+plot(x, (a+b), type = "l", main = "Addition of rect(x) and x^2")
+par(mfrow = c(1,1))
+
+
+##### Showing how sinc and rect work as a low-pass filter:
+# Set sinc and .5 sin(x)
+x = seq(-4*pi,4*pi, by = .01)
+a = sinc_fun(x)
+b = .5*sin(x) # sine curve with y_min/max = 0 / 1
+
+# CTFT Riemann sum approx. for a and b:
+freq_range  = seq(-4*pi,4*pi, by = .01)
+FT_a = c()
+for(index in 1:length(freq_range)){
+  FT_a[index] = sum(a*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+FT_b = c()
+for(index in 1:length(freq_range)){
+  FT_b[index] = sum(b*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+
+# IFT of the product of the CTFT of a and b:
+conv_a_b = c()
+for(index in 1:length(x)){
+  conv_a_b[index] = sum((FT_a*FT_b)*exp(2i*pi*freq_range*x[index]))*(freq_range[2]-freq_range[1])
+} # End for index
+
+# Plot of sinc and sine with frequency of 1 over four periods:
+par(mfrow=c(2,2))
+plot(x, a, type = "l", col = "deeppink", ylim = c(-1,1.2), main = "sinc(x) and .5*sin(x); x = -4*pi to 4*pi")
+lines(x, b, col = "blue")
+
+# Set sinc and .5 sin(x*5) for comparison
+x = seq(-4*pi,4*pi, by = .01)
+b = .5*sin(x*5) # sine curve with y_min/max = 0 / 1
+
+# Plot second set of functions sinc(x) and .5*sin(x*5) => now higher frequency than before!!
+plot(x, a, type = "l", col = "deeppink", ylim = c(-1,1.2), main = "sinc(x) and .5*sin(x*5); x = -4*pi to 4*pi")
+lines(x, b, col = "blue")
+
+# CTFT Riemann sum approx. for a and b:
+freq_range  = seq(-4*pi,4*pi, by = .01)
+FT_a = c()
+for(index in 1:length(freq_range)){
+  FT_a[index] = sum(a*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+FT_b = c()
+for(index in 1:length(freq_range)){
+  FT_b[index] = sum(b*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+
+# IFT of the product of the CTFT of a and b:
+conv_a_b2 = c()
+for(index in 1:length(x)){
+  conv_a_b2[index] = sum((FT_a*FT_b)*exp(2i*pi*freq_range*x[index]))*(freq_range[2]-freq_range[1])
+} # End for index
+
+# Add convolutions of the above:
+plot(x,conv_a_b,type = "l", col ="blue", main = "Convolution of sinc(x) and .5*sin(x*1)")
+plot(x,conv_a_b2,type = "l", col ="blue",main = "Convolution of sinc(x) and .5*sin(x*5)")
+par(mfrow=c(1,1))
+
+
+#### Same for rect function:
+# Set rect and 1+.5 sin(x)
+x = seq(-4*pi,4*pi, by = .01)
+a = rect_fun(x/10)
+b = rect_fun(x) 
+for(index in 1:length(b)){
+  if(b[index] >0){
+    b[index] = b[index]+1
+  } # End if
+} # End for index
+
+# CTFT Riemann sum approx. for a and b:
+freq_range  = seq(-4*pi,4*pi, by = .01)
+FT_a = c()
+for(index in 1:length(freq_range)){
+  FT_a[index] = sum(a*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+FT_b = c()
+for(index in 1:length(freq_range)){
+  FT_b[index] = sum(b*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+
+# IFT of the product of the CTFT of a and b:
+conv_a_b = c()
+for(index in 1:length(x)){
+  conv_a_b[index] = sum((FT_a*FT_b)*exp(2i*pi*freq_range*x[index]))*(freq_range[2]-freq_range[1])
+} # End for index
+
+# Plot of rect and rect with frequency of 1 over four periods:
+par(mfrow=c(2,2))
+plot(x, a, type = "l", col = "deeppink", ylim = c(-.2,2.2), main = "rect(x/10) and rect(x) +1 if > 0; x = -4*pi to 4*pi")
+lines(x, b, col = "blue")
+
+
+#### Two rect functions of same shape:
+x = seq(-4*pi,4*pi, by = .01)
+a = rect_fun(x)
+b = rect_fun(x) 
+
+# Plot second set of function: 
+plot(x, a, type = "l", col = "deeppink", ylim = c(-.2,2.2), main = "rect(x) and rect(x); x = -4*pi to 4*pi")
+lines(x, b, col = "blue")
+
+# CTFT Riemann sum approx. for a and b:
+freq_range  = seq(-4*pi,4*pi, by = .01)
+FT_a = c()
+for(index in 1:length(freq_range)){
+  FT_a[index] = sum(a*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+FT_b = c()
+for(index in 1:length(freq_range)){
+  FT_b[index] = sum(b*exp(-2i*pi*freq_range[index]*x))*(x[2]-x[1])
+} # End for index
+
+# IFT of the product of the CTFT of a and b:
+conv_a_b2 = c()
+for(index in 1:length(x)){
+  conv_a_b2[index] = sum((FT_a*FT_b)*exp(2i*pi*freq_range*x[index]))*(freq_range[2]-freq_range[1])
+} # End for index
+
+# Add convolutions of the above:
+plot(x,conv_a_b,type = "l", col ="blue", main = paste("Convolution of rect(x/10) and", "\n", "rect(x) +1 if rect(x) > 0"), ylim = c(0,2))
+plot(x,conv_a_b2,type = "l", col ="blue",main = "Convolution of rect(x) and rect(x)", ylim = c(0,2))
+par(mfrow=c(1,1))
 
 
 ###########################################################
