@@ -391,7 +391,7 @@ ex_tayl_plot = function(length_series){
   } # End for i
   
   # Plot resulting polynomial up to defined length of the series:
-  plot(x,base, type = "l", col = "green", ylim = c(-50,50), ylab = "y", main = paste("Taylor Series for n =",length_series))
+  plot(x,base, type = "l", col = "deeppink", ylim = c(-50,50), ylab = "y", main = paste("Taylor Series for n =",length_series))
   lines(x = x, y = exp(x)) # add e^x
   abline(h=0,v=0)          # add axes
   
@@ -402,6 +402,7 @@ ex_tayl_plot = function(length_series){
 par(mfrow = c(2,2))
 ex_tayl_plot(2);ex_tayl_plot(3);ex_tayl_plot(10);ex_tayl_plot(100)
 par(mfrow = c(1,1))
+
 
 # Approximating cos() via Taylor/Maclaurin Series:
 cos_tayl = function(length_series){ # where n and the factorial is even
@@ -433,7 +434,7 @@ cos_tayl = function(length_series){ # where n and the factorial is even
   } # End for i
   
   # Plot resulting polynomial up to defined length of the series:
-  plot(x,base, type = "l", col = "green", ylim = c(-5,5), ylab = "y", main = paste("Taylor Series for n =",n[length(n)]))
+  plot(x,base, type = "l", col = "deeppink", ylim = c(-5,5), ylab = "y", main = paste("Taylor Series for n =",n[length(n)]))
   lines(x = x, y = cos(x)) # add cos(x)
   abline(h=0,v=0)          # add axes
   return(base)
@@ -475,7 +476,7 @@ sin_tayl = function(length_series){ # where n and the factorial is even
   } # End for i
   
   # Plot resulting polynomial up to defined length of the series:
-  plot(x,base, type = "l", col = "green", ylim = c(-5,5), ylab = "y", main = paste("Taylor Series for n =",n[length(n)]))
+  plot(x,base, type = "l", col = "deeppink", ylim = c(-5,5), ylab = "y", main = paste("Taylor Series for n =",n[length(n)]))
   lines(x = x, y = sin(x)) # add sin(x)
   abline(h=0,v=0)          # add axes
   return(base)
@@ -1658,7 +1659,7 @@ for(index in 1:length(x)){
 # Convolution of rect(x) and x^2
 plot(x,conv_a_b, type ="l", main = "Convolution of rect(x) and x^2 via Riemann Sum Approx.")
 
-# IN CASE YOU RAN THE WHOLE SCRIPT you might need to turn of imager
+# IN CASE YOU RAN THE WHOLE SCRIPT you might need to turn off imager
 # since it also has a convolve function and masks convolve from "stats":
 detach("package:imager", unload = TRUE)
 
@@ -1815,8 +1816,109 @@ par(mfrow=c(1,1))
 # 3 2D Fourier Transformation and a FFT on a 2D JPG Image #
 ###########################################################
 
+#############################
+# 3.1 Simple 2D FFT Example #
+#############################
 
+# Load library imager:
+library("imager")
+# IN CASE YOU WANT TO RUN CODE FROM THE PREVIOUS SCRIPT ON CONVOLUTIONS:
+# You might need to turn off imager since it also has a convolve function 
+# and masks convolve from "stats":
+detach("package:imager", unload = TRUE)
 
+#### Example signal in 2D:
+signal2D = matrix(c(0,0,0,0,
+                    0,1,1,0,
+                    0,1,1,0,
+                    0,0,0,0), ncol = 4, byrow = TRUE)
+
+# Plot the above matrix, treating the values as grey scale values.
+# This can be done via setting the parameter useRaster = TRUE!!
+image(signal2D, col = grey.colors(256), axes = FALSE, useRaster = TRUE)
+
+# First FFT on rows:
+freq_dom_2D = signal2D
+for(index in 1:length(signal2D[,1])){
+  freq_dom_2D[index,] = fft(signal2D[index,])
+} # End for inex => fft on rows
+
+# Than fft on the cols of the previous FFT on rows!
+for(index in 1:length(signal2D[1,])){
+  freq_dom_2D[,index] = fft(freq_dom_2D[,index])
+} # End for inex => fft on rows
+
+# Compare FFT by row and by column with fft() R function that can handle 2D automatically
+freq_dom_2D == fft(signal2D)
+
+# Here we have to use image to create a raster plot of the k-space:
+# Without log magnitude:
+par(mfrow=c(1,2))
+image(log(1+Mod(fft(signal2D))),col = grey.colors(256), axes = FALSE, useRaster = TRUE, 
+      main = "Log Magnitude of k-space")
+
+# Re-construct our original signal via the IFFT of the frequency domain / k-space:
+fft(freq_dom_2D, inverse = TRUE)
+#      [,1]  [,2]  [,3] [,4]
+# [1,] 0+0i  0+0i  0+0i 0+0i
+# [2,] 0+0i 16+0i 16+0i 0+0i
+# [3,] 0+0i 16+0i 16+0i 0+0i
+# [4,] 0+0i  0+0i  0+0i 0+0i
+
+# Rescaling values via 1/N
+Re(fft(freq_dom_2D, inverse = TRUE))/length(signal2D)
+#      [,1] [,2] [,3] [,4]
+# [1,]    0    0    0    0
+# [2,]    0    1    1    0
+# [3,]    0    1    1    0
+# [4,]    0    0    0    0
+
+# Reconstructing image without dividing by length(signal2D):
+image(Re(fft(freq_dom_2D, inverse = TRUE)),col = grey.colors(256), axes = FALSE, useRaster = TRUE, 
+      main = "IFFT of k-space")
+par(mfrow=c(1,2))
+
+# Doing the same but first columns than rows:
+# First FFT on COLUMNS THIS TIME:
+freq_dom_2D_alt = signal2D
+for(index in 1:length(signal2D[1,])){
+  freq_dom_2D_alt[,index] = fft(signal2D[,index])
+} # End for inex => fft on rows
+
+# Than fft on the ROWS of the previous FFT on columns!
+for(index in 1:length(signal2D[,1])){
+  freq_dom_2D_alt[index,] = fft(freq_dom_2D_alt[index,])
+} # End for inex => fft on rows
+
+# Check for equality:
+freq_dom_2D == freq_dom_2D_alt
+# All TRUE!!
+#      [,1] [,2] [,3] [,4]
+# [1,] TRUE TRUE TRUE TRUE
+# [2,] TRUE TRUE TRUE TRUE
+# [3,] TRUE TRUE TRUE TRUE
+# [4,] TRUE TRUE TRUE TRUE
+
+#######################################################################################################
+# 3.2 FFT and IFFT on JPG/JPEG Images and Recalling the Difference Between Time and Frequency Domain #
+#######################################################################################################
+
+# Example row:
+test_row = c(1,2,3,4,5)
+fft_test_row = round(fft(test_row), 3) # round for less overloaded console output:
+# [1] 15.0+0.000i -2.5+3.441i -2.5+0.812i -2.5-0.812i -2.5-3.441i
+which(fft_test_row == max(Re(fft_test_row)))
+# [1] 1 # highes value of real part at position one not 5
+which(Im(fft_test_row) == max(Im(fft_test_row)))
+# [1] 2 # highest value of imaginary part on position 2...
+
+# Plot test row:
+image(as.matrix(test_row),col = grey.colors(256), axes = FALSE, useRaster = TRUE, 
+      main = "Signal = c(1,2,3,4,5)")
+
+# FFT of test row
+image(as.matrix(Re(fft_test_row)),col = grey.colors(256), axes = FALSE, useRaster = TRUE, 
+      main = "Frequency Domain of fft(test_row)")
 
 
 ### Looking at the Frequency Space of a JPG Image:
@@ -1831,7 +1933,7 @@ image = load.image("test_img.jpg")
 image = grayscale(image) 
 
 # Plot image to test if upload was correct and gray scaling was correct:
-plot(image, main = "Original Image, Gray Scaled")
+plot(image, main = "Original Image, Grey Scaled")
 
 # Perform Fourier Transformation (via Fast Fourier Transformation == fft()):
 image_fft = fft(image)
@@ -1868,24 +1970,43 @@ plot(image_recon, main = "Reconstruction of Orig. Image via Inverse FFT", axes =
 # Reset plot grid to 1x1:
 par(mfrow = c(1, 1))  
 
+#### Ms. Miranda test image:
+image = load.image("ms_miranda_lena.jpeg") # here JPEG not JPG!
+
+# Gray scale image - it is actually b/w but there 
+# is actually some color left in the image...
+image = grayscale(image) 
+
+par(mfrow = c(2, 2))  # Set up plot grid 1 row 2 cols
+# Plot Org. Image and Frequency Domain Image:
+plot(image, main = "Original Image", axes = FALSE)
+plot(log(1+Mod(fft(image))), main = "Frequency Spectrum or Domain / k-Space", axes = FALSE)
+
+# Perform inverse Fourier Transformation to reconstruct original image from frequency domain:
+plot(log(1+Mod(fft(image))), main = "Original Frequency Spectrum or Domain / k-Space", axes = FALSE)
+image_recon = Re(fft(fft(image), inverse = TRUE)) / length(image)
+plot(image_recon, main = "Reconstruction of Orig. Image via Inverse FFT", axes = FALSE)
+
+# Reset plot grid to 1x1:
+par(mfrow = c(1, 1))  
 
 
-#####################################################################################
-# 4 Performing FFT and IFT on MRI Data and Understanding the 2D k-Space of an Image #
-#####################################################################################
+#################################################################################################
+# 3.3 Performing FFT and IFT on MRI Data (DICOM Magnitude Plot Only) and and Shifting a k-Space #
+#################################################################################################
 
 # Install oro.dicom to read .dcm files:
 #install.packages("oro.dicom")
 library("oro.dicom")
 
 # Load example data: 
-data = readDICOMFile("kspace/example_sts.dcm")
+data = readDICOMFile("example_sts.dcm")
 data$hdr
 # Load example data from k-space explorer
 # https://github.com/birogeri/kspace-explorer/blob/master/images/default.dcm
 #data = readDICOMFile("kspace/default.dcm")
 
-# Plot original DICOM image (with dark color scheme grey(0:64/64), grey.color(256)):
+# Plot original DICOM image (with dark color scheme grey(0:64/64) instead of grey.color(256)):
 image(t(data$img), col = grey(0:64/64), axes = FALSE,
       main = "Original DICOM Image")
 
@@ -1928,6 +2049,10 @@ kspace_shifted = fftshift2D(kspace)
 # output matrix corners:
 image(log(1 + Mod(kspace_shifted)), col = grey.colors(256), axes = FALSE, 
       main = "Reshaped k-space")
+# Reshaped k-space axes:
+abline(h = 0.5, v = .5)
+text(x = .6, y = .95, "ky")
+text(x = .85, y = .45, "kx")
 
 # Reconstructing original image from k-space via IFT (includes normalization factor): 
 IFT_image = Re(fft(kspace, inverse = TRUE) / length(kspace))
@@ -1938,15 +2063,111 @@ image(t(IFT_image), col = grey(0:64/64), main = "Reconstructed Image via inverse
 
 
 
-##############################################################################################
-# 4.1 Exploring the k-Space and Plotting Gradient Plots Corresponding to Spatial Frequencies #
-##############################################################################################
+######################################################################################################################
+# 3.4.1 Same, Same — but different: Comparing a Regular 3D Plot with a 2D Gradient Plot and Introducing the Outer()  #
+######################################################################################################################
 
-# Code for plotting gradients in general and explaining how the outer() function roughly works:
+# Example 2D signal:
+signal2D = matrix(c(0,0,0,0,
+                    0,1,1,0,
+                    0,1,1,0,
+                    0,0,0,0), ncol = 4, byrow = TRUE)
 
-# Plotting a cos() wave with a vertical gradient and a horizontal
-# gradient, representing both 
+# Length for N as object:
+n = ncol(signal2D)
 
+# FFT of signal:
+kspace_signal2D = fft(signal2D)
+
+# Show k-space:
+image(log(1+Mod(kspace_signal2D)),col = grey.colors(256), axes = FALSE, useRaster = TRUE, 
+      main = "Log Magnitude of k-space")
+
+# Set up empty array matrix for result, as well as x and y:
+z_mat = vector("list", n*n)
+dim(z_mat) = c(n,n)
+x =  seq(from = 0, to = n-1)
+y =  seq(from = 0, to = n-1)
+
+# Plot gradient of each spatial frequency:
+par(mfrow = c(n,n))
+for(i1 in 0:(n-1)){ # We have to work with 0, since it is factor below!
+  for(i2 in 0:(n-1)){
+    magnitude = Mod(kspace_signal2D[i2+1,i1+1]) # or amplitude
+    phase    =  Arg(kspace_signal2D[i2+1,i1+1]) # or angle
+    # Create values of z:              
+    z_mat[[i2+1,i1+1]] = outer(x,y, 
+            function(x,y){
+              magnitude * cos(2*pi*(i1*x/n + i2*y/n) + phase) / (n^2) # Scaling necessary!
+            } # End of function
+    ) # End outer()
+    
+# ACTIVATE TO RUN!!! NOTE YOU NEED BIG FIGURE MARGIN!!!!!!!!!!!!!!
+    
+#    image(Re(z_mat[[i2+1,i1+1]]),col = grey.colors(256), axes = FALSE, main = paste("row: ", i1+1, "col: ",i2+1))
+  } # End for index2
+} # End for index1
+par(mfrow = c(1,1))
+
+# Sum of all gradient z matrices!
+sum_z = function(z){ # Start of function
+  n_z = ncol(z)
+  z_res = round(Re(z[[1,1]][]-z[[1,1]][])) # z-z = all zero! initializes object for recursive addition;
+  for(index in 1:n){# successively add the values of a vector;
+    for(j in 1:n){
+      z_res = z_res + z[[index,j]][] # recursive addition
+    } # End for j
+  } # End for index          
+  return(z_res)             # return result in the console
+} # End of function
+
+# Plot original Signal and compare with replication 
+# via summing gradient values of cosine! :O
+image(signal2D, col = grey.colors(256), axes = FALSE, useRaster = TRUE, main= "Original Signal")
+# Image of Reconstruction of 2D signal -- Sum via sum_z:
+image(Re(sum_z(z_mat)), col = grey.colors(256), axes = FALSE, main = "Sum of Gradients")
+# Alternative sum via Reduce(): 
+#image(Re(Reduce("+",z_mat)), col = grey.colors(256))
+
+# Check matrices of signal and sum of gradients for equivalence:
+signal2D == round(sum_z(z_mat),3)
+# ALL TRUE!!
+#      [,1] [,2] [,3] [,4]
+# [1,] TRUE TRUE TRUE TRUE
+# [2,] TRUE TRUE TRUE TRUE
+# [3,] TRUE TRUE TRUE TRUE
+# [4,] TRUE TRUE TRUE TRUE
+
+
+
+#########################################################################################
+# 3.4.1 Same, Same — but different: Comparing a Regular 3D Plot with a 2D Gradient Plot #
+#########################################################################################
+
+# Create x and y values:
+x = c(1:10)
+y = c(1:10)
+
+# Angle addition identity (trigonometric identity)
+round(sin(x+y),12) ==  round(sin(x)*cos(y) + sin(y)*cos(x),12)
+
+# The below results in a diagonal sine wave within a plane of x and y.
+# This can be represented as 2D gradient plot, where colors or shades of grey indicate
+# the values (how high or low they are), or via a 3D plot:
+z = outer(x,y,FUN = function(x,y){sin(x+y)}) 
+
+# Visualize as 3D wave using persp3d from rgl (or regular persp function):
+persp3d(x, y, z,
+        col = "lightblue", alpha = 0.8,
+        xlab = "x", ylab = "y", zlab = "z",
+        xlim = c(-5,15), ylim = c(-5,15), zlim =c(-5,5))
+
+# Visualize via 2D gradient plot in shades of grey via the image function,
+# interpreting each value of the z matrix as a grey scale value of a pixel:
+image(x,y,z, col = gray.colors(256))
+
+
+# SOME MORE GRADIENT PLOT EXAMPLES!
 # Define matrix size / resolution:
 size = 100  
 
@@ -1960,30 +2181,8 @@ y = seq(-1, 1, length.out = size)
 # Combine as matrix:
 xy = cbind(x,y)
 
-# The resulting matrix is rather simple,
-# since x == y. The image() function, using gray.colors(256) as parameter,
-# turns the below into a gradient from left to right, where the darker the
-# grey colors, the lower the value of x==y. 
-
-#               x          y
-#  [1,] 0.00000000 0.00000000
-#  [2,] 0.01010101 0.01010101
-#  [3,] 0.02020202 0.02020202
-#  [4,] 0.03030303 0.03030303
-#  [5,] 0.04040404 0.04040404
-#  [6,] 0.05050505 0.05050505
-#  [7,] 0.06060606 0.06060606
-#  [8,] 0.07070707 0.07070707
-#  [9,] 0.08080808 0.08080808
-# [10,] 0.09090909 0.09090909
-# [11,] 0.10101010 0.10101010
-# ...
-# ...
-# ...
-
 # Set plot grid to 2x4 for all of the below plots:
 par(mfrow = c(2, 4))  
-
 
 # Plot the image via image() with grey scaling. 
 image(xy, col = gray.colors(256))
@@ -1991,7 +2190,6 @@ image(xy, col = gray.colors(256))
 # Mirrored horizontally:
 xy = cbind(rev(x),rev(y))
 image(xy, col = gray.colors(256))
-
 
 # This will flip the gradient 90° clock-wise
 z = outer(x, y, function(x,y){cos(y)})
@@ -2055,6 +2253,10 @@ par(mfrow = c(1, 1))
 z = outer(x, y, function(x, y) cos(2*pi*x*2))
 image(x,y,z, col = gray.colors(256))
 
+
+################################################
+# 3.5 Exploring the k-space of our DICOM Image #
+################################################
 
 ################ Example using one of the DICOM images:
 
@@ -2285,4 +2487,5 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 
 # Reset grid
 par(mfrow=c(1,1))
+
 
