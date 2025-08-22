@@ -237,6 +237,30 @@ arrows(x0=0,y0=0,x1=Re(1+0*i), y = Im(1+0*i), col = "darkviolet")
 text(x=1.5,y=.25,"-1*i*i = 1+0i")
 
 
+#### Calculate the modulus/magnitude/absolut value and argument/phase/angle in R:
+Mod(2+2i)     # modulus
+abs(2+2i)     # usually for regular absolut value but also works with complex numbers
+sqrt(2^2+2^2) # via formula
+# The modulus / absolute value /phase of a complex number is the real part only when 0*i,
+# since e.g. sqrt(2^2+0^2) = 2
+Mod(2+0i)
+sqrt(2^2+0^2)
+# [1] 2
+
+# Reverse the above:
+im = complex(real = 0, imaginary = 1)
+all.equal(2+2i, (abs(2+2i)*exp(im*Arg(2+2i))))
+# [1] TRUE
+
+
+# Calculate phase via artan2(), Arg() or angle() for complex numbers, 
+# converting complex to polar coordinates. Below very similar to Matlab!
+atan2(Im(2+2i), Re(2+2i))          # via atan2()
+phase = Arg(2+2i)                  # via Arg()
+library("pracma") # for angle()
+phase = angle(2+2i)                # via angle()
+
+
 ##### The polar coordinates of a complex number can be obtained via P(Mod(2+2i)|Arg(2+2i)):
 # Set fresh grid:
 grid2Dcomp()
@@ -1625,13 +1649,13 @@ for(index in 1:length(shift_x)){
 } # End for index
 
 # Convert plots to image. UNCOMMENT TO RUN AND CREATE GIF!!!!!!!
-img_plot_conv = image_graph(width=400,height=400, res = 96)
+#img_plot_conv = image_graph(width=400,height=400, res = 96)
 # Print plots onto img_plot object
-print(plots_grid)
+#print(plots_grid)
 # Then you create an animation object:
-anime = image_animate(image_join(img_plot_conv), fps = 2)
+#anime = image_animate(image_join(img_plot_conv), fps = 2)
 # Export .gif image
-image_write(anime, "conv_anim.gif")
+#image_write(anime, "conv_anim.gif")
 
 
 ### Showing again that IFT{FFT(a)*FFT(b)} == convolution of a and b:
@@ -2073,7 +2097,7 @@ signal2D = matrix(c(0,0,0,0,
                     0,1,1,0,
                     0,0,0,0), ncol = 4, byrow = TRUE)
 
-# Length for N as object:
+# Length for N as object (for the case of equal col and row length!):
 n = ncol(signal2D)
 
 # FFT of signal:
@@ -2086,7 +2110,7 @@ image(log(1+Mod(kspace_signal2D)),col = grey.colors(256), axes = FALSE, useRaste
 # Set up empty array matrix for result, as well as x and y:
 z_mat = vector("list", n*n)
 dim(z_mat) = c(n,n)
-x =  seq(from = 0, to = n-1)
+x =  seq(from = 0, to = n-1) # has to be 0-n-1!!
 y =  seq(from = 0, to = n-1)
 
 # Plot gradient of each spatial frequency:
@@ -2172,10 +2196,10 @@ image(x,y,z, col = gray.colors(256))
 size = 100  
 
 # Create a matrix to plot a vertical grey scale gradient. Think of 
-# both as a times series from 0 to 1 Hz. We need two to plot a 
+# both as a times series from -1 to 1. We need two to plot a 
 # gradient, as often done in tutorials on k-spaces. We will use
 # the outer() function, which need an input x and y.
-x = seq(-1, 1, length.out = size) # 1 Hz 
+x = seq(-1, 1, length.out = size) # -1 to 1, usually 0 to N-1 
 y = seq(-1, 1, length.out = size)
 
 # Combine as matrix:
@@ -2234,7 +2258,6 @@ image(x,y,z, col = gray.colors(256))
 z = outer(x, y, function(x, y) cos(2*pi*x))
 image(x,y,z, col = gray.colors(256))
 
-
 # This will flip 90° and horizontal gradient peak is now in the middle 
 # for 1 amplitude peak = 2Hz frequency
 z = outer(x, y, function(x, y) cos(2*pi*y*2))
@@ -2258,110 +2281,89 @@ image(x,y,z, col = gray.colors(256))
 # 3.5 Exploring the k-space of our DICOM Image #
 ################################################
 
-################ Example using one of the DICOM images:
+################ K-space and gradient plots of DICOM images:
+# Again load example data: 
+data = readDICOMFile("example_sts.dcm")
+# DICOM k-space, shifted and unshifted:
+kspace = fft(data$img)
+kspace_shifted = fftshift2D(kspace)
 
-# Chose which pixel you want to evaluate (frequency/magnitude, amplitude, phase).
-# To be able to do so, we will use the un-shifted k-space matrix below:
-pxx = 10
-pxy = 10
+# Choose location of complex number from SHIFTED k-space image/matrix:
+kxshift = 0
+kyshift = -4
+#kxshift = 25
+#kyshift = 25
 
-# Log magnitude of k-space, otherwise frequency is to high to visualize:
+
+# Note again that we will use the log magnitude of k-space data, otherwise 
+# the frequencies outside of the centre (thinking shifted k-space) is too high 
+# to visualize and will just mostly be all black.
 # Log magnitude compression of values (result equivalent to amplitude, the 
 # intensity of each frequency of a wave):
-magnitude = log(1 + Mod(kspace[pxx,pxy]))
-magnitude = log(1 + sqrt(Re(kspace[pxx,pxy])^2+Im(kspace[pxx,pxy])^2))
-# [1] 16.21987 for pxx = 1 and pxy = 1
+Mod(kspace[1,1])  
+# For kspace[1,1] it is very high: 11570937, therefore we take the log()
+# for the plot of the kspace (not for the gradient plot below though!!)
+log(1 + Mod(kspace[1,1]))
+log(1 + sqrt(Re(kspace[1,1])^2+Im(kspace[1,1])^2))
+# [1] 16.26401 for pxx = 1 and pxy = 1
 
-# The modulus / absolute value of a complex number is the real part only when 0*i.
-Mod(kspace[1,1])
-# [1] 11071328
-
-# In R the function abs() can also handle complex numbers just as Mod():
-Mod(kspace[50,50]) == abs(kspace[50,50])  
-# For p kspace[1,1] it is very high: 11071328, therefore we take the log()
-
-# Calculate phase via artan2(), Arg() or angle() for complex numbers, 
-# converting complex to polar coordinates. Below very similar to Matlab!
-phase = atan2(Im(kspace[pxx,pxy]), Re(kspace[pxx,pxy])) # via atan2()
-phase = Arg(kspace[pxx,pxy])                            # via Arg()
-library("pracma") # for angle()
-phase = angle(kspace[pxx,pxy])                          # via angle()
-
-# Set imaginary number:
-im = complex(imaginary = 1, real = 0)
-
-# Reverse the above:
-all.equal(kspace[pxx,pxy], (abs(kspace[pxx,pxy])*exp(im*angle(kspace[pxx,pxy]))))
-
+# Phase and magnitude of pxx and pxy:
+phase_test = atan2(Im(kspace[px,py]), Re(kspace[px,py])) # via atan2()
+magnitude_test = log(1 + sqrt(Re(kspace[px,py])^2+Im(kspace[px,py])^2))
 
 ##### Each k-space pixel frequency as gradient (using DICOM image examples):
-
-kspace = kspace
-x = seq(-1,1,length.out = 100)
-y = seq(-1,1,length.out = 100)
+x = seq(0,(ncol(kspace)-1))
+y = seq(0,(nrow(kspace)-1))
 
 #### Set plot grid to 1x2:
 par(mfrow = c(1, 2))  
 
-# Choose point within the k-space image/matrix again (here pixels / matrix position, unshifted):
-pxx = nrow(kspace)/2   # for kx = 0
-pxy = nrow(kspace)/2+4 # for ky = -4
-pxx = nrow(kspace)/2+25
-pxy = nrow(kspace)/2-25
-
-# Plot shifted/reshaped image, now with low frequencies in the center, instead the
+# Plot shifted/reshaped image, now with low frequencies in the centre, instead the
 # output matrix corners:
 image(log(1 + Mod(kspace_shifted)), col = grey(0:64/64), axes = FALSE, 
-      main = "Reshaped k-space")
+      main = "Reshaped k-space (log Mag.)")
 abline(h = 0.5, v = .5)
-text(x = .65, y = .95, "ky = Im()")
-text(x = .85, y = .45, "kx = Re()")
+text(x = .65, y = .95, "ky")
+text(x = .85, y = .45, "kx")
 
 # Add respective point of the fft() / frequency domain of that value that will
-# be shown as gradient
-points(x = pxx/length(kspace[1,]) , y = 1-(pxy)/length(kspace[,1]), 
+# be shown as gradient. Since the axes scale is not following the matrix indices
+# but is a range between 0 and 1 each, we have to adjust x and y below to get the
+# point at the right location in the shifted k-space!
+px = nrow(kspace)/2+kxshift   
+py = ncol(kspace)/2+kyshift   
+
+points(x = px/length(kspace[1,]) , y = (py)/length(kspace[,1]), 
        col = "darkviolet", pch = 16, cex = 1.5)
 
-# Plot frequency, phase and amplitude/magnitude as gradient.
-# Extract spatial frequency from k-space matrix (encoded in the matrix index position):
-fxfy = function(pxx,pxy, nrow){
-  if(pxx <= nrow/2){
-    fx = -((nrow/2)-pxx)
-  } # end if
-  else if(pxx > nrow/2){
-    fx = pxx-(nrow/2)
-  } # End else
-  if(pxy <= nrow/2){
-    fy = (nrow/2)-pxy
-  } # end if
-  else if(pxy > nrow/2){
-    fy = -(pxy-(nrow/2))
-  } # End else
-  return(c(fx,fy))
-} # End of function
-
-# Use function
-fxfy_res = fxfy(pxx,pxy,length(kspace[,1]))
-
-# Calculate log magnitude and phase: 
-magnitude = log(1+Mod(kspace_shifted[pxx,pxy]))
-phase = Arg(kspace_shifted[pxx,pxy])
+# Calculate log magnitude and phase 
+# HERE WE CAN USE THE SHIFTED K-SPACE, since we just want the complex number
+# not the correct index for the spatial frequencies!!!: 
+# For the gradient plot we take the regular modulus!!
+magnitude = Mod(kspace[px,py])
+phase = Arg(kspace[px,py]) 
 
 # Plot gradient of frequency of k(fx,fy):
-z = outer(x, y, function(x, y) magnitude*cos((2*pi/2)*(fxfy_res[1]*x+fxfy_res[2]*y))) 
-image(z, col = grey(0:64/64), axes = FALSE, main = paste("Gradient Plot of kx,ky","\n", "including Magnitude and Phase"))
+m = nrow(kspace)
+n = ncol(kspace)
+# HERE the object of kxky are the spatial frequencies, already starting with 0!!
+z = outer(x, y, function(x, y) magnitude*cos(2*pi*((kxshift)*x/m + (kyshift)*y/n)+phase)/(m*n)) 
+image(x,y,z, col = grey(0:64/64), axes = FALSE, main = paste("Gradient Plot of kx,ky","\n", "including Magnitude and Phase"),xlab="",ylab="")
 
-# If you want, you could try to adjust the above to perform the same on the already shifted k-space
+# Reset plot grid:
+par(mfrow=c(1,1))
 
-# Note that we could of course also plot the gradient as just a cosine or sine wave:
-# Reset grid
-par(mfrow = c(1,1))
+# Note that we could of course also plot the gradient of each diimension
+# kx and ky separately as two 1D cosine waves:
+# Set grid
+par(mfrow = c(1,2))
 # Plot frequency phase and amplitude as wave:
 time = seq(0,1,length.out = 100)
-wave = magnitude*cos(2*pi*time+phase)
-#wave = magnitude*cos((2*pi/2)*(fxfy_res[1]*x+fxfy_res[2]*y))+phase
-plot(wave, type = "l") # Here phase only shift from left to right, and a angle of pi of the sine wave
-
+wave_kx = magnitude*cos(2*pi*(kxshift*time)+phase) 
+wave_ky = magnitude*cos(2*pi*(kxshift*time)+phase) 
+plot(time,wave_kx, type = "l", main = paste("Frequency of kx = ",kxshift), xlab = "0 to 1 Hz") 
+plot(time,wave_ky, type = "l", main = paste("Frequency of ky = ",kyshift), xlab = "0 to 1 Hz") 
+par(mfrow = c(1,1))
 
 
 #################################################################
