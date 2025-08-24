@@ -2277,9 +2277,9 @@ z = outer(x, y, function(x, y) cos(2*pi*x*2))
 image(x,y,z, col = gray.colors(256))
 
 
-################################################
-# 3.5 Exploring the k-space of our DICOM Image #
-################################################
+############################################################
+# 3.5 The Gradient Plots of the k-space of our DICOM Image #
+############################################################
 
 ################ K-space and gradient plots of DICOM images:
 # Again load example data: 
@@ -2294,7 +2294,6 @@ kyshift = -4
 #kxshift = 25
 #kyshift = 25
 
-
 # Note again that we will use the log magnitude of k-space data, otherwise 
 # the frequencies outside of the centre (thinking shifted k-space) is too high 
 # to visualize and will just mostly be all black.
@@ -2306,10 +2305,6 @@ Mod(kspace[1,1])
 log(1 + Mod(kspace[1,1]))
 log(1 + sqrt(Re(kspace[1,1])^2+Im(kspace[1,1])^2))
 # [1] 16.26401 for pxx = 1 and pxy = 1
-
-# Phase and magnitude of pxx and pxy:
-phase_test = atan2(Im(kspace[px,py]), Re(kspace[px,py])) # via atan2()
-magnitude_test = log(1 + sqrt(Re(kspace[px,py])^2+Im(kspace[px,py])^2))
 
 ##### Each k-space pixel frequency as gradient (using DICOM image examples):
 x = seq(0,(ncol(kspace)-1))
@@ -2359,122 +2354,127 @@ par(mfrow=c(1,1))
 par(mfrow = c(1,2))
 # Plot frequency phase and amplitude as wave:
 time = seq(0,1,length.out = 100)
-wave_kx = magnitude*cos(2*pi*(kxshift*time)+phase) 
+wave_kx = magnitude*cos(2*pi*(kxshift*time)+phase)
 wave_ky = magnitude*cos(2*pi*(kxshift*time)+phase) 
 plot(time,wave_kx, type = "l", main = paste("Frequency of kx = ",kxshift), xlab = "0 to 1 Hz") 
 plot(time,wave_ky, type = "l", main = paste("Frequency of ky = ",kyshift), xlab = "0 to 1 Hz") 
 par(mfrow = c(1,1))
 
 
-#################################################################
-# 4.2 Successively (Re-) Constructing an Image from the k-Space #
-#################################################################
 
-#### Reset plot grid to 1x2 again:
-par(mfrow = c(1, 2))  
-
-# Reconstructing original image from k-space via IFT (includes normalization factor): 
-IFT_image = Re(fft(kspace, inverse = TRUE) / length(kspace))
-
-image(t(IFT_image), col = grey(0:64/64), main = "Reconstructed Image via inverse FFT", axes = FALSE)
+############################################################################
+# 3.6 Field of View (FOV), Aliasing Effects, Low-Pass and Gaussian Filters #
+############################################################################
 
 
-# PARTIALLY constructing original image from k-space via IFT (includes normalization factor): 
-IFT_image = Re(fft(kspace[(nrow(kspace)/2-100):(nrow(kspace)/2+100),(nrow(kspace)/2-100):(nrow(kspace)/2+100)], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = "Partially Reconstructed Image via inverse FFT", axes = FALSE)
-
-
-#### Set plot grid to 2x2 again:
-par(mfrow = c(2, 2))  
-
-# PARTIALLY constructing original image from k-space via IFT (includes normalization factor): 
+# Only process the spatial frequencies, magnitude and phase of the first 10 column
+# and row entries of the k-space, essentially only a part on the lower right quadrant 
+# of the shifted k-space in comparison with the full k-space being processed:
+par(mfrow=c(1,2))
 rangex = 1:10
 rangey = 1:10
 IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row/col = 1:10"), axes = FALSE)
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row,col = ",max(rangex),max(rangey)), axes = FALSE)
 
-rangex = 1:100
-rangey = 1:100
-IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row/col = 1:100"), axes = FALSE)
+# Add complete k-space:
+IFT_image = Re(fft(kspace, inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row,col = N_row,N_col"), axes = FALSE)
+par(mfrow = c(1,1))
 
-rangex = 1:200
-rangey = 1:200
-IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row/col = 1:200"), axes = FALSE)
+# Example chess board like 2D signal:
+par(mfrow = c(1,2))
+signal2D = matrix(c(0,1,0,1,
+                    1,0,1,0,
+                    0,1,0,1,
+                    1,0,1,0), ncol = 4, byrow = TRUE)
+# Plot image:
+image(signal2D, col = grey.colors(256), axes = FALSE, useRaster = TRUE, main= "Original Signal")
+image(fftshift2D(log(1+Mod(fft(signal2D)))), col = grey.colors(256), axes = FALSE, useRaster = TRUE, main= "k-space")
+par(mfrow = c(1,1))
 
-rangex = 1:ncol(kspace)
-rangey = 1:nrow(kspace)
-IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row/col = 1:nrow/ncol"), axes = FALSE)
+# Check for equivalence of shifted and unhifted k-space:
+fftshift2D(log(1+Mod(fft(signal2D)))) == log(1+Mod(fft(signal2D)))
+# ALL TRUE!!
 
-# Only one line and the other entries are set to 0:
-kspace2 = kspace
-kspace2[2:nrow(kspace2),2:ncol(kspace2)] = 0
+# Obscuring effect is achieved by changing the arithmetic sign 
+# from + to negative and vice versa, which can be achieved via taking the -Re(z)!
+IFT_image = -Re(fft(kspace, inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("Inversion of Grey Scale Values"), axes = FALSE)
 
-IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("First line, rest = 0"), axes = FALSE)
+# Vertical and horizontal flip:
+par(mfrow = c(1,2))
+IFT_image = Re(fft(kspace, inverse = TRUE) / length(kspace))
+IFT_image_vertival = IFT_image[,ncol(IFT_image):1]
+image(t(IFT_image_vertival), col = grey(0:64/64), main = paste("Mirrored Vertically"), axes = FALSE)
+IFT_image_horizontal = IFT_image[nrow(IFT_image):1,]
+image(t(IFT_image_horizontal), col = grey(0:64/64), main = paste("Mirrored Horizontally"), axes = FALSE)
+par(mfrow = c(1,1))
 
-# Only first two lines and the other entries are set to 0:
-kspace2 = kspace
-kspace2[3:nrow(kspace2),2:ncol(kspace2)] = 0
+#### Here FOV for the symmetric case of FOVx = FOVy = FOV, 
+#### meaning that the length of the width and the height are equal!
+#### We will name the variables FOV_x not just FOV though, to avoid confusion:
+# Compare this tutorial: https://mriquestions.com/field-of-view-fov.html 
 
-IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("First two lines, rest = 0"), axes = FALSE)
+# WORKING WITH amount of pixels as length makes it hard to understand the concept
+# concerning the k-space and teh FOV of the image:
+# delta_kx = 1/FOV, where k_max is the length of a row col.
+# Below we refer to our DICOM image:
+delta_kx = 1/(length(kspace[,1]))  
+# [1] 0.003921569
+FOV_kx = 1/delta_kx
+# [1] 256
+FOV_kx == length(kspace[,1]) # => Equivalent with range of 1D frequencies! 
+# [1] TRUE
 
-# Only first 10 lines and the other entries are set to 0:
-kspace2 = kspace
-kspace2[11:nrow(kspace2),2:ncol(kspace2)] = 0
+# Example with mm and cm -- makes it easier to understand:
+# Say one pixel = one mm
+# 1/FOV_Pix, where FOV_Pix = 4cm (for our chess board example): 
+delta_Pix = 1/4  
+# [1] 0.25
+FOV_Pix = 1/delta_Pix
+# [1] 4
 
-IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("First 10 lines, rest = 0"), axes = FALSE)
+# Code for the plot of the cosine waves:
+# kx from 0,1,2 and 0,-1,-2:
+x = seq(0,2*pi,by = .1)
+plot(x,cos(x*0)+12, type = "l", ylim = c(-1,13), axes =  FALSE, ylab = "", xlab  = "")
+lines(x,cos(x*1)+9, type = "l")
+lines(x,cos(x*2)+6, type = "l")
+lines(x,-cos(x*1)+3, type = "l")
+lines(x,-cos(x*2), type = "l")
 
-# Only first 20 lines and the other entries are set to 0:
-kspace2 = kspace
-kspace2[21:nrow(kspace2),2:ncol(kspace2)] = 0
+# Relation \Delta k and \Delta Pix.:
+# 1/FOV_Pix, where FOV_Pix = 4cm (for our chess board example): 
+delta_Pix = 1/4 # same for \Delta k!!!   
+delta_kx = 1/4 # same for \Delta k!!!   
+# [1] 0.25 # as part of 1 we can say this is 1 of four pixels!
+FOV_Pix = 1/delta_Pix # Same for FOV_kx!!!
+FOV_kx = 1/delta_kx # Same for FOV_kx!!!
+# [1] 4
 
-IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("First 20 lines, rest = 0"), axes = FALSE)
+delta_Pix == 1/FOV_kx
+# [1] TRUE
+delta_kx == 1/FOV_Pix
+# [1] TRUE
 
+# Cycles per pixel:
+cycle_per_pixel = 1
+FOV_Pix/cycle_per_pixel # delta_Pix
+# [1] 4
+FOV_kx/cycle_per_pixel == 1/delta_Pix
+# [1] TRUE
+cycle_per_pixel/FOV_Pix == delta_kx 
+# [1] TRUE
 
-# Only first two entries and all other entries are set to 0:
-kspace2 = kspace
-kspace2[3:length(kspace2)] = 0 
-
-IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("First two entries, rest = 0"), axes = FALSE)
-
-
-# Only one value in the center area ([129,129]) is above 0:
-kspace2 = kspace
-kspace2[1:(.5*nrow(kspace2)), 1:ncol(kspace2)] = 0 
-kspace2[(2+.5*nrow(kspace2)):nrow(kspace2), 1:ncol(kspace2)] = 0 
-kspace2[1+.5*nrow(kspace2),.5*nrow(kspace2)] = 0
-kspace2[1+.5*nrow(kspace2),1:(.5*ncol(kspace2))] = 0
-kspace2[1+.5*nrow(kspace2),(2+.5*ncol(kspace2)):ncol(kspace2)] = 0
-
-IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("Entry [129,129], rest = 0"), axes = FALSE)
-
-# Only entry [(.75*nrow(kspace2)),128] and all other entries are set to 0:
-kspace2 = kspace
-kspace2[1:length(kspace2)] = 0 
-kspace2[(.75*nrow(kspace2)),128] = kspace[(.75*nrow(kspace2)),128]
-
-IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("Enrtry [(.75*nrow(kspace2)),128], rest = 0"), axes = FALSE)
-
-# Only entry [(.5*nrow(kspace2)),2*128] and all other entries are set to 0:
-kspace2 = kspace
-kspace2[1:length(kspace2)] = 0 
-kspace2[(.5*nrow(kspace2)),2*128] = kspace[(.75*nrow(kspace2)),128]
-
-IFT_image = Re(fft(kspace2[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("Enrtry [(.5*nrow(kspace2)),2*128], rest = 0"), axes = FALSE)
+# Imagine we only take every second element / pixel of the k-space,
+# see what happens to the field of view:
+delta_undersamp = 2/4 # k_max will still be 2!
+FOV_Pix_undersamp = 1/delta_undersamp
+# [1] 2
 
 
 #### Set plot grid to 1x2:
-par(mfrow = c(1, 2))  
+par(mfrow = c(2, 2))  
 
 # Aliasing effect
 rangex = 1:ncol(kspace)
@@ -2487,7 +2487,154 @@ rangey = 1:nrow(kspace)
 IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column only."), axes = FALSE)
 
+rangex = seq(1,length(kspace[,1]), by = 2)
+rangey = seq(1,length(kspace[,1]), by = 2)
+IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd row and col. only."), axes = FALSE)
+
 # Reset grid
 par(mfrow=c(1,1))
+
+
+# Only sampling one quadrant of the k-space:
+delta_Pix_samp = (1/(FOV_kx/2)) 
+# [1] 0.5 # ACTUALLY it is 2 pixels, but since we did not introduce units
+#         # it is just reflected as parts of 1
+delta_Pix*2 == delta_Pix_samp 
+# [1] TRUE
+
+
+#### Set plot grid to 2x2 again:
+par(mfrow = c(2, 2))  
+
+# Successively reconstructing one quadrant of the original image (upper-left quadrant 
+# of the k-space via IFT (includes normalization factor)): 
+rangex = 1:10
+rangey = 1:10
+IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row,col = 10,10"), axes = FALSE)
+
+rangex = 1:25
+rangey = 1:25
+IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row,col =25,25"), axes = FALSE)
+
+rangex = 1:75
+rangey = 1:75
+IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row,col = 75,75"), axes = FALSE)
+
+rangex = 1:(ncol(kspace)/2)
+rangey = 1:(nrow(kspace)/2)
+IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row,col = 128,128"), axes = FALSE)
+
+# Reset plot grid:
+par(mfrow = c(1,1))
+
+# R can somehow handle non-integer indices:
+rangex = 1:(ncol(kspace)/2)/2
+rangey = 1:(nrow(kspace)/2)/2
+IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT row,col = 128,128 divided by 2"), axes = FALSE)
+
+
+# High-pass filter: every element outside the radius will have the value 1,
+# every matrix element inside the circle will have the value 0. Applying
+# the high-pass filter will be done via a nested for loop. The kspace
+# is then simply multiplied with the high-pass matrix, meaning every value inside
+# the high-pass filter radius will be set to 0 (other way around with high-pass filter).
+# The high-pass/low-pass matrix can essentially be seen as a 2D hat function with
+# discrete values (integers essentially).
+
+# For the low-pass filter we will use the same code, just the other way around, 
+# such that everything outside the radius is set to zero not 1...
+# Recreated from this python script: https://www.physi.uni-heidelberg.de/Einrichtungen/AP/python/FFT_lena.html 
+signal2D = matrix(c(0,1,0,1,
+                    1,0,1,0,
+                    0,1,0,1,
+                    1,0,1,0), ncol = 4, byrow = TRUE)
+# Calculate kspace for simple chess board signal:
+kspacetest = fft(signal2D)
+# kspace for DICOM image:
+kspaceDICOM = fft(data$img)
+# Choose which k-space you want to try out
+kspace_pass = kspaceDICOM
+#kspace_pass = kspacetest
+
+# Use kspace matrix as base for the high-pass/low-pass matrix (all values
+# will be changed anyways):
+high_pass = Re(kspace_pass) 
+# Create objects for length of cols and rows:
+ncols = ncol(kspace_pass)
+nrows = nrow(kspace_pass)
+# Set radius (essentially integer frequency boundary for high-/low-pass filter)
+radius = 20
+for(indexI in 1:nrow(kspace_pass)){
+  for(indexJ in 1:ncol(kspace_pass)){ 
+    # The below is essentially the formula for the modulus in relation to a set radius:
+    if((((indexI-1) - (nrows-1)/2)^2 + ((indexJ-1) - (ncols-1)/2)^2) > radius^2){ 
+      high_pass[indexI,indexJ] = 1   # FOR LOW-PASS just set if < radius^2
+    }
+    else{
+      high_pass[indexI,indexJ] = 0
+    }
+  } # End for indexJ
+} # End for indexI  
+
+high_pass 
+# Result for radius 1 and chess board example (> radius^2):
+#      [,1] [,2] [,3] [,4]
+# [1,]    1    1    1    1
+# [2,]    1    0    0    1
+# [3,]    1    0    0    1
+# [4,]    1    1    1    1
+
+# For low-pass version with < radius^2 set!
+#      [,1] [,2] [,3] [,4]
+# [1,]    0    0    0    0
+# [2,]    0    1    1    0
+# [3,]    0    1    1    0
+# [4,]    0    0    0    0
+
+# Apply high-pass filter to original k-space simple multiplication with high_pass! 
+# (DON'T FORGET TO SHIFT k-SPACE HERE!!)
+kspace_high_pass = fftshift2D(kspace_pass)*high_pass
+
+
+# Plot results:
+par(mfrow = c(1,2))
+IFT_image = Re(fft(kspace_pass, inverse = TRUE) / length(kspace))
+graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace"), axes = FALSE)
+
+IFT_image = Re(Mod(fft(kspace_high_pass, inverse = TRUE)/ length(kspace)))^0.2
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. high-pass filter, radius 20"), axes = FALSE)
+par(mfrow = c(1,1))
+
+
+#### Gaussian filter:
+x = c((-(ncols-1)/2):0,1:(ncols/2))
+y = c((-(nrows-1)/2):0,1:(nrows/2))
+sigma = 100 # kernel bandwidth
+Gaussian = outer(x,y, function(x,y) exp(-(x^2+y^2)/(2*sigma^2)))
+Gaussian = Gaussian/sum(Gaussian)
+
+# Plot 3D Gaussian Kernel:
+persp3d(x,y,Gaussian, col = "deeppink")
+
+# Apply Gaussian Kernel filter and Plot results:
+kspace_Gaussian = kspace_pass*Gaussian
+
+par(mfrow = c(1,2))
+IFT_image = Re(fft(kspace_pass, inverse = TRUE) / length(kspace))
+graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace"), axes = FALSE)
+
+IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
+par(mfrow = c(1,1))
+
+
+
+
 
 
