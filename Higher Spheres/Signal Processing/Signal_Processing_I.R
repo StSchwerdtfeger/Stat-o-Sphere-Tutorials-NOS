@@ -2722,13 +2722,11 @@ IFT_image = Mod(fft(kspace_high_pass, inverse = TRUE)/ length(kspace))^0.2
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. high-pass filter, radius 20"), axes = FALSE)
 par(mfrow = c(1,1))
 
-
 #### Gaussian filter:
-x = c((-(ncols-1)/2):0,1:(ncols/2))
-y = c((-(nrows-1)/2):0,1:(nrows/2))
+x = c(((-(ncols)/2)+1):0,1:(ncols/2))
+y = c(((-(nrows)/2)+1):0,1:(nrows/2))
 sigma = 100 # kernel bandwidth
-Gaussian = outer(x,y, function(x,y) exp(-(x^2+y^2)/(2*sigma^2)))
-Gaussian = Gaussian/sum(Gaussian)
+Gaussian = outer(x,y, function(x,y) exp(-(x^2+y^2)/(sigma^2)))
 
 # Plot 3D Gaussian Kernel:
 persp3d(x,y,Gaussian, col = "deeppink")
@@ -2736,16 +2734,11 @@ persp3d(x,y,Gaussian, col = "deeppink")
 # Apply Gaussian Kernel filter and Plot results:
 kspace_Gaussian = kspace_pass*Gaussian
 
-par(mfrow = c(1,2))
 IFT_image = Re(fft(kspace_pass, inverse = TRUE) / length(kspace))
 graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace"), axes = FALSE)
 
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
-
-
-
-
 
 
