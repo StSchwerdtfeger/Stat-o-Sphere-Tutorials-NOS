@@ -2467,7 +2467,7 @@ par(mfrow = c(1,2))
 # Plot frequency phase and amplitude as wave:
 time = seq(0,1,length.out = 100)
 wave_kx = magnitude*cos(2*pi*(kxshift*time)+phase)
-wave_ky = magnitude*cos(2*pi*(kxshift*time)+phase) 
+wave_ky = magnitude*cos(2*pi*(kyshift*time)+phase) 
 plot(time,wave_kx, type = "l", main = paste("Frequency of kx = ",kxshift), xlab = "0 to 1 Hz") 
 plot(time,wave_ky, type = "l", main = paste("Frequency of ky = ",kyshift), xlab = "0 to 1 Hz") 
 par(mfrow = c(1,1))
@@ -2740,5 +2740,6 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
+
 
 
