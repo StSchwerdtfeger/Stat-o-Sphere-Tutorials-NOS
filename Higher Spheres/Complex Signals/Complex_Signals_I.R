@@ -38,7 +38,7 @@ library("patchwork") # for simple grid syntax for more than 1 plot in .gif (alte
 #################################
 #####################################################################
 # 1.1 History of Complex Numbers Concerning Solutions for Quadratic #
-#     and Cubic Equations with the Root of Negative Values          #
+#     and Cubic Equations Entailing the Root of Negative Values     #
 #####################################################################
 
 # The square root of -1 is not defined, but can be calculated via
@@ -64,8 +64,10 @@ quad_equ = function(x,a,b,c){
 
 # Set up sequence of values (you may need to adjust for different quad. equations):
 x = seq(-6,4,by=.01)
+
 # Example = 2*x^2 + 4 * x + 2 
 quad_equ(x=x,a=2,b=4,c=2)
+
 # Plot example quad equation:
 plot(x,quad_equ(x=x,a=2,b=4,c=2), type = "l", ylim = c(-10,40))
 abline(v=0)
@@ -80,7 +82,7 @@ quad_form = function(a,b,c){
 
 quad_form(2,4,2)
 # [1] -1 -1 # both results are the same, so in this case there is only one point  
-            # crossing or better: touching the x-axis at y = 0. 
+            # crossing or better: tangently touching the x-axis at y = 0. 
 
 # Set up sequence of values (you may need to adjust for different quad. equations):
 x = seq(-6,4,by=.01)
@@ -96,16 +98,16 @@ abline(h = 0)
 quad_form(-2,-4,-4)
 # > quad_form(-2,-4,-4)
 # [1] NaN NaN
-# Warnmeldungen:
-# 1: In sqrt(b^2 - 4 * a * c) : NaNs wurden erzeugt
-# 2: In sqrt(b^2 - 4 * a * c) : NaNs wurden erzeugt
+# Warning:
+# 1: In sqrt(b^2 - 4 * a * c) : NaNs produced
+# 2: In sqrt(b^2 - 4 * a * c) : NaNs produced
 
 x1 = (-4 + sqrt((-4)^2-4*(-2)*(-4))) / (2*-(2))
 # The part within the square root results in a negative number:
 (-4)^2-4*(-2)*(-4)
 # [1] -16
 
-# Same in x2
+# Same in x2:
 x2 = (-(-4) - sqrt((-4)^2-4*(-2)*(-4))) / (2*(-2))
 (-4)^2-4*(-2)*(-4)
 # [1] -16
@@ -142,7 +144,7 @@ cubic_roots_la = function(a,b,c,d){
                     # to finding the roots of a polynomial by using the QR method vi eigen()
                     roots = eigen(comp_mat)$values
                     return(roots)
-} # End of cubic_formula
+} # End of cubic_roots_la
  
 # Test function:
 cubic_roots_la(2, 0, -5, 10)
@@ -159,7 +161,8 @@ cubic_roots_la(2, 0, -5, 10)
 i = complex(real = 0, imaginary = 1)
 # [1] 0+1i
 
-# With the above 0+1i we can create any complex number (alternative use parameters of complex()):
+# With the above object 0+1i we can create any complex number 
+# (alternative use parameters of complex()):
 2+2*i
 # [1] 2+2i
 
@@ -182,7 +185,7 @@ grid2Dcomp = function() {
 } # End of function
 
 # Create fresh grid
-grid2Dcomp()
+grid2Dcomp() # no input value needed!
 
 # Complex numbers behave a lot like vectors (at least when it comes to
 # addition of vectors), but the second axes is not part of the "real" number plane: 
@@ -199,9 +202,9 @@ arrows(x0=0,y0=0,x1=Re(2+2*i), y = Im(2+2*i), col = "darkviolet")
 text(x = Re(2+2i)+.2,y = Im(2+2i)+.3, paste("2+0i + 0+2i","\n","= 2+2i", "~ (2|2)"))
 
 
-###############################################################################
-# 1.3 The Relation Between Trigonometry, Euler's Identity and Complex Numbers #
-###############################################################################
+################################################################################################################################
+# 1.3 The Relation Between Trigonometry, Euler's Identity / Formula (incl. Taylor/Maclaurin Series Proof) and Complex Numbers  #
+#############################################################################################################################
 #########################################################################
 # 1.3.1 Complex Numbers and 90° Rotations — First Hints of Trigonometry #
 #########################################################################
@@ -237,9 +240,9 @@ arrows(x0=0,y0=0,x1=Re(1+0*i), y = Im(1+0*i), col = "darkviolet")
 text(x=1.5,y=.25,"-1*i*i = 1+0i")
 
 
-#### Calculate the modulus/magnitude/absolut value and argument/phase/angle in R:
+#### Calculate the modulus/magnitude/absolute value and argument/phase/angle in R:
 Mod(2+2i)     # modulus
-abs(2+2i)     # usually for regular absolut value but also works with complex numbers
+abs(2+2i)     # usually for regular absolute value but also works with complex numbers
 sqrt(2^2+2^2) # via formula
 # The modulus / absolute value /phase of a complex number is the real part only when 0*i,
 # since e.g. sqrt(2^2+0^2) = 2
@@ -257,22 +260,27 @@ all.equal(2+2i, (abs(2+2i)*exp(im*Arg(2+2i))))
 # converting complex to polar coordinates. Below very similar to Matlab!
 atan2(Im(2+2i), Re(2+2i))          # via atan2()
 phase = Arg(2+2i)                  # via Arg()
-library("pracma") # for angle()
+library("pracma") # for angle(), Matlab style:
 phase = angle(2+2i)                # via angle()
 
 
 ##### The polar coordinates of a complex number can be obtained via P(Mod(2+2i)|Arg(2+2i)):
+
 # Set fresh grid:
 grid2Dcomp()
+
 # Draw 2 + 2i:
 arrows(x0=0,y0=0,x1=Re(2+2*i), y = Im(2+2*i))
+
 # Draw angle using exp(angle*i): 
 angle = seq(0,Arg(2+2*i),by = .001)
 lines(exp(angle*i), col = "darkviolet") # used e^Arg*i to create angle circle part in the plot below!
 text(x = 2,y = .5, paste("Arg =", round(Arg(2+2*i),3), "rad", "\n", "= ", (Arg(2+2*i)*180/pi),"°"), col = "darkviolet")
+
 # Draw line for Modulus:
 segments(x0=0,y0=0, x1=Im(2+2i),y=Re(2+2i), col = "darkgreen")
 text(x =.75,y = 1.5, paste("Mod = ", round(Mod(2+1i),3)), col = "darkgreen")
+
 # Label z = c = 2 + 2i:
 text(x = Re(2+2i)+.2, y = Im(2+2i)+.2, "z = 2+2i")
 
@@ -288,15 +296,18 @@ z_conj = Conj(z)
 
 # Set fresh grid:
 grid2Dcomp()
+
 # Draw 2 + 2i and its conjugate:
 arrows(x0=0,y0=0,x1=Re(2+2*i), y = Im(2+2*i))
 arrows(x0=0,y0=0,x1=Re(2+2*i), y = Im(2-2*i)) # just change the sign from + to - !
+
 # Draw angle using exp(angle*i): 
 angle = seq(0,Arg(2+2*i),by = .001)
 lines(exp(angle*i), col = "darkviolet") # used e^Arg*i to create angle circle part in the plot below!
 lines(exp(angle*-i), col = "darkviolet") # coonjugate angle e^Arg*-i 
 text(x = 2.2,y = .5, paste("Arg =", round(Arg(2+2*i),3), "rad", "\n", "= ", (Arg(2+2*i)*180/pi),"°"), col = "darkviolet")
 text(x = 2.2,y = -.5, paste("Arg =", round(Arg(2-2*i),3), "rad", "\n", "= ", (Arg(2-2*i)*180/pi),"°"), col = "darkviolet") # Conjugate
+
 # Draw line for Modulus:
 # Conjugate HERE 2+2i needed for the Re() part... Better use Conj() function in R
 segments(x0=0,y0=0, x1=Im(2+2i),y=Re(2+2i), col = "darkgreen")
@@ -304,6 +315,7 @@ segments(x0=0,y0=0, x1=Im(2+2i),y=Re(2-2i), col = "darkgreen")
 segments(x0=0,y0=0, x1=Re(Conj(2+2i)),y=Im(Conj(2+2i)), col = "darkgreen") #
 text(x =.75,y = 1.5, paste("Mod = ", round(Mod(2+1i),3)), col = "darkgreen")
 text(x =.75,y = -1.5, paste("Mod = ", round(Mod(2-1i),3)), col = "darkgreen") # Conjugate
+
 # Label z = c = 2 + 2i:
 text(x = Re(2+2i)+.7, y = Im(2+2i)+.2, "z = 2+2i")
 text(x = Re(2-2i)+.7, y = Im(2-2i)+.2, expression(paste(bar(z)," = 2-2i")))
@@ -362,7 +374,7 @@ exp(2*Arg(exp(2))) == cos(Arg(exp(2)))+sin(Arg(exp(2)))
 # [1] TRUE
 
 # Euler's number via 1+sum(1/n!) for n -> inf. Below we will
-# go up to n_max = 100 
+# go up to n_max = 100: 
 fact_max = c(1:100)
 # Initialize result object:
 euler = 1 # it's 1, since it starts with 1/1!, 
@@ -514,7 +526,7 @@ par(mfrow = c(1,1))
 
 #######################################################################
 # 1.3.3 Euler’s Identity and Euler’s Formula — Trigonometry Involving #
-# Complex Numbers and Euler’s number.                                 #
+# Complex Numbers and Euler’s Number.                                 #
 #######################################################################
 
 ##### Euler's identity:
@@ -523,9 +535,11 @@ par(mfrow = c(1,1))
 # also round though using the round() function:
 exp(i*pi)
 # -1+1.224606e-16i # bi ~ 0i 
+
 # Alternative via extracting the real part only:
 Re(exp(i*pi)) == -1
 # [1] TRUE
+
 # Version via rounding, such that 1.224606e-16i == 0*i
 round(exp(i*pi)) == -1
 # [1] TRUE
@@ -559,17 +573,14 @@ for(index in 1:length(steps)){ # CAVE: DON'T CALL INDEX "i" HERE, when i = compl
 # Reset grid
 par(mfrow = c(1,1))
 
-
 #### Relation to e^i*Arg(0+1i) or *theta (angle instead of argument):
 theta = 20 # for 20°
 exp(i*theta) == cos(theta)+i*sin(theta) 
 # 0.4080821+0.9129453i ==  0.4080821 + i * 0.9129453
 
-
 #### Showing that the Taylor and Maclaurin series of cos()+i*sin() = e^ix, 
 # where x = seq(from = -10,to = 10,by = .1); result is rounded to 5 decimal spaces:
 round(cos_tayl(100) + complex(real=0,imaginary=1)*sin_tayl(100),5) == round(exp(complex(real=0,imaginary=1)*seq(from = -10,to = 10,by = .1)),5)
-
 
 #### Plot exp(2*pi*time*i) from different perspectives of the dimensions Re(), Im() and for each time:
 # Set up sequence 0-1Hz:
@@ -577,7 +588,6 @@ time = seq(0,1, by= .001)
 x = Re(exp(2*pi*time*i)) # x-axis = real dimension
 y = Im(exp(2*pi*time*i)) # y-axis = imaginary / complex domain
 z = time                 # temporal dimension 
-
 
 ### Base plot perspectives triplet with exp(2*pi*time*i), where time = 0-1Hz:
 par(mfrow = c(2,2))
@@ -751,7 +761,8 @@ persp3d(x, y, z,
 
 # Plot a Square wave:
 time = seq(0,4*pi, by = .001)
-# Sign of a sine wave:
+
+# Sign of a sine wave = Square wave abstraction / simplification of a sine wave:
 square = sign(sin(time)) # time*frequency
 plot(time,square, type = "l")
 abline(h=0) # add x-axis at y = 0
@@ -819,6 +830,139 @@ lines(seq(-pi,pi,by =.001), fourier_series(n = 80, time_max = pi, fun = square_w
 # Reset plot 
 par(mfrow = c(1,1))
 
+#### Uncovering the meaning of the dot product and orthogonality, 
+# starting with linear algebra:
+grid2Dcomp()
+
+# Add two vectors that are in fact orthogonal (90° angle):
+arrows(x0=0,y0=0,x1=2, y = 0, col = "darkviolet")
+arrows(x0=0,y0=0,x1=0, y = 2, col = "darkviolet")
+arrows(x0=0,y0=0,x1=-2, y = 0, col = "darkviolet")
+text(x = 1, y = 2, "v1 = c(0,2)")
+text(x = 2, y = -.5, "v2 = c(2,0)")
+text(x = -2, y = -.5, "v3 = c(-2,0)")
+
+# Two different ways to calculate the inner product in linear algebra:
+# Via multiplying an then summing vectors:
+sum(c(0,2)*c(2,0)) == 0 
+# [1] TRUE # as we can see, they are orthogonal
+
+# What R does is essentially this: multiplying vector 
+# elements with the same index and summing the results:
+0*2 + 2*0 == 0
+# [1] TRUE
+
+# Second method via angle/radians, here 90°, i.e. orthogonality:
+Mod(c(0,2))*Mod(c(2,0))*cos(90*pi/180) == c(0,0)
+# [1] TRUE TRUE
+
+### Dot product for equivalent vectors:
+sum(c(0,1)*c(0,1)) == 1
+# [1] TRUE
+sum(c(0,2)*c(0,2)) == 4
+# [1] TRUE
+
+### Orthogonal vectors:
+sum(c(1,0)*c(0,1)) == 0 && sum(c(2,0)*c(0,2)) == 0  
+# [1] TRUE
+
+### Opposite vectors:
+sum(c(0,1)*c(0,-1)) == -1
+# [1] TRUE
+sum(c(0,2)*c(0,-2)) == -4
+# [1] TRUE
+
+# Periodicity and why integer frequencies are used for the FS:
+x = seq(0,2*pi,by= .01)
+plot(x, sin(x), type = "l", col = "blue")
+lines(x,sin(2*x), col = "green")
+lines(x, sin(2.7*x), col= "red")
+abline(v=pi ,lty = 4)
+abline(v=pi/2 ,lty = 4)
+abline(v=3*pi/2 ,lty = 4)
+
+
+##### Visualising orthogonality of sine and cosine in comparison 
+####  to exp(2*pi*time*i); time = 0-2Hz:
+par(mfrow = c(1,2))
+
+# Set up sequence 0-1Hz
+time = seq(0,2, by= .001)
+x = Re(exp(2*pi*time*i)) # x-axis = real dimension
+y = Im(exp(2*pi*time*i)) # y-axis = imaginary / complex domain
+z = time                 # temporal dimension 
+
+# Plot exp(2*pi*time*i)
+plot(x,y, xlab = "Re(exp(2*pi*time*i))", ylab = "Im(exp(2*pi*time*i))",type="l")
+
+# Draw exp(2*pi*.25*i)
+arrows(x0=0,y0=0,x1=Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)))
+
+# Draw angle using exp(2*pi*.25*i): 
+angle = seq(0,Arg(exp(2*pi*.25*i)),by = .001) # sequence for angle circle and marking of the actual circle
+lines(.5*exp(angle*i), col = "violet") # angle circle
+lines(1*exp(angle*i), col = "violet")  # matching circle and sine/cosine wave for Hz = .25
+segments(x0=0,y0=0,x1=1,y1=0)          # draw line from Re() = 0 to Re() = 1 and 0 on th Im() plane
+
+# Add text for Arg and Angle in Degrees:
+text(x = .6,y = .6, paste("Arg = ", round(Arg(exp(2*pi*.25*i)),3),"rad", "\n", "=", (Arg(exp(2*pi*.25*i))*180/pi),"°"), col = "violet", cex=1)
+text(x = .2,y = .2, "Arg" , col = "violet", cex=1)
+
+# Draw Modulus of exp(2*pi*.25*i) and add text:
+segments(x0=0,y0=0, x1=Re(exp(2*pi*.25*i)),y=Im(exp(2*pi*.25*i)), col = "darkgreen")
+text(x =-.4,y = .5, paste("Mod = ", round(Mod(exp(2*pi*.25*i)),3)), col = "darkgreen")
+
+# Label z = c = exp(2*pi*.25*i):
+text(x = Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)), "z = exp(2*pi*.25*i)")
+
+# Plot corresponding sine wave:
+plot(z,y, xlab = "time = 0-2Hz", ylab = "sin(2*pi*time) and cos(2*pi*time)", type="l",
+     main = "Dot product: cos(2*pi*.25)*sin(2*pi*.25) = 0")
+
+# Add line from 0-.25 Hz on the sine wave, corresponding to Arg = 90°;
+# Setup new shortened sequence:
+time2 = seq(0,.25, by= .001)
+x2 = time2
+y2 = Im(exp(2*pi*time2*i))
+lines(x2,y2,col = "violet") # use lines to add to add line from 0-.25Hz to existing plot
+# Add cosine plot:
+lines(z,x, xlab = "sin(2*pi*time) and cosine(2*pi*time)")
+# Setup sequence for cosine wave 0-.25Hz:
+x3 = Re(exp(2*pi*time2*i)) 
+y3 = time2
+lines(y3,x3,col="violet") # add line to plot...
+points(.25,round(cos(2*pi*.25),15))
+points(.25,round(sin(2*pi*.25),15))
+abline(h = 0)
+
+# ####### OPTIONAL ADD Cosine with frequency of 2 -> also orthogonal
+# x_freq_2 = Im(exp(2*2*pi*time*i)) # x-axis = real dimension
+# lines(z,x_freq_2)
+# x3 = Im(exp(2*2*pi*time2*i)) # for pink line
+# lines(y3,x3,col="violet") # add line to plot...
+# points(.25,round(sin(2*2*pi*.25),15)) # WILL ALSO BE AT ZERO!!
+# # Non-integer frequency 2.568:
+# x_freq_2.568 = Im(exp(2.568*2*pi*time*i)) # x-axis = real dimension
+# lines(z,x_freq_2.568)
+# x4 = Im(exp(2.568*2*pi*time2*i)) # for pink line
+# lines(y3,x4,col="red") # add line to plot...
+# #points(.25,round(sin(2.568*2*pi*.25),15)) # WILL BE SLIGHTY DRIFTED!
+# abline(v = .25, lty = 4)
+
+# Rest grid to 1x1:
+par(mfrow = c(1,1))
+
+#### The above essentially shows that they are orthogonal:
+round(cos(2*pi*.25),15)*round(sin(2*pi*.25),15)
+# [1] 0
+
+#### Orthogonality also holds for unequal frequency!
+round(cos(2*pi*.25),15)*round(sin(4*2*pi*.25),15)
+# [1] 0
+
+#### Orthogonality also holds for unequal frequency, here cos() times cos()!
+round(cos(2*pi*.25),15)*round(cos(2*2*pi*.25),15)
+# [1] 0
 
 ### Test for orthogonality of cosine and sine:
 x = seq(-2*pi, 2*pi, by = .0001)
@@ -861,53 +1005,11 @@ sum(g_mn(x))
 # Plot of cosine and sine and sum/integral of 
 # cosine*sine - the dot product of sine and cosine: 
 plot(x,cos(x), type = "l", col = "blue", ylab = "") # cos
+lines(x,sin(x), type = "l", col = "green")          # sine
 lines(x, g_mn(x), type = "l", col = "deeppink")     # sin*cos
 abline(h=0,v=0)
 # The integral of g(x) = integral of cos*cos will be clearly above 0 in this case!
 
-
-#### Uncovering the meaning of the dot product and orthogonality, 
-# starting with linear algebra:
-grid2Dcomp()
-
-# Add two vectors that are in fact orthogonal (90° angle):
-arrows(x0=0,y0=0,x1=2, y = 0, col = "darkviolet")
-arrows(x0=0,y0=0,x1=0, y = 2, col = "darkviolet")
-arrows(x0=0,y0=0,x1=-2, y = 0, col = "darkviolet")
-text(x = 1, y = 2, "v1 = c(0,2)")
-text(x = 2, y = -.5, "v2 = c(2,0)")
-text(x = -2, y = -.5, "v3 = c(-2,0)")
-
-# Two different ways to calculate the inner product in linear algebra:
-# Via multiplying an then summing vectors:
-sum(c(0,2)*c(2,0)) == 0 
-# [1] TRUE # as we can see, they are orthogonal
-
-# What R does is essentially this: multiplying vector 
-# elements with the same index and summing the results:
-0*2 + 2*0 == 0
-# [1] TRUE
-
-# Second method via angle/radians, here 90°, i.e. orthogonality:
-Mod(c(0,2))*Mod(c(2,0))*cos(90*pi/180) == c(0,0)
-# [1] TRUE TRUE
-
-
-### Dot product for equivalent vectors:
-sum(c(0,1)*c(0,1)) == 1
-# [1] TRUE
-sum(c(0,2)*c(0,2)) == 4
-# [1] TRUE
-
-### Orthogonal vectors:
-sum(c(1,0)*c(0,1)) == 0 && sum(c(2,0)*c(0,2)) == 0  
-# [1] TRUE
-
-### Opposite vectors:
-sum(c(0,1)*c(0,-1)) == -1
-# [1] TRUE
-sum(c(0,2)*c(0,-2)) == -4
-# [1] TRUE
 
 #### For pi/2, where a cosine wave and the square wave overlap:
 square_wave(pi/2)*cos((1*pi*(pi/2))/pi)
@@ -917,7 +1019,7 @@ all.equal(0, square_wave(pi/2)*cos((1*pi*(pi/2))/pi))
 
 
 ###############################################################################
-# 2.2.x Sampling a Frequency as Winding up a Signal onto to the Complex Plane #
+# 2.2.2 Sampling a Frequency as Winding up a Signal onto to the Complex Plane #
 ###############################################################################
 
 
@@ -951,12 +1053,12 @@ g_t = cos(2*pi*freq*time)
 # This cosine wave is used in the 3blue1brown video, shifted upwards, creates dented circle at samp_f == freq
 #g_t = cos(2*pi*freq*time) + 1 
 
-# More than one frequency
+# More than one frequency:
 #freq1 = 3; freq2 = 6
 #amp1 = 3 ; amp2 = 2
 #g_t = amp1*cos(2*pi*freq1*time) + amp1*cos(2*pi*freq2*time)
 
-# Square wave
+# Square wave:
 #g_t = sin(2*pi*freq*time) + 0*sin(2*2*pi*freq*time) + (1/3)*sin(3*2*pi*freq*time)
 
 # Sawtooth:
@@ -1206,9 +1308,69 @@ library("magick")
 #image_write(anime, "fft_animation.gif")
 
 
-######################################################
-# 2.3 Fast Fourier Transformation (Cooley-Tukey FFT) #
-######################################################
+########################################################################################################################
+# 2.3 The Discrete Fourier Transformation (DFT and its Inverse) and the Fast Fourier Transformation (Cooley-Tukey FFT) #
+########################################################################################################################
+#############################################################
+# 2.3.1 The Discrete Fourier Transformation and its Inverse #
+#############################################################
+
+#### Discrete Fourier Transformation:
+d_ft = function(signal){
+  k = c(0:(length(signal)-1)) 
+  i = complex(real=0,imaginary=1)
+  result = 0
+  # Looping over k (harmonics):
+  for(index in 0:(length(signal)-1)){ # Here the index is part of the formula
+    # referring to the time-step/domain
+    # and has to start with zero - R vectors 
+    # start with one, so it needs some work around!
+    result[index+1] = sum(signal*exp((-2*pi*i*index*k)/length(signal)))
+  }# End for index
+  return(result)
+} # End of d_ft
+
+#### Understanding k^th harmonics of a signal:
+x = seq(0,2*pi, length.out = 16) # make sure N == number to the power of 2, here 2^4!
+x2 = seq(0,2*pi, length.out = 1000) # for lines() plot of k^th freq with higher resolution
+signal = sin(x*7) # our example signal
+k = c(1:((length(signal)/2))-1) # integer from 0 to (N/2)-1 
+
+# Plot discrete data points:
+plot(x, signal, ylab = "sine(x*2)", xlab = paste("Discrete Sampling Points of the Signal Sin(x*7) incl. k^th Harmonic.","\n","N_signal = 16. We see 7 sine waves, since k[1]=0."))
+
+# In the case of a sine wave as signal, we can see that the k^th harmonic 
+# with a frequency of 7 lays exactly on all the points of our initial signal sin(x*7):
+for(index in 1:length(k)){
+  lines(x2,sin(x2*k[index]), col = "deeppink")
+} # End for index
+
+### Function for the inverse discrete Fourier transformation:
+inverse_d_ft = function(ft){
+  k = c(0:(length(ft)-1)) 
+  i = complex(real=0,imaginary=1)
+  result = 0
+  # Looping over k (harmonics):
+  for(index in 0:(length(ft)-1)){ # as DFT, but ft as input, 1/N as factor and +2*pi (!) etc.:
+    result[index+1] = (1/length(ft))*sum(ft*exp((+2*pi*i*index*k)/length(ft)))
+  }# End for index
+  return(result)
+} # End of inverse_d_ft
+
+# Reconstruct original sine wave from complex numbers from DFT/FFT/FT:
+xift = seq(0,2*pi, length.out = 1000) # for better resolution of IFT signal
+signal = sin(xift*2) # our example signal
+plot(xift, inverse_d_ft(d_ft(signal)), type = "l")
+abline(h=0) # add axis at y=0
+
+# Check for equality of the signal and the IFT of the signal:
+all.equal(signal,Re(inverse_d_ft(d_ft(signal))))
+# [1] TRUE
+
+
+#####################################################################
+# 2.3.2 The Fast Fourier Transformation (Cooley-Tuckey Radix-2-FFT) #
+#####################################################################
 
 # Comparing N^2 and N*log_2 of N - below an example for 64 data points:
 n = 64 
@@ -1239,22 +1401,6 @@ lines(wave4hz, type = "l", col = "lightblue")
 lines(wave8hz, type = "l", col = "darkviolet")
 lines(wave16hz, type = "l", col = "orange")
 
-#### Arithmetics with vectors of unequal length, where v1 is not a multiple of v2:
-c(1,1) + c(1,2,3)
-# [1] 2 3 4
-# Warning:
-# In c(1, 1) + c(1, 2, 3) : longer object length is not a multiple of shorter object length
-c(1,1) * c(1,2,3)
-# [1] 1 2 3
-# Warning:
-# In c(1, 1) * c(1, 2, 3) : longer object length is not a multiple of shorter object length
-
-#### Arithmetics with vectors of unequal length, where v2 has twice the length of v1:
-c(1,1) + c(1,2,3,4)
-# [1] 2 3 4 5
-c(1,1) * c(1,2,3,4)
-# [1] 1 2 3 4
-
 #### Example Cooley Tukey FFT function, based on Wikipedia pseudo code:
 ct_fft = function(signal) {
   # Base case
@@ -1278,45 +1424,25 @@ ct_fft = function(signal) {
   return(c(even_plus, even_minus)) # vector with results
 } # End of function ct_fft()
 
-# Sine wave with freq of 2 as test signal with length 8^2:
-x = seq(0,2*pi, length.out = 64) # make sure N == power of 2, here 8^2!
+# Sine wave with freq of 2 as test signal with length 2^6:
+x = seq(0,2*pi, length.out = 64) # make sure N == power of 2, here 2^6!
 signal = sin(x*2) # our example signal
 
-# Check for equality:
+# Check for equality with R base function fft():
 all.equal(ct_fft(signal), fft(signal)) # Some minor deviations, so == does not result in all TRUE!
 # [1] TRUE
 
-#### Discrete Fourier Transformation:
-d_ft = function(signal){
-  k = c(0:(length(signal)-1)) 
-  i = complex(real=0,imaginary=1)
-  result = 0
-  # Looping over k (harmonics):
-  for(index in 0:(length(signal)-1)){ # Here the index is part of the formula
-    # referring to the time-step/domain
-    # and has to start with zero - R vectors 
-    # start with one, so it needs some work around!
-    result[index+1] = sum(signal*exp((-2*pi*i*index*k)/length(signal)))
-  }# End for index
-  return(result)
-} # End of d_ft
 
-#### Understanding k^th harmonics of a signal:
-x = seq(0,2*pi, length.out = 16) # make sure N == power of 2, here 4^2!
-x2 = seq(0,2*pi, length.out = 1000) # for lines() plot of k^th freq with higher resolution
-signal = sin(x*2) # our example signal
-k = c(0:((length(signal)/2)-1)) # integer from 0 to (N/2)-1 
-
-# Plot discrete data points:
-plot(x, signal, ylab = "sine(x*2)", xlab = paste("Discrete Sampling Points of the Signal incl. k^th Harmonic.","\n","N_signal = 16. We see 7 sine waves, since k[1]=0."))
-
-# In the case of a sine wave as signal, we can see that the k^th harmonic 
-# with a frequency of 2 lays exactly on all the points of our initial signal sin(x*2):
-for(index in 1:length(k)){
-  lines(x2,sin(x2*k[index]), col = "deeppink")
-} # End for index
+######################################################################
+# 2.3.3 The Symmetry of Sine or Cosine Waves in the Frequency Domain #
+######################################################################
 
 #### Plot frequency domain of ct_fft(signal):
+x = seq(0,2*pi, length.out = 16) # make sure N == number to the power of 2, here 2^4!
+x2 = seq(0,2*pi, length.out = 1000) # for lines() plot of k^th freq with higher resolution
+signal = sin(x*2) # our example signal
+k = c(1:((length(signal)/2))-1) # integer from 0 to (N/2)-1 
+# Plot:
 plot(c(1:length(ct_fft(signal)))-1,abs(ct_fft(signal)), type="l")
 
 # Index of value with the highest magnitude. Index = Freq, since we work with 
@@ -1324,7 +1450,7 @@ plot(c(1:length(ct_fft(signal)))-1,abs(ct_fft(signal)), type="l")
 which.max(abs(ct_fft(signal)))-1 # minus 1 to compensate for index starting with 1!
 # [1] 2
 
-#### Alternative formula for Fourier series of sine wave sin(-2*pi*2*x):
+#### Alternative formula for sine wave sin(-2*pi*2*x):
 all.equal(Re((exp(2*pi*i*2*x)-exp(-2*pi*i*2*x))/2*i), sin(-2*pi*2*x))
 # [1] TRUE
 Re((exp(2*pi*i*2*x)-exp(-2*pi*i*2*x))/2*i) == sin(-2*pi*2*x)
@@ -1333,7 +1459,7 @@ Re((exp(2*pi*i*2*x)-exp(-2*pi*i*2*x))/2*i) == sin(-2*pi*2*x)
 #### To get rid of the symmetry we can just plot half of the frequency domain:
 plot((c(1:length(ct_fft(signal)))-1)[1:length(signal)/2],abs(ct_fft(signal))[1:length(signal)/2], type="l")
 
-#### Alternative with adjusted x-axis using 1D fftshift matlab style:
+#### Alternative with adjusted y-axis using 1D fftshift matlab style:
 #### Function based on Matlab documentation: https://de.mathworks.com/help/matlab/ref/fftshift.html
 fftshift1D = function(signal){
   x = c(1:length(signal))
@@ -1361,28 +1487,6 @@ plot(x_axis_shift_fft(x), Re(fftshift1D(ct_fft(signal))), type = "l", xaxt = "n"
 # Adjust tick marks to show every tick mark step; first turn of tick marks of 
 # plot() via xaxt = "n":
 axis(1, at= seq(min(x_axis_shift_fft(x)),max(x_axis_shift_fft(x),by=1)))
-
-### Function for the inverse discrete Fourier transformation:
-inverse_d_ft = function(ft){
-  k = c(0:(length(ft)-1)) 
-  i = complex(real=0,imaginary=1)
-  result = 0
-  # Looping over k (harmonics):
-  for(index in 0:(length(ft)-1)){ # as DFT, but ft as input, 1/N as factor and +2*pi (!) etc.:
-    result[index+1] = (1/length(ft))*sum(ft*exp((+2*pi*i*index*k)/length(ft)))
-  }# End for index
-  return(result)
-} # End of inverse_d_ft
-
-# Reconstruct original sine wave from complex numbers from DFT/FFT/FT:
-xift = seq(0,2*pi, length.out = 1000) # for better resolution of IFT signal
-signal = sin(xift*2) # our example signal
-plot(xift, inverse_d_ft(d_ft(signal)), type = "l")
-abline(h=0) # add axis at y=0
-
-# Check for equality of the signal and the IFT of the signal:
-all.equal(signal,Re(inverse_d_ft(d_ft(signal))))
-# [1] TRUE
 
 
 #######################################
@@ -1460,6 +1564,11 @@ par(mfrow = c(1,2))
 plot(x, sin(x), type = "l", col = "blue", xlim = c(-4,4), main = "sin(x)")
 plot(x, 1/x, type ="l", col = "blue",xlim = c(-.5,.5), main = "1/x")
 par(mfrow = c(1,1))
+
+# Check if multiplication of sinc(x) and a asymptote holds:
+round(sin(x)*(1/x),7) == round(sinc_fun(x),7)
+# All true! Since asymptote(0) = Inf, whe get a NA at the beginng...
+# [1]   NA TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 
 # Plot of un-normalized sinc function and cos(x); ylim was adjusted:
 plot(x,sinc_fun(x), type = "l", col ="blue", ylab = "Sine Cardinal", ylim = c(-1,1))
@@ -1839,7 +1948,6 @@ par(mfrow=c(1,1))
 ###########################################################
 # 3 2D Fourier Transformation and a FFT on a 2D JPG Image #
 ###########################################################
-
 #############################
 # 3.1 Simple 2D FFT Example #
 #############################
@@ -1875,6 +1983,27 @@ for(index in 1:length(signal2D[1,])){
 # Compare FFT by row and by column with fft() R function that can handle 2D automatically
 freq_dom_2D == fft(signal2D)
 
+#### Doing the same but first columns than rows:
+#### First FFT on COLUMNS THIS TIME:
+freq_dom_2D_alt = signal2D
+for(index in 1:length(signal2D[1,])){
+  freq_dom_2D_alt[,index] = fft(signal2D[,index])
+} # End for inex => fft on rows
+
+# Than fft on the ROWS of the previous FFT on columns!
+for(index in 1:length(signal2D[,1])){
+  freq_dom_2D_alt[index,] = fft(freq_dom_2D_alt[index,])
+} # End for inex => fft on rows
+
+# Check for equality:
+freq_dom_2D == freq_dom_2D_alt
+# All TRUE!!
+#      [,1] [,2] [,3] [,4]
+# [1,] TRUE TRUE TRUE TRUE
+# [2,] TRUE TRUE TRUE TRUE
+# [3,] TRUE TRUE TRUE TRUE
+# [4,] TRUE TRUE TRUE TRUE
+
 # Here we have to use image to create a raster plot of the k-space:
 # Without log magnitude:
 par(mfrow=c(1,2))
@@ -1902,27 +2031,6 @@ image(Re(fft(freq_dom_2D, inverse = TRUE)),col = grey.colors(256), axes = FALSE,
       main = "IFFT of k-space")
 par(mfrow=c(1,2))
 
-# Doing the same but first columns than rows:
-# First FFT on COLUMNS THIS TIME:
-freq_dom_2D_alt = signal2D
-for(index in 1:length(signal2D[1,])){
-  freq_dom_2D_alt[,index] = fft(signal2D[,index])
-} # End for inex => fft on rows
-
-# Than fft on the ROWS of the previous FFT on columns!
-for(index in 1:length(signal2D[,1])){
-  freq_dom_2D_alt[index,] = fft(freq_dom_2D_alt[index,])
-} # End for inex => fft on rows
-
-# Check for equality:
-freq_dom_2D == freq_dom_2D_alt
-# All TRUE!!
-#      [,1] [,2] [,3] [,4]
-# [1,] TRUE TRUE TRUE TRUE
-# [2,] TRUE TRUE TRUE TRUE
-# [3,] TRUE TRUE TRUE TRUE
-# [4,] TRUE TRUE TRUE TRUE
-
 #######################################################################################################
 # 3.2 FFT and IFFT on JPG/JPEG Images and Recalling the Difference Between Time and Frequency Domain #
 #######################################################################################################
@@ -1931,22 +2039,27 @@ freq_dom_2D == freq_dom_2D_alt
 test_row = c(1,2,3,4,5)
 fft_test_row = round(fft(test_row), 3) # round for less overloaded console output:
 # [1] 15.0+0.000i -2.5+3.441i -2.5+0.812i -2.5-0.812i -2.5-3.441i
-which(fft_test_row == max(Re(fft_test_row)))
-# [1] 1 # highes value of real part at position one not 5
-which(Im(fft_test_row) == max(Im(fft_test_row)))
-# [1] 2 # highest value of imaginary part on position 2...
 
 # Plot test row:
 image(as.matrix(test_row),col = grey.colors(256), axes = FALSE, useRaster = TRUE, 
       main = "Signal = c(1,2,3,4,5)")
 
-# FFT of test row
-image(as.matrix(Re(fft_test_row)),col = grey.colors(256), axes = FALSE, useRaster = TRUE, 
+# Frequency domain of  test row (magnitude image): 
+image(as.matrix(Mod(fft_test_row)),col = grey.colors(256), axes = FALSE, useRaster = TRUE, 
       main = "Frequency Domain of fft(test_row)")
 
+# Shifted Frequency domain of test row (magnitude image): 
+image(as.matrix(Mod(fftshift1D(fft_test_row))),col = grey.colors(256), axes = FALSE, useRaster = TRUE,
+      main = "Shifted Frequency Domain of fft(test_row)")
+
+# Regular shifted frequency domain plot of the fft(test_row).
+# NOTE WE DID NOT USE x_axis_shift_shift(), since it was written for 
+# signals of even length:
+plot(c(-2,-1,0,1,2), as.matrix(Mod(fftshift1D(fft_test_row)))/5, type = "l", xlab = "Shifted x-axis",
+     main = "Regular Plot of Shifted Frequency Domain")
+abline(v =0, lty = 4)
 
 ### Looking at the Frequency Space of a JPG Image:
-
 #install.packages("imager")
 library("imager") # for load.image() and grayscale()
 
@@ -2426,9 +2539,7 @@ FOV_kx = 1/delta_kx
 FOV_kx == length(kspace[,1]) # => Equivalent with range of 1D frequencies! 
 # [1] TRUE
 
-# Example with mm and cm -- makes it easier to understand:
-# Say one pixel = one mm
-# 1/FOV_Pix, where FOV_Pix = 4cm (for our chess board example): 
+# 1/FOV_Pix, where FOV_Pix = 4 Pixels (for our chess board example): 
 delta_Pix = 1/4  
 # [1] 0.25
 FOV_Pix = 1/delta_Pix
@@ -2446,10 +2557,11 @@ lines(x,-cos(x*2), type = "l")
 # Relation \Delta k and \Delta Pix.:
 # 1/FOV_Pix, where FOV_Pix = 4cm (for our chess board example): 
 delta_Pix = 1/4 # same for \Delta k!!!   
-delta_kx = 1/4 # same for \Delta k!!!   
+delta_kx = 1/4 # same for \Delta Pix!!!   
 # [1] 0.25 # as part of 1 we can say this is 1 of four pixels!
+#          # and we need 1 cycle per pixel, delta_Pix!!
 FOV_Pix = 1/delta_Pix # Same for FOV_kx!!!
-FOV_kx = 1/delta_kx # Same for FOV_kx!!!
+FOV_kx = 1/delta_kx # Same for FOV_Pix.!!!
 # [1] 4
 
 delta_Pix == 1/FOV_kx
@@ -2490,7 +2602,7 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd column o
 rangex = seq(1,length(kspace[,1]), by = 2)
 rangey = seq(1,length(kspace[,1]), by = 2)
 IFT_image = Re(fft(kspace[rangex,rangey], inverse = TRUE) / length(kspace))
-image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd row and col. only."), axes = FALSE)
+image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of every 2nd row/col. only."), axes = FALSE)
 
 # Reset grid
 par(mfrow=c(1,1))
@@ -2607,7 +2719,7 @@ par(mfrow = c(1,2))
 IFT_image = Re(fft(kspace_pass, inverse = TRUE) / length(kspace))
 graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace"), axes = FALSE)
 
-IFT_image = Re(Mod(fft(kspace_high_pass, inverse = TRUE)/ length(kspace)))^0.2
+IFT_image = Mod(fft(kspace_high_pass, inverse = TRUE)/ length(kspace))^0.2
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. high-pass filter, radius 20"), axes = FALSE)
 par(mfrow = c(1,1))
 
@@ -2632,8 +2744,6 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
-
-
 
 
 
