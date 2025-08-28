@@ -1,8 +1,7 @@
 ###############################################
-#      Higher Spheres: Complex Signals I:     #
-#   Introducing Complex Numbers, the Fourier  #
-# Series / Transformation and its Application #
-#          in Information Technology          #
+#     Higher Spheres: Processing Signals I:   #
+#         Introducing Complex Numbers,        #
+#   the Fourier Series and Fourier Transform  #         
 #                     by                      #
 #           Steffen Schwerdtfeger             #
 #                  08.2025                    #
@@ -752,9 +751,9 @@ persp3d(x, y, z,
 
 
 
-############################
-# 2 Fourier Transformation #
-############################
+#######################
+# 2 Fourier Transform #
+#######################
 #########################################################################################
 # 2.1 Fourier Series of a Signal — Approximation of Functions via Summing up Sine Waves #
 #########################################################################################
@@ -1023,7 +1022,7 @@ all.equal(0, square_wave(pi/2)*cos((1*pi*(pi/2))/pi))
 ###############################################################################
 
 
-# The following is based on the 3blue1brown tutorial on Fourier Transformation.
+# The following is based on the 3blue1brown tutorial on Fourier Transform.
 # https://www.youtube.com/watch?v=spUNpyF58BY&t=70s  
 # There is also a python script that produces mostly equivalent results, however the
 # python code is not well documented and therefore hard to read for beginners and 
@@ -1308,14 +1307,14 @@ library("magick")
 #image_write(anime, "fft_animation.gif")
 
 
-########################################################################################################################
-# 2.3 The Discrete Fourier Transformation (DFT and its Inverse) and the Fast Fourier Transformation (Cooley-Tukey FFT) #
-########################################################################################################################
-#############################################################
-# 2.3.1 The Discrete Fourier Transformation and its Inverse #
-#############################################################
+##############################################################################################################
+# 2.3 The Discrete Fourier Transform (DFT and its Inverse) and the Fast Fourier Transform (Cooley-Tukey FFT) #
+##############################################################################################################
+########################################################
+# 2.3.1 The Discrete Fourier Transform and its Inverse #
+########################################################
 
-#### Discrete Fourier Transformation:
+#### Discrete Fourier Transform:
 d_ft = function(signal){
   k = c(0:(length(signal)-1)) 
   i = complex(real=0,imaginary=1)
@@ -1345,7 +1344,7 @@ for(index in 1:length(k)){
   lines(x2,sin(x2*k[index]), col = "deeppink")
 } # End for index
 
-### Function for the inverse discrete Fourier transformation:
+### Function for the inverse discrete Fourier transform:
 inverse_d_ft = function(ft){
   k = c(0:(length(ft)-1)) 
   i = complex(real=0,imaginary=1)
@@ -1368,9 +1367,9 @@ all.equal(signal,Re(inverse_d_ft(d_ft(signal))))
 # [1] TRUE
 
 
-#####################################################################
-# 2.3.2 The Fast Fourier Transformation (Cooley-Tuckey Radix-2-FFT) #
-#####################################################################
+################################################################
+# 2.3.2 The Fast Fourier Transform (Cooley-Tuckey Radix-2-FFT) #
+################################################################
 
 # Comparing N^2 and N*log_2 of N - below an example for 64 data points:
 n = 64 
@@ -1945,9 +1944,9 @@ plot(x,conv_a_b2,type = "l", col ="blue",main = "Convolution of rect(x) and rect
 par(mfrow=c(1,1))
 
 
-###########################################################
-# 3 2D Fourier Transformation and a FFT on a 2D JPG Image #
-###########################################################
+######################################################
+# 3 2D Fourier Transform and a FFT on a 2D JPG Image #
+######################################################
 #############################
 # 3.1 Simple 2D FFT Example #
 #############################
@@ -2072,7 +2071,7 @@ image = grayscale(image)
 # Plot image to test if upload was correct and gray scaling was correct:
 plot(image, main = "Original Image, Grey Scaled")
 
-# Perform Fourier Transformation (via Fast Fourier Transformation == fft()):
+# Perform Fourier Transform (via Fast Fourier Transform == fft()):
 image_fft = fft(image)
 
 # Calculate the log scale of the magnitude of the frequency spectrum, 
@@ -2099,7 +2098,7 @@ par(mfrow = c(2, 2))  # Set up plot grid 1 row 2 cols
 plot(image, main = "Original Image", axes = FALSE)
 plot(fft_magnitude, main = "Frequency Spectrum or Domain / k-Space", axes = FALSE)
 
-# Perform inverse Fourier Transformation to reconstruct original image from frequency domain:
+# Perform inverse Fourier Transformn to reconstruct original image from frequency domain:
 plot(fft_magnitude, main = "Original Frequency Spectrum or Domain / k-Space", axes = FALSE)
 image_recon = Re(fft(image_fft, inverse = TRUE)) / length(image_fft)
 plot(image_recon, main = "Reconstruction of Orig. Image via Inverse FFT", axes = FALSE)
@@ -2119,7 +2118,7 @@ par(mfrow = c(2, 2))  # Set up plot grid 1 row 2 cols
 plot(image, main = "Original Image", axes = FALSE)
 plot(log(1+Mod(fft(image))), main = "Frequency Spectrum or Domain / k-Space", axes = FALSE)
 
-# Perform inverse Fourier Transformation to reconstruct original image from frequency domain:
+# Perform inverse Fourier Transform to reconstruct original image from frequency domain:
 plot(log(1+Mod(fft(image))), main = "Original Frequency Spectrum or Domain / k-Space", axes = FALSE)
 image_recon = Re(fft(fft(image), inverse = TRUE)) / length(image)
 plot(image_recon, main = "Reconstruction of Orig. Image via Inverse FFT", axes = FALSE)
@@ -2200,9 +2199,9 @@ image(t(IFT_image), col = grey(0:64/64), main = "Reconstructed Image via inverse
 
 
 
-######################################################################################################################
-# 3.4.1 Same, Same — but different: Comparing a Regular 3D Plot with a 2D Gradient Plot and Introducing the Outer()  #
-######################################################################################################################
+##################################################################################################################
+# 3.4 Exploring the k-Space via Plotting Gradient Plots Corresponding to Spatial Frequencies and their Magnitude #
+##################################################################################################################
 
 # Example 2D signal:
 signal2D = matrix(c(0,0,0,0,
@@ -2744,6 +2743,8 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
+
+
 
 
 
