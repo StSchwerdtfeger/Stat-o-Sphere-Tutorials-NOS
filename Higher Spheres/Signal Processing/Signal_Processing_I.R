@@ -934,7 +934,7 @@ points(.25,round(cos(2*pi*.25),15))
 points(.25,round(sin(2*pi*.25),15))
 abline(h = 0)
 
-# ####### OPTIONAL ADD Cosine with frequency of 2 -> also orthogonal
+# ####### OPTIONAL ADD other frequencies -> also orthogonal
 # x_freq_2 = Im(exp(2*2*pi*time*i)) # x-axis = real dimension
 # lines(z,x_freq_2)
 # x3 = Im(exp(2*2*pi*time2*i)) # for pink line
@@ -951,17 +951,6 @@ abline(h = 0)
 # Rest grid to 1x1:
 par(mfrow = c(1,1))
 
-#### The above essentially shows that they are orthogonal:
-round(cos(2*pi*.25),15)*round(sin(2*pi*.25),15)
-# [1] 0
-
-#### Orthogonality also holds for unequal frequency!
-round(cos(2*pi*.25),15)*round(sin(4*2*pi*.25),15)
-# [1] 0
-
-#### Orthogonality also holds for unequal frequency, here cos() times cos()!
-round(cos(2*pi*.25),15)*round(cos(2*2*pi*.25),15)
-# [1] 0
 
 ### Test for orthogonality of cosine and sine:
 x = seq(-2*pi, 2*pi, by = .0001)
@@ -976,6 +965,11 @@ sum(g(x))
 # [1] -1.037524e-05
 # The above value gets smaller approaching 0 the finer our 
 # seq of x will be, above by = .0001
+
+# Also holds for different frequencies:
+g2 = function(x){cos(x)*sin(2*x)}
+integrate(g2,lower = -2*pi, upper = 2*pi)
+# 0 with absolute error < 5.8e-14
 
 # Plot of cosine and sine and sum/integral of 
 # cosine*sine - the dot product of sine and cosine: 
@@ -2722,6 +2716,7 @@ IFT_image = Mod(fft(kspace_high_pass, inverse = TRUE)/ length(kspace))^0.2
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. high-pass filter, radius 20"), axes = FALSE)
 par(mfrow = c(1,1))
 
+
 #### Gaussian filter:
 x = c(((-(ncols)/2)+1):0,1:(ncols/2))
 y = c(((-(nrows)/2)+1):0,1:(nrows/2))
@@ -2740,6 +2735,9 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
+
+
+
 
 
 
