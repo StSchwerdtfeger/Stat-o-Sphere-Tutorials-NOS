@@ -17,7 +17,7 @@
 
 ###### Necessary packages: 
 # UNCOMMENT next line, to install all necessary packages:
-#install.packages("pracma","ggplot2","magick","oro.dicom","imager","rgl","plotly","patchwork")
+#install.packages("pracma","ggplot2","magick","oro.dicom","imager","rgl","plotly","patchwork", "av")
 library("pracma")    # for angle(), optional... Arg() or atan2() works as well...
 library("ggplot2")   # entailed in tidyverse
 library("magick")    # creating .gif
@@ -26,6 +26,7 @@ library("imager")    # for load.image() - JPG images NEEDS DX11 (WIN) or Xquartz
 library("rgl")       # for persp3d(), interactive 3D plot of surfaces
 library("plotly")    # for plot_ly() 3D plot of lines
 library("patchwork") # for simple grid syntax for more than 1 plot in .gif (alternative to e.g. grid.extra())
+library("av")        # optional for looking at STFT audio spectrograms via read_audio_fft() and plot()
 
 # USE A R PROJECT WITH THIS SCRIPT AND PLACE THE DICOM AND JPG FILE THAT COMES WITH
 # THIS TUTORIAL IN YOUR WORKING DIRECTORY FOLDER, THEN THE SCRIPT SHOULD BE
@@ -1301,6 +1302,27 @@ library("magick")
 #image_write(anime, "fft_animation.gif")
 
 
+#######################################################
+# 2.2.4 Short-Time Fourier Transform and Spectrograms #
+#######################################################
+
+##### OPTIONAL ##### Spectrogram of audio files (NO AUDIO FILE PROVIDED!):
+#install.packages("av")
+library(av)
+
+# 47 second extract of Douglas Quins weddell seal recordings:
+#fft_data <- read_audio_fft("extract_weddell_seal.wav", end_time = 47)
+#plot(fft_data, log = 'y')
+
+# EXAMPLE CODE from the av documentation:
+# Demo sound included with av:
+wonderland <- system.file('samples/Synapsis-Wonderland.mp3', package='av')
+
+# Read first 5 sec of demo:
+fft_data <- read_audio_fft(wonderland, end_time = 5.0)
+plot(fft_data)
+
+
 ##############################################################################################################
 # 2.3 The Discrete Fourier Transform (DFT and its Inverse) and the Fast Fourier Transform (Cooley-Tukey FFT) #
 ##############################################################################################################
@@ -2472,7 +2494,6 @@ par(mfrow = c(1,1))
 # 3.6 Field of View (FOV), Aliasing Effects, Low-Pass and Gaussian Filters #
 ############################################################################
 
-
 # Only process the spatial frequencies, magnitude and phase of the first 10 column
 # and row entries of the k-space, essentially only a part on the lower right quadrant 
 # of the shifted k-space in comparison with the full k-space being processed:
@@ -2735,6 +2756,7 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
+
 
 
 
