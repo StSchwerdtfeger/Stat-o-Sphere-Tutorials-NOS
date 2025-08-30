@@ -1303,7 +1303,7 @@ library("magick")
 
 
 #######################################################
-# 2.2.4 Short-Time Fourier Transform and Spectrograms #
+# 2.3 Short-Time Fourier Transform and Spectrograms #
 #######################################################
 
 ##### OPTIONAL ##### Spectrogram of audio files (NO AUDIO FILE PROVIDED!):
@@ -1322,12 +1322,14 @@ wonderland <- system.file('samples/Synapsis-Wonderland.mp3', package='av')
 fft_data <- read_audio_fft(wonderland, end_time = 5.0)
 plot(fft_data)
 
+play(wonderland)
+
 
 ##############################################################################################################
-# 2.3 The Discrete Fourier Transform (DFT and its Inverse) and the Fast Fourier Transform (Cooley-Tukey FFT) #
+# 2.4 The Discrete Fourier Transform (DFT and its Inverse) and the Fast Fourier Transform (Cooley-Tukey FFT) #
 ##############################################################################################################
 ########################################################
-# 2.3.1 The Discrete Fourier Transform and its Inverse #
+# 2.4.1 The Discrete Fourier Transform and its Inverse #
 ########################################################
 
 #### Discrete Fourier Transform:
@@ -1384,7 +1386,7 @@ all.equal(signal,Re(inverse_d_ft(d_ft(signal))))
 
 
 ################################################################
-# 2.3.2 The Fast Fourier Transform (Cooley-Tuckey Radix-2-FFT) #
+# 2.4.2 The Fast Fourier Transform (Cooley-Tuckey Radix-2-FFT) #
 ################################################################
 
 # Comparing N^2 and N*log_2 of N - below an example for 64 data points:
@@ -1449,7 +1451,7 @@ all.equal(ct_fft(signal), fft(signal)) # Some minor deviations, so == does not r
 
 
 ######################################################################
-# 2.3.3 The Symmetry of Sine or Cosine Waves in the Frequency Domain #
+# 2.4.3 The Symmetry of Sine or Cosine Waves in the Frequency Domain #
 ######################################################################
 
 #### Plot frequency domain of ct_fft(signal):
@@ -1505,7 +1507,7 @@ axis(1, at= seq(min(x_axis_shift_fft(x)),max(x_axis_shift_fft(x),by=1)))
 
 
 #######################################
-# 2.3.1 Benchmarking FFT and DFT in R #
+# 2.4.4 Benchmarking FFT and DFT in R #
 #######################################
 
 #### Benchmark test ct_fft() with fft() an regular d_ft():
@@ -1547,7 +1549,7 @@ all.equal(d_ft(signal),fft(signal))
 
 
 #############################################################
-# 2.4 The Relation between Rect and Sinc Functions and      #
+# 2.5 The Relation between Rect and Sinc Functions and      #
 # Their Use for Low-Pass Fourier Space Filtering (incl.     #
 # Convolutions and the Riemann Sum Approximation of a CTFT) #      
 #############################################################
@@ -2756,6 +2758,15 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
+
+
+
+
+
+
+
+
+
 
 
 
