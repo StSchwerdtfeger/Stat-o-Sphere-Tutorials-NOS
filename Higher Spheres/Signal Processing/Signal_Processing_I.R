@@ -1,5 +1,5 @@
 ###############################################
-#     Higher Spheres: Processing Signals I:   #
+#     Higher Spheres: Signal Processing I:    #
 #         Introducing Complex Numbers,        #
 #   the Fourier Series and Fourier Transform  #         
 #                     by                      #
@@ -176,12 +176,13 @@ grid2Dcomp = function() {
   
   # Plot empty plot (asp = 1 for steady ratio)
   plot(NA, xlim=c(-3,3), ylim=c(-3,3), xlab="x-axis = a = Real Number Plane", ylab="y-axis = bi = Imaginary Number Plane", asp = 1, 
-       axes = TRUE, las = 1) # axes removes pre-set axes, las = 1 for horizontal tick marks
+       axes = TRUE, las = 1, yaxt = "n") # y-axes removed, las = 1 for horizontal tick marks
   abline(h = 0,lty = 1) # adds horizontal line at ylim = 0 
   abline(v = 0,lty = 1) # adds vertical line at xlim = 0
   abline(h = posY, lty=3) # adds grid both h and v
   abline(v = posX, lty=3)
-  
+  # Adjust tick-marks of y-axis
+  axis(2, at = c(-3:3), labels = c("-3i","-2i","-1i","0i","1i","2i","3i"), las = 1)
 } # End of function
 
 # Create fresh grid
@@ -259,6 +260,7 @@ all.equal(2+2i, (abs(2+2i)*exp(im*Arg(2+2i))))
 # Calculate phase via artan2(), Arg() or angle() for complex numbers, 
 # converting complex to polar coordinates. Below very similar to Matlab!
 atan2(Im(2+2i), Re(2+2i))          # via atan2()
+atan(Re(2+2i)/Im(2+2i))            # via atan()
 phase = Arg(2+2i)                  # via Arg()
 library("pracma") # for angle(), Matlab style:
 phase = angle(2+2i)                # via angle()
@@ -362,12 +364,6 @@ expo_fun = function(x) {exp(x)}
 integrate(expo_fun, lower = -Inf, upper = 1)
 # 2.718282 with absolute error < 0.00015
 # = e again.
-
-# The relation between e^{x*Arg} sin and cos in the real plain, 
-# regular trigonometry. We will soon see a similar formula just including
-# the imaginary number i, which is then referred to as Euler's formula,
-# connecting trigonometry and complex numbers:
-exp(2*Arg(exp(2))) == cos(Arg(exp(2)))+sin(Arg(exp(2)))
 
 # Example for factorials
 3*2*1 == factorial(3)
@@ -553,7 +549,7 @@ round(exp(i*pi)) + 1 == 0
 # Set up grid for four plots:
 par(mfrow = c(2,2))
 
-# Set time from 0 to 1 for Hz = 1 second:
+# Set time from 0 to 1 for 1 second, to fit Hz = cycles per 1 second
 steps = c(0,.25,.5,1)
 for(index in 1:length(steps)){ # CAVE: DON'T CALL INDEX "i" HERE, when i = complex(imaginary = 1,real = 0) 
   time = seq(0,steps[index],by=.001)
@@ -567,7 +563,7 @@ for(index in 1:length(steps)){ # CAVE: DON'T CALL INDEX "i" HERE, when i = compl
          y1 = Im(exp(-2*pi*time[length(time)]*i)),  # dependent on Re() and Im() of last element of time
          col = "darkviolet", lty = "dashed")  
   # Add value of e^2*pi*i*time[length(time)]
-  text(x = 0, y = -1.5, paste("e^(-2)*pi*i*",time[length(time)], "Hz"))
+  text(x = 0, y = -1.5, paste("e^(-2)*pi*i*",time[length(time)]))
 } # End for i
 
 # Reset grid
@@ -593,13 +589,13 @@ z = time                 # temporal dimension
 par(mfrow = c(2,2))
 
 # exp(2*pi*time*i)
-plot(x,y, xlab = "Re(exp(2*pi*time*i))", ylab = "Im(exp(2*pi*time*i))",type="l")
+plot(x,y, xlab = "Re(exp(2*pi*t*i))", ylab = "Im(exp(2*pi*t*i))",type="l")
 
 # Sine(2*pi*time*i)
-plot(z,y, xlab = paste("time = 0-1Hz","\n", "i*sine(2*pi*t)"), ylab = "Im(exp(2*pi*time*i))",type="l")
+plot(z,y, xlab = paste("time = 0-1 Second","\n", "i*sine(2*pi*t)"), ylab = "Im(exp(2*pi*t*i))",type="l")
 
 # Cosine(2*pi*time*i)
-plot(x,z, xlab = paste("Re(exp(2*pi*time*i))","\n", "cosine(2*pi*t)"), ylab = "time = 0-1Hz", type="l")
+plot(x,z, xlab = paste("Re(exp(2*pi*t*i))","\n", "cosine(2*pi*t)"), ylab = "t = time, 0-1 Second", type="l")
 
 
 #### Base plot perspectives triplet with exp(2*pi*time*i), where time = 0-1Hz,
@@ -607,7 +603,7 @@ plot(x,z, xlab = paste("Re(exp(2*pi*time*i))","\n", "cosine(2*pi*t)"), ylab = "t
 par(mfrow = c(2,2))
 
 # Plot exp(2*pi*time*i)
-plot(x,y, xlab = "Re(exp(2*pi*time*i))", ylab = "Im(exp(2*pi*time*i))",type="l")
+plot(x,y, xlab = "Re(exp(2*pi*t*i))", ylab = "Im(exp(2*pi*t*i))",type="l")
 
 # Draw exp(2*pi*.25*i)
 arrows(x0=0,y0=0,x1=Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)))
@@ -615,7 +611,7 @@ arrows(x0=0,y0=0,x1=Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)))
 # Draw angle using exp(2*pi*.25*i): 
 angle = seq(0,Arg(exp(2*pi*.25*i)),by = .001) # sequence for angle circle and marking of the actual circle
 lines(.5*exp(angle*i), col = "violet") # angle circle
-lines(1*exp(angle*i), col = "violet")  # matching circle and sine/cosine wave for Hz = .25
+lines(1*exp(angle*i), col = "violet")  # matching circle and sine/cosine wave for freq = .25
 segments(x0=0,y0=0,x1=1,y1=0)          # draw line from Re() = 0 to Re() = 1 and 0 on th Im() plane
 
 # Note the equality of a quarter circle rotation to 1*pi:
@@ -634,7 +630,7 @@ text(x =-.4,y = .5, paste("Mod = ", round(Mod(exp(2*pi*.25*i)),3)), col = "darkg
 text(x = Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)), "z = exp(2*pi*.25*i)")
 
 # Plot corresponding sine wave:
-plot(z,y, xlab = paste("time = 0-1Hz","\n","i*sine(2*pi*time)"), ylab = "Im(exp(2*pi*time*i))", type = "l")
+plot(z,y, xlab = paste("time = 0-1 Second","\n","i*sine(2*pi*t)"), ylab = "Im(exp(2*pi*t*i))", type = "l")
 
 # Add line from 0-.25 Hz on the sine wave, corresponding to Arg = 90°;
 # Setup new shortened sequence:
@@ -645,7 +641,7 @@ lines(x2,y2,col = "violet") # use lines to add to add line from 0-.25Hz to exist
 
 # Use rev(range(z)) to reverse y-axis; in this case necessary for the cosine wave plot
 # below exp(2*pi*time*i):
-plot(x,z, xlab = paste("Re(exp(2*pi*time*i)","\n", "cosine(2*pi*time)"), ylab = "time = 0-1Hz",type = "l", ylim = rev(range(z)))
+plot(x,z, xlab = paste("Re(exp(2*pi*t*i)","\n", "cosine(2*pi*t)"), ylab = "time = 0-1 Second",type = "l", ylim = rev(range(z)))
 # Setup sequence for cosine wave 0-.25Hz:
 x3 = Re(exp(2*pi*time2*i)) 
 y3 = time2
@@ -760,11 +756,12 @@ persp3d(x, y, z,
 #########################################################################################
 
 # Plot a Square wave:
-time = seq(0,4*pi, by = .001)
+time = seq(0,2*pi, by = .001)
 
 # Sign of a sine wave = Square wave abstraction / simplification of a sine wave:
 square = sign(sin(time)) # time*frequency
 plot(time,square, type = "l")
+lines(time, sin(time), col = "blue", lty = 3)
 abline(h=0) # add x-axis at y = 0
 
 # Since we are about to calculate the integral of functions, we need
@@ -804,7 +801,7 @@ fourier_series = function(n, time_max, fun){
 } #  End of function
 
 ### Test function with square_wave() and plot results:
-plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3),ylab ="Amplitude", main = "n = 20", xlab = "periods in pi")
+plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3),ylab ="f(x)", main = "n = 20", xlab = "periods in pi")
 abline(h=0)
 lines(seq(-pi,pi,by =.001), fourier_series(n = 20, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
 
@@ -812,7 +809,7 @@ lines(seq(-pi,pi,by =.001), fourier_series(n = 20, time_max = pi, fun = square_w
 # Set 2*2 grid:
 par(mfrow = c(2,2))
 # n = 1
-plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3), ylab ="Amplitude", main = "n = 1", xlab = "-pi to pi")
+plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3), ylab ="f(x)", main = "n = 1", xlab = "-pi to pi")
 abline(h=0)
 lines(seq(-pi,pi,by =.001), fourier_series(n = 1, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
 # n = 10
@@ -820,7 +817,7 @@ plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "
 abline(h=0)
 lines(seq(-pi,pi,by =.001), fourier_series(n = 10, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
 # n = 20
-plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3), ylab ="Amplitude", main = "n = 20", xlab = "-pi to pi")
+plot(seq(-pi,pi,by =.001),square_wave(seq(-pi,pi,by =.001)), type = "l", col = "blue", ylim = c(-1.3,1.3), ylab ="f(x)", main = "n = 20", xlab = "-pi to pi")
 abline(h=0)
 lines(seq(-pi,pi,by =.001), fourier_series(n = 20, time_max = pi, fun = square_wave), type = "l", col = "deeppink")
 # n = 80
@@ -883,10 +880,10 @@ abline(v=3*pi/2 ,lty = 4)
 
 
 ##### Visualising orthogonality of sine and cosine in comparison 
-####  to exp(2*pi*time*i); time = 0-2Hz:
+####  to exp(2*pi*time*i); time = 0-2 seconds:
 par(mfrow = c(1,2))
 
-# Set up sequence 0-1Hz
+# Set up sequence 0-2 seconds
 time = seq(0,2, by= .001)
 x = Re(exp(2*pi*time*i)) # x-axis = real dimension
 y = Im(exp(2*pi*time*i)) # y-axis = imaginary / complex domain
@@ -916,7 +913,7 @@ text(x =-.4,y = .5, paste("Mod = ", round(Mod(exp(2*pi*.25*i)),3)), col = "darkg
 text(x = Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)), "z = exp(2*pi*.25*i)")
 
 # Plot corresponding sine wave:
-plot(z,y, xlab = "time = 0-2Hz", ylab = "sin(2*pi*time) and cos(2*pi*time)", type="l",
+plot(z,y, xlab = "time = 0-2 seconds", ylab = "sin(2*pi*time) and cos(2*pi*time)", type="l",
      main = "Dot product: cos(2*pi*.25)*sin(2*pi*.25) = 0")
 
 # Add line from 0-.25 Hz on the sine wave, corresponding to Arg = 90°;
@@ -972,6 +969,13 @@ g2 = function(x){cos(x)*sin(2*x)}
 integrate(g2,lower = -2*pi, upper = 2*pi)
 # 0 with absolute error < 5.8e-14
 
+# Test for cos(1*x) == cos(1*x), resulting in 2*pi, meaning a match! 
+g3 = function(x){cos(x)*cos(x)}
+integrate(g3,lower = -2*pi, upper = 2*pi) 
+# 6.283185 with absolute error < 4.6e-09
+all.equal(integrate(g3,lower = -2*pi, upper = 2*pi)$value ,2*pi)
+# [1] TRUE
+
 # Plot of cosine and sine and sum/integral of 
 # cosine*sine - the dot product of sine and cosine: 
 plot(x,cos(x), type = "l", col = "blue", ylab = "") # cos
@@ -996,11 +1000,11 @@ sum(g_mn(x))
 # Summing for the discrete case does not work in this case, however, 
 # the value divided by 20k somehow roughly results in pi...
 
-# Plot of cosine and sine and sum/integral of 
+# Plot of cosine and cos and sum/integral of 
 # cosine*sine - the dot product of sine and cosine: 
-plot(x,cos(x), type = "l", col = "blue", ylab = "") # cos
-lines(x,sin(x), type = "l", col = "green")          # sine
-lines(x, g_mn(x), type = "l", col = "deeppink")     # sin*cos
+plot(x,cos(x), type = "l", col = "blue", ylab = "", lty =3)  # cos
+lines(x,cos(x), type = "l", col = "green", lty = 4)          # cos
+lines(x, g_mn(x), type = "l", col = "deeppink")              # cos*cos
 abline(h=0,v=0)
 # The integral of g(x) = integral of cos*cos will be clearly above 0 in this case!
 
@@ -1271,7 +1275,7 @@ for(index in 1:length(samp_f)){ # don't call it "i" when "i" was defined above a
     geom_point(data = point, aes(x = Re, y = Im), # add point of central mass
                color = "darkblue", size = 3) +  # color and size of the point
     labs(title = paste("Sample Frequency", samp_f[index], "Hz"), 
-         x = "Real Number", y = "Imaginary Number") +
+         x = "Real Part", y = "Imaginary Part") +
     xlim(c(min(min_max[,1]),max(min_max[,3]))) +  # making sure that plot is not out of bounds
     ylim(c(min(min_max[,2]),max(min_max[,4]))) +  # and not just centralized
     theme_minimal() # white instead of grey background
@@ -1321,8 +1325,6 @@ wonderland <- system.file('samples/Synapsis-Wonderland.mp3', package='av')
 # Read first 5 sec of demo:
 fft_data <- read_audio_fft(wonderland, end_time = 5.0)
 plot(fft_data)
-
-play(wonderland)
 
 
 ##############################################################################################################
@@ -2293,6 +2295,28 @@ signal2D == round(sum_z(z_mat),3)
 # [4,] TRUE TRUE TRUE TRUE
 
 
+#### Successive addition of the gradients as animation:
+n_z = ncol(z_mat)
+plots = list()
+z_res = round(Re(z_mat[[1,1]][]-z_mat[[1,1]][])) # z-z = all zero! initializes object for recursive addition;
+for(index in 1:n_z){# successively add the values of a vector;
+  for(j in 1:n_z){
+    z_res = z_res + z_mat[[index,j]][] # recursive addition
+    plots = append(plots,image(z_res,col = grey.colors(256), axes = FALSE), after = length(plots))
+  } # End for j
+} # End for index          
+
+# Convert plots to image. This works a little weird: First you
+# create img_plot and execute an image_graph object.
+#img_plot = image_graph(width=350,height=350, res = 96)
+# Then you just print all the plots onto it, so to speak:
+#print(plots)
+# Then you create an animation object:
+#anime = image_animate(image_join(img_plot), fps = 5)
+
+# Export .gif image
+#image_write(anime, "sum_gradients.gif")
+
 
 #########################################################################################
 # 3.4.1 Same, Same — but different: Comparing a Regular 3D Plot with a 2D Gradient Plot #
@@ -2421,8 +2445,8 @@ kspace_shifted = fftshift2D(kspace)
 # Choose location of complex number from SHIFTED k-space image/matrix:
 kxshift = 0
 kyshift = -4
-#kxshift = 25
-#kyshift = 25
+kxshift = 25
+kyshift = 25
 
 # Note again that we will use the log magnitude of k-space data, otherwise 
 # the frequencies outside of the centre (thinking shifted k-space) is too high 
@@ -2478,7 +2502,7 @@ image(x,y,z, col = grey(0:64/64), axes = FALSE, main = paste("Gradient Plot of k
 # Reset plot grid:
 par(mfrow=c(1,1))
 
-# Note that we could of course also plot the gradient of each diimension
+# Note that we could of course also plot the gradient of each dimension
 # kx and ky separately as two 1D cosine waves:
 # Set grid
 par(mfrow = c(1,2))
@@ -2486,8 +2510,8 @@ par(mfrow = c(1,2))
 time = seq(0,1,length.out = 100)
 wave_kx = magnitude*cos(2*pi*(kxshift*time)+phase)
 wave_ky = magnitude*cos(2*pi*(kyshift*time)+phase) 
-plot(time,wave_kx, type = "l", main = paste("Frequency of kx = ",kxshift), xlab = "0 to 1 Hz") 
-plot(time,wave_ky, type = "l", main = paste("Frequency of ky = ",kyshift), xlab = "0 to 1 Hz") 
+plot(time,wave_kx, type = "l", main = paste("Frequency of kx = ",kxshift), xlab = "0 to 1 seconds") 
+plot(time,wave_ky, type = "l", main = paste("Frequency of ky = ",kyshift), xlab = "0 to 1 seconds") 
 par(mfrow = c(1,1))
 
 
@@ -2758,6 +2782,12 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
+
+
+
+
+
+
 
 
 
