@@ -256,7 +256,6 @@ im = complex(real = 0, imaginary = 1)
 all.equal(2+2i, (abs(2+2i)*exp(im*Arg(2+2i))))
 # [1] TRUE
 
-
 # Calculate phase via artan2(), Arg() or angle() for complex numbers, 
 # converting complex to polar coordinates. Below very similar to Matlab!
 atan2(Im(2+2i), Re(2+2i))          # via atan2()
@@ -267,7 +266,6 @@ phase = angle(2+2i)                # via angle()
 
 
 ##### The polar coordinates of a complex number can be obtained via P(Mod(2+2i)|Arg(2+2i)):
-
 # Set fresh grid:
 grid2Dcomp()
 
@@ -549,18 +547,18 @@ round(exp(i*pi)) + 1 == 0
 # Set up grid for four plots:
 par(mfrow = c(2,2))
 
-# Set time from 0 to 1 for 1 second, to fit Hz = cycles per 1 second
-steps = c(0,.25,.5,1)
+# Plot different fractions of 2*pi*t
+steps = c(0,.25,.5,1) # fractions of a period of 2*pi*x
 for(index in 1:length(steps)){ # CAVE: DON'T CALL INDEX "i" HERE, when i = complex(imaginary = 1,real = 0) 
-  time = seq(0,steps[index],by=.001)
+  time = seq(0,steps[index],by=.001) # 0-1 seconds, essentially scales for units of Hz.
   i = complex(imaginary = 1, real = 0)
   plot(exp(-2*pi*time*i), type = "l", 
-       ylim = c(-2,2), xlim = c(-2,2), # limit is important, otherwise plot is always centered and cut.
+       ylim = c(-2,2), xlim = c(-2,2), # limit is important, otherwise plot is always centred and cut.
        xlab = "Real", ylab = "Imaginary")
   # We can add an arrow and axes:
-  arrows(x0 = 0, y0 = 0 ,   # always in center 
+  arrows(x0 = 0, y0 = 0 ,   # always in centre 
          x1 = Re(exp(-2*pi*time[length(time)]*i)), 
-         y1 = Im(exp(-2*pi*time[length(time)]*i)),  # dependent on Re() and Im() of last element of time
+         y1 = Im(exp(-2*pi*time[length(time)]*i)),  # dependent on Re() and Im() of last element of x
          col = "darkviolet", lty = "dashed")  
   # Add value of e^2*pi*i*time[length(time)]
   text(x = 0, y = -1.5, paste("e^(-2)*pi*i*",time[length(time)]))
@@ -578,47 +576,46 @@ exp(i*theta) == cos(theta)+i*sin(theta)
 # where x = seq(from = -10,to = 10,by = .1); result is rounded to 5 decimal spaces:
 round(cos_tayl(100) + complex(real=0,imaginary=1)*sin_tayl(100),5) == round(exp(complex(real=0,imaginary=1)*seq(from = -10,to = 10,by = .1)),5)
 
-#### Plot exp(2*pi*time*i) from different perspectives of the dimensions Re(), Im() and for each time:
-# Set up sequence 0-1Hz:
-time = seq(0,1, by= .001)
-x = Re(exp(2*pi*time*i)) # x-axis = real dimension
-y = Im(exp(2*pi*time*i)) # y-axis = imaginary / complex domain
-z = time                 # temporal dimension 
+#### Plot exp(2*pi*x*i) from different perspectives of the dimensions Re(), Im() and for each time:
+# Set up sequence 0-1 to one second, scaling for units of Hz:
+time = seq(0,1, by= .001) 
+real = Re(exp(2*pi*time*i))       # x-axis of e^2*pi*i = real dimension, normalized by 2*pi being a full period
+imaginary = Im(exp(2*pi*time*i))  # y-axis of e^2*pi*i = imaginary dimension
 
-### Base plot perspectives triplet with exp(2*pi*time*i), where time = 0-1Hz:
+### Plot triplet with exp(2*pi*x*i) and of the exclusive real and imaginary parts:
 par(mfrow = c(2,2))
 
-# exp(2*pi*time*i)
-plot(x,y, xlab = "Re(exp(2*pi*t*i))", ylab = "Im(exp(2*pi*t*i))",type="l")
+# exp(2*pi*t*i)
+plot(real,imaginary, xlab = "Re(exp(2*pi*t*i))", ylab = "Im(exp(2*pi*t*i))",type="l")
 
-# Sine(2*pi*time*i)
-plot(z,y, xlab = paste("time = 0-1 Second","\n", "i*sine(2*pi*t)"), ylab = "Im(exp(2*pi*t*i))",type="l")
+# Sine(2*pi*t*i)
+plot(time,imaginary, xlab = paste("Sequence of 0-1 seconds","\n", "i*sine(2*pi*t)"), ylab = "Im(exp(2*pi*t*i))",type="l")
 
-# Cosine(2*pi*time*i)
-plot(x,z, xlab = paste("Re(exp(2*pi*t*i))","\n", "cosine(2*pi*t)"), ylab = "t = time, 0-1 Second", type="l")
+# Cosine(2*pi*t*i)
+plot(real,time, xlab = paste("Re(exp(2*pi*t*i))","\n", "cosine(2*pi*t)"), ylab = "Sequence of 0-1 seconds", type="l")
 
 
-#### Base plot perspectives triplet with exp(2*pi*time*i), where time = 0-1Hz,
-#### Including a sequence of 0-.25 Hz on the circle:
+#### Base plot perspectives triplet with exp(2*pi*t*i), where t = 0-1 seconds,
+#### Including a sequence of 0-.25 on the circle (quarter fraction of a full rotation):
 par(mfrow = c(2,2))
 
-# Plot exp(2*pi*time*i)
-plot(x,y, xlab = "Re(exp(2*pi*t*i))", ylab = "Im(exp(2*pi*t*i))",type="l")
+# Plot exp(2*pi*t*i)
+plot(real,imaginary, xlab = "Re(exp(2*pi*t*i))", ylab = "Im(exp(2*pi*t*i))",type="l")
 
-# Draw exp(2*pi*.25*i)
+# Draw exp(2*pi*t*.25*i)
 arrows(x0=0,y0=0,x1=Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)))
 
-# Draw angle using exp(2*pi*.25*i): 
+# Draw angle using exp(2*pi*t*.25*i): 
 angle = seq(0,Arg(exp(2*pi*.25*i)),by = .001) # sequence for angle circle and marking of the actual circle
 lines(.5*exp(angle*i), col = "violet") # angle circle
 lines(1*exp(angle*i), col = "violet")  # matching circle and sine/cosine wave for freq = .25
 segments(x0=0,y0=0,x1=1,y1=0)          # draw line from Re() = 0 to Re() = 1 and 0 on th Im() plane
 
-# Note the equality of a quarter circle rotation to 1*pi:
-Arg(exp(2*pi*.25*i))*2 == pi
+# Note the equality of a quarter circle rotation to .5*pi:
+Arg(exp(2*pi*.25*i)) == .5*pi
 
-# Add text for Arg and Angle in Degrees:
-text(x = .6,y = .6, paste("Arg = ", round(Arg(exp(2*pi*.25*i)),3),"rad", "\n", "=", 
+# Add text for Arg and Angle in degrees:
+text(x = .55,y = .6, paste("Arg = ", round(Arg(exp(2*pi*.25*i)),3),"rad", "\n", "=", 
                           (Arg(exp(2*pi*.25*i))*180/pi),"°"), col = "violet", cex=1)
 text(x = .2,y = .2, "Arg" , col = "violet", cex=1)
 
@@ -627,24 +624,23 @@ segments(x0=0,y0=0, x1=Re(exp(2*pi*.25*i)),y=Im(exp(2*pi*.25*i)), col = "darkgre
 text(x =-.4,y = .5, paste("Mod = ", round(Mod(exp(2*pi*.25*i)),3)), col = "darkgreen")
 
 # Label z = c = exp(2*pi*.25*i):
-text(x = Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)), "z = exp(2*pi*.25*i)")
+text(x = Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)), "z = exp(2*pi*t*.25*i)")
 
 # Plot corresponding sine wave:
-plot(z,y, xlab = paste("time = 0-1 Second","\n","i*sine(2*pi*t)"), ylab = "Im(exp(2*pi*t*i))", type = "l")
+plot(time,imaginary, xlab = paste("Sequence of 0-1 seconds","\n","i*sine(2*pi*t)"), ylab = "Im(exp(2*pi*t*i))", type = "l")
 
-# Add line from 0-.25 Hz on the sine wave, corresponding to Arg = 90°;
+# Add line from 0 to .25 on the sine wave, corresponding to Arg = 90°;
 # Setup new shortened sequence:
-time2 = seq(0,.25, by= .001)
-x2 = time2
-y2 = Im(exp(2*pi*time2*i))
-lines(x2,y2,col = "violet") # use lines to add to add line from 0-.25Hz to existing plot
+x2 = seq(0,.25, by= .001)
+y2 = Im(exp(2*pi*x2*i))
+lines(x2,y2,col = "violet") # use lines to add to add line from x = 0 to .25 to existing plot
 
 # Use rev(range(z)) to reverse y-axis; in this case necessary for the cosine wave plot
 # below exp(2*pi*time*i):
-plot(x,z, xlab = paste("Re(exp(2*pi*t*i)","\n", "cosine(2*pi*t)"), ylab = "time = 0-1 Second",type = "l", ylim = rev(range(z)))
-# Setup sequence for cosine wave 0-.25Hz:
-x3 = Re(exp(2*pi*time2*i)) 
-y3 = time2
+plot(real,time, xlab = paste("Re(exp(2*pi*t*i)","\n", "cosine(2*pi*t)"), ylab = "Sequence of 0-1 seconds",type = "l", ylim = rev(range(z)))
+# Setup sequence for cosine wave from x = 0 to .25:
+x3 = Re(exp(2*pi*x2*i)) 
+y3 = x2
 lines(x3,y3,col="violet") # add line to plot...
 
 # The above essentially shows that:
@@ -916,15 +912,15 @@ text(x = Re(exp(2*pi*.25*i)), y = Im(exp(2*pi*.25*i)), "z = exp(2*pi*.25*i)")
 plot(z,y, xlab = "time = 0-2 seconds", ylab = "sin(2*pi*time) and cos(2*pi*time)", type="l",
      main = "Dot product: cos(2*pi*.25)*sin(2*pi*.25) = 0")
 
-# Add line from 0-.25 Hz on the sine wave, corresponding to Arg = 90°;
+# Add line from 0-.25 seconds on the sine wave, corresponding to Arg = 90°;
 # Setup new shortened sequence:
 time2 = seq(0,.25, by= .001)
 x2 = time2
 y2 = Im(exp(2*pi*time2*i))
-lines(x2,y2,col = "violet") # use lines to add to add line from 0-.25Hz to existing plot
+lines(x2,y2,col = "violet") # use lines to add to add line from 0-.25 seconds to existing plot
 # Add cosine plot:
 lines(z,x, xlab = "sin(2*pi*time) and cosine(2*pi*time)")
-# Setup sequence for cosine wave 0-.25Hz:
+# Setup sequence for cosine wave 0-.25 seconds:
 x3 = Re(exp(2*pi*time2*i)) 
 y3 = time2
 lines(y3,x3,col="violet") # add line to plot...
@@ -2102,7 +2098,7 @@ image_fft = fft(image)
 log(1)     # 0.0
 log(1+.25) # 0.2231436  # remains close to .25 (little changes only) 
 log(1+6)   # 1.94591
-log(1+200) # 5.303305   # from 200 to around 5! This value gets highly compressed!
+log(1+200) # 5.303305   # from 200 to around 5! This value gets highly compressed in range!
 
 # Mod() can handle complex() numbers and 
 # Mod(z) = sqrt(x^2+y^2) == calculates the magnitude of the frequency domain 
@@ -2302,7 +2298,7 @@ z_res = round(Re(z_mat[[1,1]][]-z_mat[[1,1]][])) # z-z = all zero! initializes o
 for(index in 1:n_z){# successively add the values of a vector;
   for(j in 1:n_z){
     z_res = z_res + z_mat[[index,j]][] # recursive addition
-    plots = append(plots,image(z_res,col = grey.colors(256), axes = FALSE), after = length(plots))
+    plots = append(plots,image(z_res,col = grey.colors(256), axes = FALSE, main = paste("col,row = ", index,",", j)), after = length(plots))
   } # End for j
 } # End for index          
 
@@ -2310,9 +2306,9 @@ for(index in 1:n_z){# successively add the values of a vector;
 # create img_plot and execute an image_graph object.
 #img_plot = image_graph(width=350,height=350, res = 96)
 # Then you just print all the plots onto it, so to speak:
-#print(plots)
+# HERE JUST RUN LOOP ABOVE!!!!
 # Then you create an animation object:
-#anime = image_animate(image_join(img_plot), fps = 5)
+#anime = image_animate(image_join(img_plot), fps = 1)
 
 # Export .gif image
 #image_write(anime, "sum_gradients.gif")
@@ -2445,8 +2441,8 @@ kspace_shifted = fftshift2D(kspace)
 # Choose location of complex number from SHIFTED k-space image/matrix:
 kxshift = 0
 kyshift = -4
-kxshift = 25
-kyshift = 25
+#kxshift = 25
+#kyshift = 25
 
 # Note again that we will use the log magnitude of k-space data, otherwise 
 # the frequencies outside of the centre (thinking shifted k-space) is too high 
@@ -2504,14 +2500,14 @@ par(mfrow=c(1,1))
 
 # Note that we could of course also plot the gradient of each dimension
 # kx and ky separately as two 1D cosine waves:
-# Set grid
+# Set grid:
 par(mfrow = c(1,2))
 # Plot frequency phase and amplitude as wave:
-time = seq(0,1,length.out = 100)
-wave_kx = magnitude*cos(2*pi*(kxshift*time)+phase)
-wave_ky = magnitude*cos(2*pi*(kyshift*time)+phase) 
-plot(time,wave_kx, type = "l", main = paste("Frequency of kx = ",kxshift), xlab = "0 to 1 seconds") 
-plot(time,wave_ky, type = "l", main = paste("Frequency of ky = ",kyshift), xlab = "0 to 1 seconds") 
+x_space = seq(0,256,length.out = 1000) # length.out 100 is under-sampled for kx/ky 25!!
+wave_kx = magnitude*cos(2*pi*(kxshift*x_space/m)+phase)/m
+wave_ky = magnitude*cos(2*pi*(kyshift*x_space/n)+phase)/n 
+plot(x_space,wave_kx, type = "l", main = paste("Frequency of kx = ",kxshift), xlab = "0 to ncol pixels") 
+plot(x_space,wave_ky, type = "l", main = paste("Frequency of ky = ",kyshift), xlab = "0 to nrow pixels") 
 par(mfrow = c(1,1))
 
 
@@ -2782,23 +2778,6 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
