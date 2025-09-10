@@ -637,7 +637,7 @@ lines(x2,y2,col = "violet") # use lines to add to add line from x = 0 to .25 to 
 
 # Use rev(range(z)) to reverse y-axis; in this case necessary for the cosine wave plot
 # below exp(2*pi*time*i):
-plot(real,time, xlab = paste("Re(exp(2*pi*t*i)","\n", "cosine(2*pi*t)"), ylab = "Sequence of 0-1 seconds",type = "l", ylim = rev(range(z)))
+plot(real,time, xlab = paste("Re(exp(2*pi*t*i)","\n", "cosine(2*pi*t)"), ylab = "Sequence of 0-1 seconds",type = "l", ylim = rev(range(time)))
 # Setup sequence for cosine wave from x = 0 to .25:
 x3 = Re(exp(2*pi*x2*i)) 
 y3 = x2
@@ -2778,6 +2778,8 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
+
+
 
 
 
