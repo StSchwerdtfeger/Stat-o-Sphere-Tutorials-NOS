@@ -2289,7 +2289,7 @@ signal2D == round(sum_z(z_mat),3)
 # [2,] TRUE TRUE TRUE TRUE
 # [3,] TRUE TRUE TRUE TRUE
 # [4,] TRUE TRUE TRUE TRUE
-
+z_mat[[1,1]] + z_res
 
 #### Successive addition of the gradients as animation:
 n_z = ncol(z_mat)
@@ -2298,12 +2298,13 @@ z_res = round(Re(z_mat[[1,1]][]-z_mat[[1,1]][])) # z-z = all zero! initializes o
 for(index in 1:n_z){# successively add the values of a vector;
   for(j in 1:n_z){
     z_res = z_res + z_mat[[index,j]][] # recursive addition
-    plots = append(plots,image(z_res,col = grey.colors(256), axes = FALSE, main = paste("col,row = ", index,",", j)), after = length(plots))
+    plots = append(plots,image(z_res,col = grey.colors(256), axes = FALSE, main = paste("col,row = ", index,",", j)), after = length(plots)+1)
   } # End for j
 } # End for index          
 
 # Convert plots to image. This works a little weird: First you
-# create img_plot and execute an image_graph object.
+# create img_plot and execute an image_graph object. 
+# START WITH z_res, then execute img_plot line below, then execute loop above!!
 #img_plot = image_graph(width=350,height=350, res = 96)
 # Then you just print all the plots onto it, so to speak:
 # HERE JUST RUN LOOP ABOVE!!!!
