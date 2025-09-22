@@ -2289,7 +2289,6 @@ signal2D == round(sum_z(z_mat),3)
 # [2,] TRUE TRUE TRUE TRUE
 # [3,] TRUE TRUE TRUE TRUE
 # [4,] TRUE TRUE TRUE TRUE
-z_mat[[1,1]] + z_res
 
 #### Successive addition of the gradients as animation:
 n_z = ncol(z_mat)
@@ -2779,6 +2778,7 @@ graphics::image(t(IFT_image), col = grey(0:64/64), main = paste("IFT of kspace")
 IFT_image = Re(Mod(fft(kspace_Gaussian, inverse = TRUE)/ length(kspace)))
 image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter, sigma = 100"), axes = FALSE)
 par(mfrow = c(1,1))
+
 
 
 
