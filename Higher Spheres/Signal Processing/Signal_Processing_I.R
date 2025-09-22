@@ -2293,11 +2293,12 @@ signal2D == round(sum_z(z_mat),3)
 #### Successive addition of the gradients as animation:
 n_z = ncol(z_mat)
 plots = list()
+plots2 = list()
 z_res = round(Re(z_mat[[1,1]][]-z_mat[[1,1]][])) # z-z = all zero! initializes object for recursive addition;
 for(index in 1:n_z){# successively add the values of a vector;
   for(j in 1:n_z){
     z_res = z_res + z_mat[[index,j]][] # recursive addition
-    plots = append(plots,image(z_res,col = grey.colors(256), axes = FALSE, main = paste("col,row = ", index,",", j)), after = length(plots)+1)
+    plots = append(plots,image(z_res,col = grey.colors(256), axes = FALSE, main = paste("Cumulative Gradients; col,row = ", index,",", j)), after = length(plots)+1)
   } # End for j
 } # End for index          
 
@@ -2780,9 +2781,153 @@ image(t(IFT_image), col = grey(0:64/64), main = paste("IFT incl. Gaussian filter
 par(mfrow = c(1,1))
 
 
+#########################################################################################
+# 4 The Relation between Bandwidth, the Uncertainty Principle and the Fourier Transform #
+#########################################################################################
+
+# Simplified example: 
+delta_t = 4
+delta_f = 4
+1/delta_t * delta_f/1 == 1
+# [1] TRUE
+
+# The uncertainty principle as aliasing effect:
+
+# Set values of x:
+x  = seq(-6,6, by = .01)
+
+# Different possible frequencies:
+y1 = sin(x)
+y2 = sin(1.01*x)
+y3 = sin(.99*x)
+y4 = sin(1.02*x)
+y5 = sin(.98*x)
+# Plot above:
+plot(x,y2,type="l", col = "blue", ylab = "")
+lines(x,y3, col="green")
+lines(x,y4, col="yellow3")
+lines(x,y5, col="lightblue")
+lines(x,y1, col="deeppink") # actual signal last, such that it overlaps with
+                            # the other frequencies, being on top of them
+
+# Create table to check which values are equivalent (rounded):
+table = cbind(x,round(y1,3),round(y2,3),round(y3,3),round(y4,3),round(y5,3),c(0))
+for(index in 1:length(table[,1])){
+  table[index,7] = all(table[index,3:6] == table[index,2])
+} # End for index
+
+# Rows of the table that entail equivalent values: 
+which(table[,7] ==TRUE)
+# [1] 599 600 601 602 603
+round(y1[which(table[,7] ==TRUE)],3)
+# [1] -0.02 -0.01  0.00  0.01  0.02
+
+# Add respective points to the plot:
+points(x[which(table[,7] ==TRUE)],y1[which(table[,7] ==TRUE)])
+abline(v=0,h=0)
 
 
+# Similar to the code further above, just using the standard deviation of 
+# Gaussian functions as bandwidth and sampling rate measure:
+# \Delta omega = sqrt(2*pi)*sigma_omega times \Delta t = sqrt(2*pi)*sigma_t == 2*pi
+# Sigma = standard deviation:
+sigma_omega = 1
+sigma_t = 1     # both 1 for simplicity...
+# \delta sigma_omega is equal to 1 over \delta sigma_t:
+sigma_omega == 1/sigma_t
+# [1] TRUE
+# ... and vice versa:
+sigma_t == 1/sigma_omega
+# [1] TRUE
 
+# \Delta omega * delta t = 2*pi:
+round((sqrt(2*pi)*sigma_omega) * (sqrt(2*pi)*sigma_t),6) == round(2*pi,6)
+# [1] TRUE
+
+# Delta omega == 2*pi * (1/delta_st)
+delta_omega = sqrt(2*pi)*sigma_omega
+delta_t = (sqrt(2*pi)*sigma_t)
+round(delta_omega,6) == round(2*pi*(1/delta_t),6)
+# [1] TRUE
+
+# Bandwidth theorem, simplified where \Delta f = in measures of Hz:
+delta_t = (sqrt(2*pi)*sigma_t) / sqrt(2*pi)
+delta_f = (sqrt(2*pi)*sigma_omega) / sqrt(2*pi)
+delta_f*delta_t
+# [1] 1
+
+#### Showing that the FT of a Gaussian is also a Gaussian:
+# First we define our Gaussian functions - a regular parametric Gaussian and
+# a probability density function with adjustable mean and sd:
+
+# Gaussian probability density function:
+Gaussian_PDF = function(x,mean,sd){
+  fx = (1/sqrt(2*pi*sd^2))*exp((-((x-mean)^2))/(2*sd))
+  return(fx)
+} # End of function
+
+# ALTERNATIVE: Regular parametric Gaussian prob. function:
+Gaussian_FUN = function(x,a,mean,sd){ 
+  fx = a * exp((-((x-mean)^2))/(2*sd))
+  return(fx)
+} # End of function
+
+# Create sequence of x: 
+range = 8
+x = seq(-range,range,length.out = 4096)
+# Delta_x for Riemann sum approximation of an integral, as done in previous chapters:
+delta_x = x[2] - x[1] # size of the steps for rescaling frequency domain
+
+# Set standard deviations:
+sd1 =  5 # note that the sd is here not +/-5 but |-sd| + |+sd| = 5!!!
+sd2 = .1
+
+# Gaussian PDF (standard normal PDF, given mean = 0 and sd = 1):
+signal_FUN1 = Gaussian_PDF(x, mean = 0,sd = sd1)
+signal_FUN2 = Gaussian_PDF(x, mean = 0,sd = sd2)
+
+# FFT of our Gaussian:
+fft_SIGNAL1 = abs(fft(signal_FUN1))*delta_x
+fft_SIGNAL2 = abs(fft(signal_FUN2))*delta_x
+
+# Set grid:
+par(mfrow = c(2,2))
+
+# Plot Gaussian PDF:
+plot(x, signal_FUN1, type = "l", col = "blue",
+     main = paste("Gaussian PDF, sd = ",sd1), ylab = "Density")
+
+# Plot FFT of Gaussian PDF:
+plot(x_axis_shift_fft(x),fftshift1D(fft_SIGNAL1), type = "l", col = "deeppink",
+     main = paste("FFT PDF, sd = ",1/sd1), xlab = "Frequencies",  ylab = "Magnitude", xlim = c(-50,50))
+
+# Plot Gaussian PDF2:
+plot(x, signal_FUN2, type = "l", col = "blue",
+     main = paste("Gaussian PDF, sd = ",sd2), ylab = "Density")
+
+# Plot FFT of Gaussian PDF2:
+plot(x_axis_shift_fft(x),fftshift1D(fft_SIGNAL2), type = "l", col = "deeppink",
+     main = paste("FFT PDF, sd = ",1/sd2), xlab = "Frequencies",  ylab = "Magnitude", xlim = c(-50,50))
+
+# Reset grid:
+par(mfrow = c(1,1))
+
+# Bandwidth theorem according to second example of the above plots,
+# a Gaussian with sd = .1:
+sigma_signal = .1
+sigma_fft = 1/.1
+
+# Simplified and regular version:
+sigma_fft*sigma_signal == 1
+# [1] TRUE
+delta_signal = sqrt(2*pi)*sigma_signal
+delta_fft = sqrt(2*pi)*sigma_fft
+round(delta_signal*delta_fft,6) == round(2*pi,6)
+# [1] TRUE
+
+# delta_f * delta_t = 1, where \delta_f == delta_fft/2*pi 
+(sqrt(2*pi)*sigma_fft)/(2*pi) * (sqrt(2*pi)*sigma_signal)
+# [1] 1
 
 
 
