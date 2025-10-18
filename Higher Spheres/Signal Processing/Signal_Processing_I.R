@@ -1169,13 +1169,16 @@ fourier_trans = function(g_t,samp_f,time){
   
   # Function of the center of mass of the wound up graph, peaking at the 
   # frequency or frequencies of the initial cosine wave!
-  plot(x = samp_f, y = g_hat_mean[,1], type ="l",   # plot of mean(Re)
+  # The y-axis will be multiplied by 2, in order to fit the actual 
+  # magnitude/amplitude - this has to do with the symmetry of sine/cosine,
+  # which we will discuss in later chapters.
+  plot(x = samp_f, y = 2*g_hat_mean[,1], type ="l",   # plot of mean(Re)
        xlab = "Winding Frequency",  # rename labels
        ylab = "Mean of g_hat(f)",
        main = "Function of the Center of Mass for each Winding Frequency",
-       col = "deepskyblue3", ylim = c(min(min(g_hat_mean[,1]),min(g_hat_mean[,2])), 
-                                      max(max(g_hat_mean[,1]),max(g_hat_mean[,2]))))
-  lines(x = samp_f, y = g_hat_mean[,2], type = "l", col = "hotpink2") # Add mean(Im) to plot
+       col = "deepskyblue3", ylim = c(min(2*min(g_hat_mean[,1]),2*min(g_hat_mean[,2])), 
+                                      max(2*max(g_hat_mean[,1]),2*max(g_hat_mean[,2]))))
+  lines(x = samp_f, y = 2*g_hat_mean[,2], type = "l", col = "hotpink2") # Add mean(Im) to plot
   axis(1, at = seq(min(samp_f),max(samp_f), by = 1)) # Adjust x-axis tick mark (every integer step)
   legend("bottomright",legend = c("Re","Im"),               # add legend
          col = c("deepskyblue3","hotpink2"),  # legend line color
@@ -1183,7 +1186,7 @@ fourier_trans = function(g_t,samp_f,time){
          cex = .75) # size of legend in ratio to standard size
   
   # Smoothed out version (similar to python version):
-  g_hat_smooth = g_hat_mean
+  g_hat_smooth = g_hat_mean*2
   for(index in 1:length(g_hat_smooth[,1])){
     if(g_hat_smooth[index,1]<=max(g_hat_smooth[,1])/2){ # Filter for values below Nyquist frequency
       g_hat_smooth[index,1] = 0
@@ -1457,8 +1460,9 @@ x = seq(0,2*pi, length.out = 16) # make sure N == number to the power of 2, here
 x2 = seq(0,2*pi, length.out = 1000) # for lines() plot of k^th freq with higher resolution
 signal = sin(x*2) # our example signal
 k = c(1:((length(signal)/2))-1) # integer from 0 to (N/2)-1 
-# Plot:
-plot(c(1:length(ct_fft(signal)))-1,abs(ct_fft(signal)), type="l")
+# Plot. Note that (2/length(x) will adjust the y-axis, such that it relates to the
+# magnitude/amplitude of the original signal:
+plot(c(1:length(ct_fft(signal)))-1,(2/length(x))*abs(ct_fft(signal)), type="l")
 
 # Index of value with the highest magnitude. Index = Freq, since we work with 
 # integer frequencies: 
@@ -1472,7 +1476,7 @@ Re((exp(2*pi*i*2*x)-exp(-2*pi*i*2*x))/2*i) == sin(-2*pi*2*x)
 # => Also all TRUE
 
 #### To get rid of the symmetry we can just plot half of the frequency domain:
-plot((c(1:length(ct_fft(signal)))-1)[1:length(signal)/2],abs(ct_fft(signal))[1:length(signal)/2], type="l")
+plot((c(1:length(ct_fft(signal)))-1)[1:length(signal)/2],(2/length(x))*abs(ct_fft(signal))[1:length(signal)/2], type="l")
 
 #### Alternative with adjusted y-axis using 1D fftshift matlab style:
 #### Function based on Matlab documentation: https://de.mathworks.com/help/matlab/ref/fftshift.html
@@ -1498,7 +1502,7 @@ x_axis_shift_fft = function(x){
 } # End of x_axis_shift_fft
 
 #### Adjusted plot for positive and negative frequencies (cat silhouette? batman?): 
-plot(x_axis_shift_fft(x), Re(fftshift1D(ct_fft(signal))), type = "l", xaxt = "n")
+plot(x_axis_shift_fft(x), (2/length(x))*abs(fftshift1D(ct_fft(signal))), type = "l", xaxt = "n")
 # Adjust tick marks to show every tick mark step; first turn of tick marks of 
 # plot() via xaxt = "n":
 axis(1, at= seq(min(x_axis_shift_fft(x)),max(x_axis_shift_fft(x),by=1)))
@@ -2802,6 +2806,7 @@ y2 = sin(1.01*x)
 y3 = sin(.99*x)
 y4 = sin(1.02*x)
 y5 = sin(.98*x)
+
 # Plot above:
 plot(x,y2,type="l", col = "blue", ylab = "")
 lines(x,y3, col="green")
