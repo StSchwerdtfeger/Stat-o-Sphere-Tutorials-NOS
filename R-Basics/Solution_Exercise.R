@@ -35,7 +35,6 @@ data # execute line or mark name of an object to show content in console,
       # or, recall, use print(data) to "print" the content of 
       # an object in the console
 
-
 ########## Add missing measurement value (b)):
 data$measurement_sysRR[9] = 122
 
@@ -74,7 +73,7 @@ plot(density(t2$measurement_sysRR), ylim = c(0,.12))
 
 # Reset plot grid:
 par(mfrow = c(1,1))
-# Plot density functions ontop of another. Note that the information
+# Plot density functions on top of another. Note that the information
 # on bandwidth only refers to t1 density, but could be extracted fro  density(), see below:
 plot(density(t1$measurement_sysRR), ylim = c(0,.12))
 lines(density(t2$measurement_sysRR))
@@ -89,7 +88,7 @@ density2$bw
 
 
 ######## Perform paired/dependent t-test: Note that input is t.test(t2,t1,paired=TRUE) (c)):
-result_t_test = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired = TRUE)
+result_t_test = t.test(t1$measurement_sysRR, t2$measurement_sysRR, paired = TRUE)
 result_t_test
 
 # > result_t_test 
@@ -174,7 +173,19 @@ for(i in 1:length(yes)){
   data$fam[which(data$fam == yes[i])] = "yes"  
 } # End for i
 
-# Change "noo" and "n" to "no":
+# It is also possible to turn the above loop into a function, to abbreviate the process
+# for several cases where entries need to be changed: 
+
+change_entry = function(change_vec,change_var,data){
+  for(i in 1:length(change_vec)){
+    data[which(data == change_vec[i])] = change_var
+  } # End for i
+} # End of function
+
+# Test function:
+change_entry(yes, "yes", data$fam)
+
+# Change "noo" and "n" to "no" (without loop or function):
 data$fam[which(data$fam == "noo")] = "no"
 data$fam[which(data$fam == "n")] = "no"
 
@@ -210,7 +221,7 @@ table(data$patient_id)
 data 
 
 # > data 
-# patient_id time measurement_sysRR           fam
+#    patient_id time measurement_sysRR           fam
 # 1           1   t1               130           yes
 # 2           1   t2               122           yes
 # 3           2   t1               132            no
@@ -387,7 +398,7 @@ length(diff_10plus[,1])
 
 ####### Create a nice table for export (e)):
 # install.packages("gt")
-# library(gt)
+library(gt)
 gt(reformat)
 
 
@@ -472,7 +483,16 @@ data_long = gather(long_reformat, key = "time", value = "sysRR", sysRR_t1:sysRR_
 
 
 
+# As a bonus, here you can randomly create a heart for fun <3
+x = seq(-4,4, by = .001)
+y = sin(pi^3*x)*sqrt((exp(2)-x^2)/2)+sqrt(abs(x)) # Heart Wave formula 
+plot(x,y, col = "deeppink", type = "l")
 
+# From andy_math_dot_com:
+t = seq(-3,3,.001)
+x = 16*sin(t)^3
+y = 13*cos(t)-5*cos(2*t)-2*cos(3*t)-cos(4*t)
+plot(x,y, col = "deeppink")
 
 
 
