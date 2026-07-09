@@ -1,20 +1,10 @@
 ##################################
 ##################################
-#       R-Basic Tutorial I       #
-#     CIPom @ Charité Edition    #
-#               by               #
-#     Steffen Schwerdtfeger      # 
-#            10.2023             #
-##################################
-##################################
-
-##################################
-##################################
 #           R-Basics I           #
 #         Tutorial Script        #
 #               by               #
 #     Steffen Schwerdtfeger      # 
-#       12.2023 - 05.2025        #
+#       12.2023 - 07.2026        #
 ##################################
 ##################################
 
@@ -38,14 +28,15 @@
 # also the solutions for the exercises of chapter 14 are not included in this script)):
 
 # UNCOMMENT FOLLOWING LINE AND EXECUTE TO INSTALL ALL OF THE BELOW PACKAGES:
-#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR"))
-# Tidyverse entails among others the packages stringr, dplyr, ggplot, readr
+#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR", "rgl"))
+# Tidyverse entails among others the packages stringr, dplyr, ggplot, readr...
 library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
 library("stringi")      # changing symbol patterns such as Ae to Ä
 library("effsize")      # cohen.d() for the exercise
 library("shiny")        # create and run shiny apps
 library("readxl")       # read_excel()
 library("tidytuesdayR") # resource for plenty of free example data sets
+library("rgl")          # for creating interactive 3D plots 
 
 # Needed for Rmarkdown example:
 #install.packages(c("gt","kableExtra", "gridExtra"))
@@ -105,12 +96,13 @@ parabola(x)
 # [1] 2505.074
 
 
-#### Code benchmarks are mostly not of concern, except for ML/AI or fMRI analysis and such:
-# x=c(rnorm(1000000,mean=22,sd=6))
-# y=c(rnorm(1000000,mean=35,sd=4))
+#### Code benchmarks are mostly not of concern, except for ML/AI or 
+#### some forms of (f)MRI analysis and such:
+#x=c(rnorm(1000000,mean=22,sd=6))
+#y=c(rnorm(1000000,mean=35,sd=4))
 
 # linear regression with 1 Million data points:
-# lm(y~x) # instant result with my computer...
+#lm(y~x) # instant result with my computer...
 
 #y=c(rnorm(100000000,mean=35,sd=4))
 #x=c(rnorm(100000000,mean=22,sd=6))
@@ -125,7 +117,6 @@ print("Hello World!")
 print("Werde 1 Cyber!")
 
 
-
 #########################################
 # ------------------------------------- #
 #########################################
@@ -136,7 +127,7 @@ print("Werde 1 Cyber!")
 # Mark line and execute via ALT+ENTER or Cmd+ENTER (Mac),
 # or make sure that the blinking | courser is in the line you want to execute 
 # and then press ALT+ENTER or Cmd+ENTER for mac users.
-test = 2 + 5
+test = 2 + 5 
 
 # Test Code:
 test = 2 +4          # Spacing is mostly no problem...
@@ -194,17 +185,17 @@ test == test3
 ###################################################################
 
 # Create a vector using c() i.e. the combine function:
-vec = c(1,2,3)
-vec <- c(1,2,3)  
-# [1] 1 2 3  # NOTE that an output is also a vector
+vec = c(4,5,6)
+vec <- c(4,5,6)  
+# [1] 4 5 6  # NOTE that an output is also a vector
 #              therefore the [1] at the beginning.
 
 # Execute the following line to get "Help", i.e., the 
-# documentation of how the function works:
-?c()
+# documentation of how the function works; DELETE "#" and execute next line:
+#?c
 
 # TYPICAL ERROR, ALWAYS CHECK CONSOLE OUTPUT FOR > ON THE END INDICATING
-# THAT A PROCESS WAS COMPLETED:
+# THAT A PROCESS (REPL cycle) WAS COMPLETED:
 # > # Typical Error:
 # > vec = c(
 # + 
@@ -226,52 +217,62 @@ vec[2] # index 2 == second element of the vector
 # [1] 2 # second element in the vector is also 2
 
 # Change element:
-vec[2] = 4
-# [1] 1 4 3
+vec[2] = 8
+# [1] 4 8 6
 
-# Turn vector into a matrix
+# Turn vector into a matrix:
 mat = as.matrix(vec)
 #      [,1]
-# [1,]    1
-# [2,]    4
-# [3,]    3
+# [1,]    4
+# [2,]    8
+# [3,]    6
 
 # Look at the third element:
 mat[3]
+# [1] 6
 # or, since there is now also an index for the first and only column:
-# Scheme = mat[row,column]
+# Scheme = mat[row,column], below for the second element now in the second row:
+mat[2,1]
+# [1] 8
+# Show second row for all columns (here just one column given): 
 mat[2,]
-# [1] 4
+#      [,1]
+# [1,]    4
+# [2,]    8
+# [3,]    6
 
 mat2 = as.matrix(t(vec))
 mat2[,2]
 # t() == transpose == tilting a vector (different with matrices!!!)
 #      [,1] [,2] [,3]
-# [1,]    1    2    3 
+# [1,]    4    8    6 
 
 # Creating a matrix table via cbind() and c()
 # This method can be used to create quick synthetic data sets in order 
 # to test functions...
-mat_bind = cbind(c(1,2,3),c(1,2,3),c(1,2,3))
+mat_bind = cbind(c(4,5,6),c(4,5,6),c(4,5,6))
 #      [,1] [,2] [,3]
-# [1,]    1    1    1
-# [2,]    2    2    2
-# [3,]    3    3    3
+# [1,]    4    4    4
+# [2,]    5    5    5
+# [3,]    6    6    6
 
-mat_bind2 = rbind(c(1,2,3),c(1,2,3),c(1,2,3))
-
+mat_bind2 = rbind(c(4,5,6),c(4,5,6),c(4,5,6))
 #      [,1] [,2] [,3]
-# [1,]    1    2    3
-# [2,]    1    2    3
-# [3,]    1    2    3
+# [1,]    4    5    6
+# [2,]    4    5    6
+# [3,]    4    5    6
 
 # Note that you can select several rows and columns via
 mat_bind[c(1,2),1] # first two rows, first column
-# [1] 1 2
+# [1] 4 5
 
 # Check class of our vector using the class() function:
 class(vec)
+# [1] numeric
+class(mat_bind)
+# [1] "matrix" "array"
 is.numeric(vec)
+# [1] TRUE
 
 # Transforming an atomic matrix table into a "molecular" data table.
 # Here the columns can have different classes, each column for itself
@@ -287,35 +288,41 @@ is.numeric(vec)
 # atomic vector constrains anymore - further below we will look at an 
 # alternative way to combine vectors right at the molecular level 
 # (first we will look at changing column names):
+
+# Convert "matrix, array" to data.frame:
 mat_bind = as.data.frame(mat_bind) 
 #   V1 V2 V3  # V stands for variable
-# 1  1  1  1
-# 2  2  2  2
-# 3  3  3  3
+# 1  4  4  4
+# 2  5  5  5
+# 3  6  6  6
 
 # We can still use brackets and index to go to a specific location:
 mat_bind[,2]
+# [1] 4 5 6
 # Or we use the dollar sign to call/select a specific row of the table by name
 # We can then also still use the bracket syntax notation:
 mat_bind$V2
+# [1] 4 5 6
 mat_bind$V2[2]
+# [1] 5
 # you can also call a column by name within the brackets (same would be
 # possible with lines when lines were given names via rownames()...):
 mat_bind[1,"V2"]
+# [1] 4
 
 # Column names can be changed via:
 colnames(mat_bind) = c("One", "Two", "Three") # rownames() exists too
-#      One Two Three
-# [1,]   1   1     1
-# [2,]   2   2     2
-# [3,]   3   3     3
+#   One Two Three
+# 1   4   4     4
+# 2   5   5     5
+# 3   6   6     6
 
 # Change single column name:
 colnames(mat_bind)[2] = "Second_Col"
 #   One Second_Col Three
-# 1   1          1     1
-# 2   2          2     2
-# 3   3          3     3
+# 1   4          4     4
+# 2   5          5     5
+# 3   6          6     6
 
 # Note that with the above method the class of all columns will be 
 # character, since combining a bunch of vectors c() is happening 
@@ -328,6 +335,13 @@ numeric2 = c(3,2,1)
 
 # Use data.frame()
 data_frame = data.frame(character,numeric1,numeric2)
+is.character(data_frame$character)
+# [1] TRUE 
+is.numeric(data_frame$numeric1)
+# [1] TRUE
+is.numeric(data_frame$numeric2)
+# [1] TRUE # Col 1 is character the others numeric: molecular data frame!
+
 
 # Alternative: First turn one vector into a data frame:
 data_frame = as.data.frame(character) 
@@ -336,7 +350,7 @@ data_frame = as.data.frame(character)
 # assigned automatically and need not to be changed. Note that
 # the below also demonstrates how to use cbind() to add a vector 
 # to an existing table:
-data_frame = cbind(data_frame,numeric1, numeric2)
+data_frame = cbind(data_frame, numeric1, numeric2)
 is.character(data_frame$character)
 # [1] TRUE 
 is.numeric(data_frame$numeric1)
@@ -359,14 +373,10 @@ is.character(data_frame_atomic$numeric2)
 # String Example
 string = c("One",2,3)
 # Try to add a 1 to the second element in the string above:
-# string[2]+1
+#string[2]+1
 # Error in string[2] + 1 : non-numeric argument to binary operator
 class(string)
 # [1] "character"
-
-# Try to add a 1 to the second element in the string above:
-# string[2]+1 # uncomment this line and execute to see effect
-# Error in string[2] + 1 : non-numeric argument to binary operator
 
 # Character string to numeric vector:
 test = c("1","2","3")
@@ -388,11 +398,22 @@ test = as.numeric(test)
 
 # The above output can be use to track entries in numeric columns with typos such as 12q,
 # i.e. a letter made it into the column... See chapter 8.2 and 8.7 for details.
+which(is.na(test) == TRUE)
+# [1] 1 2
 
-# Apart from NAs, empty entries of a column of the class character can also entails "" entries:
+# Apart from NAs, empty entries of a column of the class character 
+# can also entails "" entries:
 test = c("","","test")
-# These can be tracked via the which() function, e.g. which(table$column == ""). See chapter 
-# 8.2 and 8.6 for details on the use of the which() function. 
+# These can be tracked via the which() function, e.g. which(table$column == ""). 
+# See chapter 8.2 and 8.6 for details on the use of the which() function. 
+which(test == "")
+# [1] 1 2
+
+# The which function can also be used on matrices and result in row,col position:
+test2 = matrix(c(1,2,3,4,5,6,7,8,9), ncol = 3)
+which(test2 == 4, arr.ind = TRUE)
+#      row col
+# [1,]   1   2
 
 # Example array with dim = c(rows, columns, further_dimension)
 # Below uses a trick: 1 or 0 at the beginning and defining dimension
@@ -439,6 +460,47 @@ test_list = list("test",2,3)
 test_list[[2]]
 # [1] 2
 
+# Bonus: Difference between transposing and tilting a matrix:
+# Difference transpose and 9° flip
+initial = matrix(c("a", "b", "c", "d", "e", "f", "g", "h", "i"), nrow = 3, byrow = TRUE)
+#     [,1] [,2] [,3]
+# [1,] "a"  "b"  "c" 
+# [2,] "d"  "e"  "f" 
+# [3,] "g"  "h"  "i"
+
+# Transpose matrix (diagonal flip):
+transpose = t(initial)
+#     [,1] [,2] [,3]
+# [1,] "a"  "d"  "g" 
+# [2,] "b"  "e"  "h" 
+# [3,] "c"  "f"  "i" 
+
+# By row and by col. matrix with 90° tilt:
+tilt = matrix(c("g", "d", "a", "h", "e", "b", "i", "f", "c"), nrow = 3, byrow = TRUE)
+#     [,1] [,2] [,3]
+# [1,] "g"  "d"  "a" 
+# [2,] "h"  "e"  "b" 
+# [3,] "i"  "f"  "c"
+
+tilt == transpose
+#       [,1] [,2]  [,3]
+# [1,] FALSE TRUE FALSE
+# [2,] FALSE TRUE FALSE
+# [3,] FALSE TRUE FALSE
+
+tilt2 = matrix(c("g", "d", "a", "h", "e", "b", "i", "f", "c"), nrow = 3, byrow = FALSE)
+#     [,1] [,2] [,3]
+# [1,] "g"  "h"  "i" 
+# [2,] "d"  "e"  "f" 
+# [3,] "a"  "b"  "c" 
+
+tilt2 == transpose
+#       [,1]  [,2]  [,3]
+# [1,] FALSE FALSE FALSE
+# [2,] FALSE  TRUE FALSE
+# [3,] FALSE FALSE FALSE
+
+
 
 ###################################################################
 # --------------------------------------------------------------- #
@@ -469,9 +531,9 @@ dino = read.csv("dino_csv.csv")
 plot(x = dino$x, y = dino$y)
 
 # Load Excel file:
-# install.packages("readxl") # also within "tidyverse"
+# install.packages("readxl") # also within "tidyverse", but not automatically loaded...
 library("readxl")
-# dino_excel = read_excel("dino_csv2.xlsx") # activate line when you have a .xlsx Version of the csv
+excel_test = read_excel("excel_test.xlsx") # activate line when you have a .xlsx Version of the csv
 
 # install.packages("readr")
 library("readr") # package also within "tidyverse"
@@ -531,10 +593,10 @@ summary(lm(dino$y~dino$x)) # Slope is not significant...
 library("tidytuesdayR")
 
 # Load example data set scooby doo:
-tt_scooby = tt_load(2021,week=29)
+#tt_scooby = tt_load(2021,week=29) # downloads data set from the internet!
 
 # All Scooby Doo Episodes, whoop!
-scooby = tt_scooby$scoobydoo
+#scooby = tt_scooby$scoobydoo
 
 
 ###########################################
@@ -557,34 +619,50 @@ measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 # data.frame() which concatenates vectors column-wise, as cbind():
 table = data.frame(patient_id,time,measurement_sysRR,fam)
 
-# install.packages("dplyr")  # install package
+#install.packages("dplyr")  # install package
 library(dplyr)               # load/activate package
+# THE OUTPUT of library(dplyr) tells us that another function with in the stats package
+# that is automatically loaded (entailing functions such as lm() or mean() etc.) also
+# has a function called filter(), which is now masked, meaning it is "turned off". In python
+# the problem of functions with equivalent names is solved in a different way. When loading
+# a package, you write "important packages as p". The part "as p" defines a variable "p", which
+# is used to call a function from a specific package only. Functions are then called in fashion
+# of writing p.function() -- the above chosen variable is always written before the actual function name... 
 
-# Filter function: filter(data_object, column_name == "entry") or != for unequal
-t1 = filter(table, time == "t1")
+# Filter function: filter(data_object, column_name == "entry") or != for unequal via dplyr function:
+t1 = filter(table, time == "t1") 
 t1 = filter(table, time != "t2") # alternative
 t2 = filter(table, time == "t2")
 
-# Alternative without filter function:
-t1_alt = table[table$time == "t1",] # placed in row position; don't forget comma
-t1 == t1_alt # All true...
+# Alternative base package filter function, without the need of loading an additional package.
+# Note that the use of the index bracket syntax is very similar to the dplyr filter functions' syntax:
+t1_alt = table[table$time == "t1",] # placed in row position; don't forget the index dimension comma!!
+t1 == t1_alt # All true... Note that compared NAs stay NAs...
 
-# Also note that you can filter for multiple factors. The below keeps only
-# those lines that are either "ys" in fam and "yes" in fam:
+# Also note that you can filter for multiple factor via dplyr. The below keeps only
+# those lines that are either "ys" in fam and "yes" in fam ("|" := "or" operator):
 filter(table, fam == "ys" | fam == "yes") 
 
-# From there we could go on an explore the data:
+# From there we could go on and explore the data:
+
 # Simple plotting example (note that the code is spread over two lines!!!):
-plot(x = t1$patient_id,y = t1$measurement_sysRR, 
+plot(x = t1$patient_id, y = t1$measurement_sysRR, 
      ylim = c(100,150), 
      col = "blue", 
      ylab = "sysRR")
 points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
 
+
 # ... and perform a paired/dependent t-test):
 # Here using as.numeric() was necessary...
 result = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired  = TRUE)
+result$p.value
+# [1] 0.0008591109
 result$estimate
+# mean difference 
+#       -10.14286
+
+#?t.test
 
 #         Paired t-test
 
@@ -640,7 +718,8 @@ object = c(1,1,1,1)
 # Initialize a list to store the results:
 list_results = c()
 
-# Analoge without loop (same code, just each i is written out individually line by line): 
+# Analoge without loop (same code, just each i is 
+# written out individually line by line): 
 list_results[1] = object[1]+1
 list_results[2] = object[2]+1
 list_results[3] = object[3]+1
@@ -650,7 +729,6 @@ list_results[4] = object[4]+1
 for(i in 1:length(object)){
   list_results[i] = object[i]+1
 } # End for i
-
 
 
 ######################## POSSIBLE SOLUTION I to get rid of patients data with only t1 or t2. not both:
@@ -689,7 +767,7 @@ for(i in 1:length(na_lines)){
   pat_id_na[i] = new_table$patient_id[na_lines[i]]
 } # End for i
 pat_id_na
-#[1] "2" "4" # Patient ids with NA in either t1 or t2
+#[1] 2 4 # Patient ids with NA in either t1 or t2
 
 # Analoge without loop:               
 pat_id_na[1] = new_table$patient_id[4]  
@@ -869,7 +947,7 @@ apply(result, MARGIN = 1, FUN = sum)
 ### 8.5 EXAMPLE V: Introduction into “tidyverse” and the Pipe Operator #
 ########################################################################
 
-#### Pipe operator %>% using tidyverse:
+# Pipe operator %>% using tidyverse:
 # install.packages("tidyverse")
 library("tidyverse")
 
@@ -918,7 +996,7 @@ new_table2 == new_table3 # all TRUE...
 ###################################################################################
 
 
-### POSSIBLE SOLUTION II Simple dplyr/tidyverse alternative:
+# POSSIBLE SOLUTION II Simple dplyr/tidyverse alternative:
 new_table_alt %>%   # new_table_alt was filtered for NAs already!!! 
   select(patient_id,time,measurement_sysRRalt)%>%
   group_by(patient_id) %>%  # sorts individ. entries into indiv. groups 
@@ -928,18 +1006,20 @@ new_table_alt %>%   # new_table_alt was filtered for NAs already!!!
 
 
 
-#############################################################################################################
+#############################################################################################################                                           
 ### 8.6 EXAMPLE VI: Adjusting Character String Entries and Pattern Matching and Deleting Empty Entries ("") #
 #############################################################################################################
 
 #### Duplicate our previous table:
 fin_table_alt = new_table
 
-# Use the unique() function to show all individual entries (without duplicates so to speak)
+# Use the unique() function to show all individual entries 
+# (without duplicates so to speak)
 unique(fin_table_alt$fam)
 # [1] "yes" "no"  NA    "n"   "ys" 
 
-# Theoretical alternative to unique function via filtering duplicates; see chapter 10 for more on duplicated():
+# Theoretical alternative to unique function via filtering duplicates; 
+# see chapter 10 for more on duplicated():
 test = c(1,2,2,3, "test", "test")
 test[duplicated(test) == FALSE]
 # [1] "1"    "2"    "3"    "test"
@@ -1029,7 +1109,9 @@ filter_emp1 == filter_emp2 & filter_emp2 == filter_emp3
 # [1,] TRUE TRUE
 # [2,] TRUE TRUE
 
-# %in% "in"-Operator, which checks if elements of one vecotr are in another:
+# %in% "in"-Operator, which checks if elements of one vector are in another, here done with numbers
+# but also works with character entries(you will find this part also in chapter 10 on logical 
+# operators and general math functions):
 c(1,2,3) %in% c(1,2,3,4,5)
 # [1] TRUE TRUE TRUE
 sum(c(1,2,3) %in% c(1,2,3,4,5))
@@ -1147,7 +1229,7 @@ x$measurement_sysRRalt[!is.na(x$measurement_sysRRalt)]
 # You can also use na.omit(), but you should only do so for vectors, not tables/matrices:
 # The output format is nasty though; change via is.numeric():
 x = as.tibble(new_table)
-x2 = na.omit(x$measurement_sysRRalt)
+x2 = na.omit(x$measurement_sysRRalt) 
 #  [1] 130 122 132 133 121 125 135 119 134 127 140 125
 # attr(,"na.action")
 # [1] 4 7
@@ -1193,7 +1275,7 @@ data
 
 # Drop lines given NAs in column b
 drop_na(data,b)
-# > drop_na(df,b)
+# > drop_na(data,b)
 #   a b  c
 # 1 1 1  1
 # 2 2 2 NA
@@ -1300,6 +1382,9 @@ test_multi
 ##########################################
 ### 8.10 EXAMPLE X: Decoding and Sorting #
 ##########################################
+
+# More decoding functions such as stri_replace_all_fixed() can be found in chapter 8.11
+# Here we look at basic loop options for decoding:
 
 code = c("a","b","a","c","a")
 count = c(20,22,19,5,44)
@@ -1430,11 +1515,11 @@ table_new
 # 5    a    44 Something1
 
 
-##################################################################
-### 8.11 EXAMPLE XI: Changing Ä/ä into Ae/ae and Jumbled Unicode #
-##################################################################
+######################################################################################
+### 8.11 EXAMPLE XI: Changing Ä/ä into Ae/ae and Jumbled Unicode (Decoding patterns) #
+######################################################################################
 
-# Forgot to find the source for this one:
+# Essentially another way to perform decoding by pattern
 # install.packages("stringi")
 library(stringi)
 
@@ -2136,9 +2221,9 @@ parabola(x)
 ### 9.2 EXAMPLE FUNCTION II: Turning Nested For Loop Example into a Function #
 ##############################################################################
 
-########## You can turn any code that you would use again just for different variables into
-########## a function that does the same for any kind of input object. We can use our
-########## nested for loop example to demonstrate what this means:
+# You can turn any code that you would use again just for different variables into
+# a function that does the same for any kind of input object. We can use our
+# nested for loop example to demonstrate what this means:
 
 # Nested for loop example from above:
 object2 = cbind(c(1,1,1),c(1,1,1))
@@ -2275,8 +2360,10 @@ Bayes_Machine(likelihood = likelihood, prior = prior)
 ### 9.5 EXAMPLE FUNCTION V: Sum Function #
 ##########################################
 
-############### Examplatory code for a sum function (do not name it "sum",
-############### since it conflicts with the integrated sum() function)
+############### Example code for a sum function (do not name it "sum",
+############### since it conflicts with the integrated sum() function), 
+############### which then would be masked/turned off temporarily 
+############### (might need restart session to reset, if named sum()...)
 sum_alt = function(x){ # Start of function
   result = 0                 # initialize object for recursive addition;
   for(i in 1:length(x)){     # successively add the values of a vector;
@@ -2298,8 +2385,11 @@ sum(c(1,2,3)) == sum_alt(c(1,2,3))
 ### 9.6 EXAMPLE FUNCTION VI: Filter Function, similar to filter() in dplyr #
 ############################################################################
 
-# Example for a filter function, similar to filter() in the dplyr package
-# Criteria means what should be deleted, equivalent to always
+# Example for a filter function, similar to filter() in the dplyr package.
+# It shows that functions can be written by hand quite easily, however they 
+# may not be optimized for every case, class, speed-wise etc. 
+
+# Criteria refers to what should be deleted, equivalent to always
 # working with != in the dplyr filter function... 
 filter_alt = function(data_table,criteria_col,criteria){ 
   lines_to_filter = c()                # empty vector for lines to filter
@@ -2724,19 +2814,1175 @@ fibonacci2(20)
 2584/1597
 # [1] 1.618034
 
-#####################################################
-### 9.10 EXAMPLE FUNCTION X: Fourier Transformation #
-#####################################################
+################################################
+### 9.10 EXAMPLE FUNCTION X: Fourier Transform #
+################################################
 
-# This chapter can be found in a separate script R_Basic_I_FFT.R 
-# In order to use the package imager you have to install DirectX11 (Win) or Xquartz (Mac)!
+# This chapter can be found in a separate script R_Basic_I_FFT.R, found in the respective chapter
+# and within the .zip file...
+# In order to use the package imager you may have to install DirectX11 (Win) or Xquartz (Mac)!
+
+###############################################################################################
+### 9.11 EXAMPLE FUNCTION XI: Spatial Zombie Outbreak Simulation - incl. while() Loop Example #
+###############################################################################################
+
+# Function results in a different outcome every time it is executed (incl. randomness / is stochastic).
+
+# Code below inspired by the following math you tube video:
+# https://www.youtube.com/watch?v=g-g-NdyYwsY 
+
+# For a more academic approach on Zombies using a modification of the SIR model,
+# see this paper: https://doi.org/10.48550/arXiv.1503.01104 
+
+# Percolation point/threshold for a 2D lattice (given left/right/up/down neighbors
+# can be infected and no diagonal infection is possible (as in a rather classic SIR model)!) 
+# See Wikipedia for more details: https://en.wikipedia.org/wiki/Percolation_threshold  
+percentage = .592746050792
+
+# Zombie infection function, which is used within the zombie_outbreak function:
+infect = function(infected, t2){
+  
+  # Additional frame is added via zombie_outbreak(), so no if statements needed 
+  # for starting at margins or corners or handling the infection of corners and 
+  # potential surroundings from there:
+  for(index in 1:nrow(infected)){
+    # Shorthand variables for col and row:
+    row = infected[index,1]
+    col = infected[index,2]
+    
+    # If statement to rule out positions at the matrix corner.
+    # NOTE that corners and borders could be handled via more if statements, however, it is 
+    # much more efficient by just adding a redundant frame with all zeros around 
+    # the matrix t2 and delete it again at the end, saving the need of any further exceptions 
+    # via loads of if statements for the starting and end cases....
+    # The redundant frame is added within the function zombie_outbreak(percentage), 
+    # where percentage refers to the percentage of people over empty spaces, such 
+    # that .6 means 60 % people and 40 % empty spaces:
+    
+    # if (non-corner and non-boarder positions)
+    if(row > 1 & row < nrow(t2) && col > 1 & col < ncol(t2)){
+      # Infection to the left, given that a human is at that position, i.e. 1 not 0!:
+      if(t2[row,col-1] == 1){
+        t2[row,col-1] = 2
+      } # End if
+      # Infection to the right:
+      if(t2[row,col+1] == 1){
+        t2[row,col+1] = 2
+      } # End if
+      # Infection "upwards":
+      if(t2[row-1,col] == 1){
+        t2[row-1,col] = 2
+      } # End if
+      # Infection "downwards":
+      if(t2[row+1,col] == 1){
+        t2[row+1,col] = 2
+      } # End if
+    } # End if non-corner positions
+  } # End for index
+  return(t2)
+} # End of function
+
+# Actual outbreak function that uses the infect function within it:
+zombie_outbreak = function(percentage){
+  
+  # Define n as 10000 (more is rather hard to plot):
+  n = 10000
+  
+  # Create matrix of people, empty spaces and an initial zombie0:
+  # First define amount of 1s and 0s, rounded:
+  one = round(n*percentage)
+  zero = n-one
+  
+  # Create vector, similar to previous, where I used 6/10, i.e. 60% people range, via c(0,0,0,0,1,1,1,1,1,1),
+  # from which I sampled. The below method is more elegant.
+  # The vector uses rep() for a repetition of 0s and 1s.
+  x = c(rep(1,one),rep(0,zero)) # rep() repeats a series of defined values up to n...
+  
+  # Shuffle it via the following, where replace is FALSE by default, which is the same as shuffling.
+  # Would not have worked sampling from c(0,1) (== Bernoulli trials) or our vector wit n = 10, 
+  # but since we already created a vector with our desired length of 10k, it is equivalent to shuffling!!
+  x = sample(x)
+  
+  # Start matrix (without infections):
+  start = matrix(x, ncol = sqrt(n)) # col-wise, here sqrt(n) = 100 , given n = 10000
+  
+  # Deciding for Patient 0:
+  # Search for people in the matrix:
+  pospeople = which(start == 1, arr.ind = TRUE)
+  
+  # Sample one of the people to choose a Zombie 0:
+  pos0 = sample(c(1:length(pospeople[,1])), size = 1)
+  
+  # Position of the first Zombie in the matrix: 
+  # Note that the expression "patient zero" comes from a reading error, confusing the vowel "o" 
+  # with zero... The better option would be "index case", which is however not as associative
+  # to the context of an infection as when using something with "zero" and naming the first person
+  # that was infected from human to human patient "one"... hard to challenge conventions in this case...
+  zombie0 = pospeople[pos0,]
+  
+  # Add Zombie 0, initializing infection on patient 0:
+  infection0 = start
+  infection0[zombie0[1],zombie0[2]] = 2
+  
+  # Initialize the first t1 and t2 variables (for the initial difference calculated further below
+  # which will then be repeatedly updated each loop cycle within the while() loop below):
+  t1 = start      # uninfected matrix
+  t2 = infection0 # first infection
+  
+  # Add redundant frame, in order to avoid writing multiple if statements in the infect() function
+  # for the case of borders and corners...
+  t1 = cbind(c(0),t1,c(0))
+  t1 = rbind(c(0),t1,c(0))
+  t2 = cbind(c(0),t2,c(0))  
+  t2 = rbind(c(0),t2,c(0))
+  
+  # First initial difference:
+  diff = t1 == t2
+  
+  # Using a while loop for the actual infection process, which stops, when the current
+  # and previous state are identical, indicating that no further infections are happening...
+  # We can't use a for loop here, since the number of infections is dynamic and it is 
+  # unclear when the infections stops in advance! Therefore we use a while loop with 
+  # a break included for the case that the infection stopped. Otherwise the loop would go on 
+  # forever potentially! Makes a program crash... floods memory... leads to errors... 
+  steps = 1 # initial variable where +1 is added each time, to keep track of the number of cycles...
+  
+  # The list below keeps track of how many infections have occured per step/day
+  curve_infect = list()
+  
+  # The while loop will do the job of simulating the infection throughout previously unknown number of days
+  while(sum(diff) < length(t1)){ # sum of all 0s = 0, and sum of all 1s and 2s is the respective sum;
+                                 # this is enough information to validate that a change between t1 and t2 has occured!
+    
+    # Update variable "steps" to keep track of how many loops/cycles have passed 
+    # (for the final console output, stating when the outbreak found an end):
+    steps = steps + 1 # recursively adds + 1 after each loop cycle
+    
+    # Boolean matrix where false indicates a change to the previous state of the matrix, 
+    # i.e. indicating a new infections that leads to further infections...:
+    diff = t1 == t2
+    
+    # Stop while loop when the infection stops to spread:
+    if(sum(diff) == length(t1)){ # indicating no change between t1 and t2, then...
+      # Add fancy ASCII-art text to console output, including a message from the government;
+      # the ASCII-art has to be inserted as so called raw string via r"()" within cat(), otherwise
+      # cat understands certain patterns as functional code, such as "\_":
+      cat(r"(
+                _     _     _             ______               _     _           _ _ _
+          /\   | |   | |   | |           |___  /              | |   (_)         | | | |
+         /  \  | |__ | |__ | |__            / / ___  _ __ ___ | |__  _  ___  ___| | | |
+        / /\ \ | '_ \| '_ \| '_ \          / / / _ \| '_ ` _ \| '_ \| |/ _ \/ __| | | |
+       / ____ \| | | | | | | | | |_ _ _   / /_| (_) | | | | | | |_) | |  __/\__ \_|_|_|
+      /_/    \_\_| |_|_| |_|_| |_(_|_|_) /_____\___/|_| |_| |_|_.__/|_|\___||___(_|_|_))", "\n", "\n")
+      cat("\t","\t","\t","\t","\t",steps,"Days Later", "\n", "\n")
+      cat("\t","\t","\t","\t","   BREAKING GOVERNMENT NEWS!","\n","\n","The spread of the Umbrella Corp. induced T-Virus infection has finally stopped after", steps,"days.","\n",
+          "Amount of people in the initial, non-infected neighborhood of Racoon City (matrix field):",as.character(100/length(x)*sum(x)),"%")
+      break
+    } # End if
+    
+    # List of the row,col positions of previously infected aka current Zombies (current loop cycle),
+    # which will be infected a few lines further below via the infect() function that applies the infect rule
+    # on the current matrix:
+    infected = which(diff == FALSE, arr.ind = TRUE)
+    
+    # Save number of current infections given steps/days, in order
+    # to optionally show the dynamic of the spread:
+    curve_infect[[steps]] = nrow(infected) # number of new infections per step/day
+    
+    # AHHHhhh...!!! Infection of new people via the current Zombies: #######################
+    new_infections = infect(infected,t2) ############ HERE is where the function infect() is used!!!!! 
+    
+    # At the end of each loop, the old t2 has to become the new t1, in order to 
+    # keep the loop logic consistent:
+    t1 = t2
+    
+    # And the new t2 has all the new infections upon the now old t2 table:
+    t2 = new_infections
+    
+  } # End of while
+  
+  # Delete redundant frame:
+  t2 = t2[-c(1,nrow(t2)),]
+  t2 = t2[,-c(1,ncol(t2))]
+  
+  # For the case that the infection has reached at least one boarder or not:
+  if(length(which(t2[1,] ==  2)) > 0 || length(which(t2[nrow(t2),] ==  2)) > 0 || length(which(t2[,1] ==  2)) > 0 || length(which(t2[,ncol(t2)] ==  2)) > 0){
+    cat("\n","Ahhh...!!! The infection has reached at least one boarder!!! Nearby districts are at risk of infection!", "\n")
+    reach = 1
+  } # End if
+  else{
+    cat("\n","The infection remained local. Sigh...", "\n")
+    reach = 0
+  } # End of else
+  
+  # Ratio Human/Zombie after outbreak has stopped (cat() needs extra 
+  # "\n" i.e. backspace at the end, to not mess up the console output):
+  cat("\n","Zombies =", length(which(t2 == 2)), ", Humans =",
+      length(which(t2 == 1)), ", Ratio in Percent:", round(length(which(t2 == 2))/(length(which(t2 == 1))+length(which(t2 == 2))),4)*100, 
+      "% Undead Walker", "\n")     
+  
+  # Track number of zombies and humans at the end of an outbreak:
+  zombie_hum = c(length(which(t2 == 2)),length(which(t2 == 1)))
+  
+  # Percentage of Zombies among humans:
+  zombie_perc = round(length(which(t2 == 2))/(length(which(t2 == 1))+length(which(t2 == 2))),4)*100
+  
+  # Output list for further evaluation, specially for multiple trials:
+  output_list = list()
+  output_list[[1]] = c(steps,n)   # Number of Days/steps and n, i.e. number of matrix "pixels" in total
+  output_list[[2]] = percentage   # used percentage as result of the ratio of people and total spaces/"pixels"!
+  output_list[[3]] = reach        # Indicates if at least one boarder as been reached
+  output_list[[4]] = zombie_hum   # Plain number of Zombies and Humans at the end of the infection. 
+  output_list[[5]] = zombie_perc  # Percentage of Zombies among people
+  output_list[[6]] = curve_infect # A list of the number of new infections per step/day
+  
+  # Plot Final State of Zombie Outbreak:
+  image(t2, col = c("white", "black", "deeppink"), axes = FALSE, main = "Ahhhh... Zombies!!")
+  invisible(output_list) # returns the list object, but does not show it in the console!
+                         # the list however can be retrieved via using object names, or adding
+                         # [[]] and the respective list number at the end of the function, 
+                         # e.g. zombie_outbreak(percentage)[[2]]
+  
+} ################################# End of function zombie_outbreak
+
+# Test function (explore what happens when using different percentages!!):
+# NOTE that there are a lot of parameters returned from the above function
+# that can be used to visualize more aspects of the development of the infection
+## especially when simulating an outbreak several times (see code further below): 
+zombie_outbreak(percentage = .5927)  
+zombie_outbreak(percentage = .5927)
+zombie_outbreak(percentage = .5927)
+
+######## ACTIVATE CODE BELOW TO SIMULATE A BUNCH OF OUTBREAKS:
+
+# Simulate a bunch of outbreaks an further evaluate the result:
+# multiple_outbreaks = list()
+# n_sim = 100
+# multiple_outbreaks = list()
+# for(index in 1:n_sim){
+#   multiple_outbreaks[[index]] = zombie_outbreak(percentage = .592746050792) # .592746050792
+# } # End for index
+# 
+# # Extract number of steps and reach
+# steps = c()
+# reach = c()
+# for(index in 1:length(multiple_outbreaks)){
+#   steps[index] = multiple_outbreaks[[index]][[1]][1]
+#   reach[index] = multiple_outbreaks[[index]][[3]][1]
+# } # End for index
+# 
+# # Number of steps until the outbreak stopped:
+# hist(steps, col = "deeppink", breaks = 25)
+# 
+# # How often was a boarder reached:
+# hist(reach, col = "deeppink", breaks = 2)
+
+
+
+######################################################
+### 9.12 EXAMPLE FUNCTION XII: Conway's Game of Life #
+######################################################
+
+# Works similar as the Zombie Outbreak example! 
+# CODE THAT PRODUCES IMAGES and the actual execution of the function
+# has been turned off, since it floods the plot window...
+
+# Game of Life Function:
+# The Parameter "game_board" has to be an initialized game board including a 
+# starting patterns or a random distributions of 1s:
+game_of_life = function(game_board, cycles_max = 20){ 
+  
+  # Add redundant frame to make computation easier (equivalent to the Zombie Outbreak example! 
+  # it makes the use of several if rules to cover the frame and corners of the board unnecessary!):
+  game_board = cbind(c(0),game_board,c(0))
+  game_board = rbind(c(0),game_board,c(0))
+  
+  # Step variable to keep track of how many steps have evolved:
+  step = 1
+  
+  # We need a redundant game board where the change is stored, such that 
+  # a change due to the application of rules does not affect any surrounding cells where the rule
+  # has not been applied yet, right away:
+  game_board_t2 = game_board
+  
+  # Create list with the plots:
+  plots = list()
+  
+  # While loop looping over each generation of life/death: 
+  while(step <= cycles_max){ # Cutoff for the case of oscillations etc. 
+    # OR that an empty world remains.
+    
+    # Break when cycles max is reached
+    if(step == cycles_max){
+      print("Max. Cycles Reached")
+      break # this part is actually redunant, since already defined as endpoint in the while() statement above!
+    } # End if step == max cycles...
+    
+    # Extract coordinates of 1s and 0s
+    ones  = which(game_board == 1, arr.ind = TRUE)
+    zeros = which(game_board == 0, arr.ind = TRUE)
+    
+    # Break when world becomes empty (not the case with every pattern, therfore cycles_max has to be defined!):
+    if(sum(ones) == 0){
+      print(paste("World became empty after", step, "Generations."))
+      break
+    } # End if step == max cycles...
+    
+    # For loop to apply the rule of LIVING and DYING, i.e., will a cell (1s) survive or not
+    # due to under - or over population (more than 3 neighbors). 
+    # The following loop looks at each 1 in the matrix and extracts a surrounding frame 
+    # of that 1. It then simply checks the sum, due to the fact that at least two neighbors 
+    # in the frame means the cell can live. Different to the previous and similar zombie case, 
+    # the below frame also includes diagonal relations to a living cell!
+    for(index in 1:nrow(ones)){
+      # Shorthand variables for col and row:
+      row = ones[index,1]
+      col = ones[index,2]
+      
+      # Extract surrounding grid of the respective 1 case (living cell), given
+      # that the position of a 1 is inside the redundant frame we added:
+      if(row > 1 & row < nrow(game_board) && col > 1 & col < ncol(game_board)){
+        # Sum of the grid, including the center 1:
+        grid = sum(c(game_board[c((row-1):(row+1)),(col-1)], 
+                     game_board[c((row-1):(row+1)),(col+1)],
+                     game_board[c((row-1):(row+1)),(col)]))        
+        if(grid < 3){ # For the case of one or no neighbor cell with 1, 
+          # i.e A CELL DIES, due to UNDERPOPULATION!
+          game_board_t2[row,col] = 0
+        } # End if a cell dies, the implicit else case just leaves the one be...
+        else if(grid > 4){ # For the case of OVERPOLUATION, i.e. more than 3 neighbors! It's >4 since the sum counts in the give coordinate with 1 too!!!
+          game_board_t2[row,col] = 0
+        } # End if a cell dies, the implicit else case just leaves the one be...
+      } # End if
+    } # End for index 
+    
+    # For loop of cells COMING TO LIFE, i.e., has a 0 cell two or three neighbors, since than it will
+    # come to life!!
+    for(index in 1:nrow(zeros)){
+      # Shorthand variables for col and row:
+      row = zeros[index,1]
+      col = zeros[index,2]
+      
+      # Extract surrounding grid of the respective 0 case (dead cells), given
+      # that the position of a 0 is inside the redundant frame we added:
+      if(row > 1 & row < nrow(game_board) && col > 1 & col < ncol(game_board)){
+        # Sum of the grid, including the center 1:
+        grid = sum(c(game_board[c((row-1):(row+1)),(col-1)], 
+                     game_board[c((row-1):(row+1)),(col+1)],
+                     game_board[c((row-1):(row+1)),(col)]))        
+        if(grid == 3){ # For the case of three neighbor cells with 1, i.e. A CELL WILL COME TO LIFE!
+          game_board_t2[row,col] = 1
+        } # End if a cell comes to live, the implicit else case just leaves the zero (dead cell) be...
+      } # End if
+    } # End for index 
+    
+    # After every cycle, the game_board variable has to be updated, now being the former t2!!
+    game_board    = game_board_t2  
+    
+    # Store plot of the images (could be used for .gif animation, but does not work will with the
+    # image() function and this function only to show the basic concept; feel free to advance
+    # its function scope...)
+    plots[[step]] = image(t(game_board[nrow(game_board):1,1:ncol(game_board)]), col = c(0,1), axes = FALSE)
+    
+    # Update steps variable:
+    step = step + 1
+    
+  } # End while
+  invisible(plots)
+} # End of function
+
+# Initialize empty game board of life:
+dim = 43 # nrow or ncol
+game_board = rep(0,dim*dim)
+game_board = matrix(game_board, ncol = dim)
+
+# Some starting patterns:
+# Initialize center position to generalize the below starting patterns
+# such that they can be placed flexibly within any given board (works as long
+# as the starting pattern does not go out of index bounds!):
+center_col = floor(ncol(game_board)/2)
+center_row = floor(nrow(game_board)/2)
+
+# Start Pattern 1 (very cool one that comes to an end after around 55 cycles/generations!):
+game_board[c((center_row-3):(center_row-1),(center_row+1):(center_row+3)),center_col-1] = 1
+game_board[c((center_row-3):(center_row-1),(center_row+1):(center_row+3)),center_col+1] = 1
+game_board[c((center_row-3),center_row+3),center_col] = 1
+#image(t(game_board[nrow(game_board):1,1:ncol(game_board)]), col = c(0,1), axes = FALSE)
+
+# Start Pattern 2 --- Glider:
+# game_board[c(center_row+1), (center_col-1):(center_col+1)] = 1
+# game_board[center_row,(center_col+1)] = 1
+# game_board[center_row-1,(center_col)] = 1
+# image(t(game_board[nrow(game_board):1,1:ncol(game_board)]), col = c(0,1), axes = FALSE)
+
+# Start Pattern 3 --- Space Ship
+# game_board[center_row, c(2:7)] = 1
+# game_board[center_row-1, c(1,7)] = 1
+# game_board[center_row-2, c(7)] = 1
+# game_board[center_row-3, c(1,6)] = 1
+# game_board[center_row-4, c(3,4)] = 1
+# image(t(game_board[nrow(game_board):1,1:ncol(game_board)]), col = c(0,1), axes = FALSE)
+
+# Start Pattern 4 --- Oscillators and Static Objects
+# Block:
+# game_board[(center_row-15),(center_col-15)] = 1
+# game_board[(center_row-15),(center_col-14)] = 1
+# game_board[(center_row-14),(center_col-15)] = 1
+# game_board[(center_row-14),(center_col-14)] = 1
+# 
+# # Boat:
+# game_board[(center_row-15),(center_col-10)] = 1
+# game_board[(center_row-15),(center_col-9)] = 1
+# game_board[(center_row-14),(center_col-9)] = 1
+# game_board[(center_row-14),(center_col-11)] = 1
+# game_board[(center_row-13),(center_col-10)] = 1
+# 
+# # Pendecathlon: DOESNT WORK?????
+# game_board[(center_row-8),(center_col-15)] = 1
+# game_board[(center_row-8),(center_col-14)] = 1
+# game_board[(center_row-8),(center_col-12):(center_col-8)] = 1
+# game_board[(center_row-8),(center_col-6)] = 1
+# game_board[(center_row-8),(center_col-5)] = 1
+# game_board[(center_row-7),(center_col-13)] = 1
+# game_board[(center_row-9),(center_col-13)] = 1
+# game_board[(center_row-7),(center_col-7)] = 1
+# game_board[(center_row-9),(center_col-7)] = 1
+#image(t(game_board[nrow(game_board):1,1:ncol(game_board)]), col = c(0,1), axes = FALSE)
+
+############# TEST FUNCTION:
+#game_of_life(game_board, cycles_max = 100)
+
+######## Random Pattern of 1s (so-called "soup") with random 0s and 1s:
+# Initialize empty game board of life:
+# dim = 43 # nrow or ncol
+# 
+# # Ratio of 1s and 0s:
+# percentage = .3
+# n = dim*dim
+# ones = round(n*percentage)
+# zeros = n-ones
+
+# Create vector of ones and zeros, equivalent to the Zombie Outbreak example:
+#game_board = c(rep(1,ones),rep(0,zeros)) # rep() repeats a series of defined values up to n...
+
+# Shuffle it via the following, where replace is FALSE, which is the same as shuffling.
+# Would not have worked sampling from c(0,1) (== Bernoulli trials) or our vector wit n = 10, 
+# but since we already created a vector with our desired length of 10k, it is equivalent to shuffling!!
+#game_board = sample(game_board)
+
+# Start matrix (without infections:
+#game_board = matrix(game_board, ncol = dim) # col wise
+
+# View game board with random 1s and 0s:
+#image(game_board, col = c(0,1), axes = FALSE)
+
+# Test function:
+#game_of_life(game_board,cycles_max = 200)
+
+
+##############################################################################################################
+### 9.13 EXAMPLE FUNCTION XIII: Compartmental Modelling - The SIR and SEIR Model, incl. a SIR Zombie Variant #
+##############################################################################################################
+
+##### SIR Model via Euler's method (deterministic) and via the Gillespie algorithm (stochastic).
+
+#### SIR stands for the relation between the number of:
+# S == Susceptibles, i.e., individuals that can be infected / are susceptible for an infection
+# I == Infectious individuals, i.e., everyone that has the disease and can carry it over to S, the susceptible individuals                                     
+# R == Remission/Removed/Immune/Deceased/Recovered/Resistant individuals; assumes that people that recover are immune from there on
+
+#### Difference between using a deterministic and a stochastic model:
+# In general, a deterministic model does not involve randomness, such that certain dynamics and
+# cases are not captured by the model. A stochastic model captures the randomness. 
+# The rather huge function with a reasonable set of standard parameters, such that no parameter
+# has to be adjusted in prior, delivers by default a plot of both a stochastic (Gillespie algorithm),
+# as well as a deterministic model (via Euler's method). For the simple SIR model,
+# both outcomes differ not enough that it would matter in any decision of a country or region
+# in order to lower the transmission rate of a disease, but the stochastic model includes
+# some interesting dynamics in certain cases, e.g. if the outbreak starts only with
+# one infected person (as by default), it can happen that this person recovers right away
+# and the infection does not move further than 2 days... 
+
+# NOTE that this model neglects diseased individuals as an influence to the total population (which is usually
+# mathematically valid enough, even though e.g. 1% of a population dying is actually extreme,
+# but does not heavily influence the mathematical outcome of modelling the spread).
+# OTHER CORE ASSUMPTIONS of the SIR model (partially from https://www.youtube.com/watch?v=f1Ewm1hyPWY):
+# Constant and closed population size (no one comes in and out); fixed uniform infectious period
+# (this will be the variable D within gamma, which could be dynamic); permanent immunity after infection
+# and theoretically via vaccines, but there we would change the number of susceptible individuals
+# at t = 0; there is no incubation time or latency of becoming the disease, meaning once infected
+# a individual has the disease right away, not hours, days etc. later... and a bunch more... 
+
+##### THE BELOW CODE is based on the following online material:
+# Wiki article on compartmental modelling:
+# https://en.wikipedia.org/wiki/Compartmental_models_(epidemiology)
+# Youtube video by Dr. Trefor Bazett:
+# https://www.youtube.com/watch?v=Qrp40ck3WpI
+# R tut using the deSolve package for diff equations, which the below doesn't, since it is a 
+# complete autonomous function that does not require any additional functions apart from
+# basic packages...
+# https://urbanpsychology.medium.com/understanding-the-sir-model-for-disease-spread-with-r-a7b9c1f666e3 
+# Zombie Paper that shows several modified versions of the SIR model:
+# https://doi.org/10.48550/arXiv.1503.01104 
+# Code for Gillespie algorithm is mostly based on Tutorial by Mike Saint-Antoine and the accompanied 
+# python code, I add some tweaks and more error control: 
+# https://www.youtube.com/watch?v=ZQbf5QVxPB0 
+
+
+# Function to plot the SIR model using Euler's method and the Gillespie algorithm:
+SIR_fun = function(beta, D, N, days, Infected, limit_x, legend, plot_R_0, stoch_algo){ # All parameters are optional
+  
+  # DEFAULT PARAMETERS: 
+  # beta = 1, D = 10 (gamma = 1/D), N = 500, 
+  # days = 500, Infected = 1, limit_x = c(0,60), 
+  # legend = TRUE, plot_R_0 = TRUE, 
+  # stoch_algo = TRUE # in some cases, S and I run out early before the 500 days; a break had been implemented for this case.
+                      # including information on the number of days, passed and the SIR values for t (=days).
+                      # Note that in the plots of this function, by default you will only see
+                      # the first 60 days; for an analysis how many times it does not end up to the 500 days, use the
+                      # list output of this function to model several simulations and the check for the
+                      # length of tt, Sp, Ip, Rp.... 
+
+  ####### Code below sets the Default parameters, given that the input parameter is missing.
+  ####### There is a simplified way of coding the below without the need
+  ####### of the use of the missing() function and if statements,
+  ####### but this way the whole logic is directly represented, since we 
+  ####### want to keep it basic and about understanding algorithms, not 
+  ####### about writing code for official packages etc... We will also use
+  ####### a form of coding that is more typical for python for the Gillespie
+  ####### Algorithm, since the basis for that part was python code...
+  ####### NOTE that some of the default parameters, especially those 
+  ####### related to plotting, will be handled further below in the function.
+  
+  # N = Population, which is also the sum of S+I+N:
+  if(missing(N) == TRUE){ 
+    N = 500 # total constant population = 500 by default
+  } # End if
+  
+  # Average time period a person is infectious, or when it recovers:
+  if(missing(D) == TRUE){
+    D = 10  # 10 days infectious by default, or "recovers after 10 days"
+  } # End if
+  
+  # Average number of contacts per person per time / transmission rate. 
+  # In this simple case contact means immediate infection.
+  # Beta can be influenced by hygiene, fewer contacts with other people, general awareness, 
+  # quarantine of infectious people...
+  if(missing(beta) == TRUE){
+    beta = 1 # contact with 1 other person resulting in infection (right away in the simple SIR model)
+  } # End if 
+  
+  # Observation window of an outbreak in days:
+  if(missing(days) == TRUE){
+    days = 500 # outbreak takes 500 days by default
+  } # End if
+  
+  # For more control over the plot:
+  if(missing(limit_x) == TRUE){
+    limit_x = c(0,60) # This setting works well for the default case....
+  } # End if
+  
+  # Gamma (recovery rate) is the fraction of the currently infected that is recovering, which
+  # results in a percentage of the people that recover everyday, given D (the time period
+  # an individual stays infectious)... 
+  # So, for the case that D = 2 days, this means that 1/2 == .50 == 50% of infected recover every day
+  gamma = 1/D
+  
+  # Initialize variables for the differential equations solved in the loop further below:
+  dt   = .1  # for a reasonable resolution so to speak; used to weight e.g. dS in dS/dt 
+  t = seq(0,days,by = dt) # is used later on for plotting; x-axis
+  time = length(seq(0,days,by = dt)) # is used as maximum value for the index variable of the for loop below
+  R_0  = rep(0,days) # for keeping track of the basic reproduction number
+  
+  # The following part is only used for the Euler's method for loop, since the Gillespie algorithm
+  # uses a while loop and appends (adds) new values to a starting vector with just the initial 
+  # values, i.e. a length of 1... The default values for the Gillespie algorithm are set further 
+  # below, along with setting the default values for S by just using the first value of S for 
+  # the variable Sp within the code for the stochastic SIR model. 
+  # Create a vector for the variables S, I and R with initial states:
+  # Empty vectors; note that we use a length of N+1, since we 
+  # will set the first position, but on the other hand, we will also loop
+  # over the length of N later on, but we don't want 
+  S = rep(0, time)
+  I = rep(0, time)
+  R = rep(0, time)
+
+  # Initial conditions
+  # R will be 0 at the beginning, since no one recovered/died yet...
+  # This could also be changed, adding a number of naturally immune or vaxxed individuals, which
+  # would also affect the number of initially susceptible individuals, given it is not happening 
+  # in the middle of a current and outbreak of a previously unknown virus or other infectious diseases... 
+  # ... however, we will keep it simple here... Feel free to add more option to the code....
+  R[1] = 0
+  Rp = c(0) # for the case of Gillespie algorithm, the p stands for probabilistic...
+  
+  # For the default case of one infected individual
+  if(missing(Infected) == TRUE){
+    Infected = 1
+    S[1] = N-Infected
+    Sp = c(S[1]) # p in Sp stands for probabilistic/stochastic
+    I[1] = Infected  
+    Ip = c(I[1])
+  } # End else
+  
+  # Optional for the case that the function parameter for the initial number of infected is 
+  # used, not the default of 1:
+  else{
+    S[1] = N-Infected
+    Sp = c(S[1])
+    I[1] = Infected
+    Ip = c(I[1])   
+  } # End if
+  
+ 
+  ######## SIR via EULER'S METHOD (deterministic method):
+  
+  # Loop that solves the differential equations for each day, i.e. 
+  # each t using Euler's method (later a while loop will perform the Gillespie algorithm):
+  for(time in 2:(time)){ # starting at [2], since [1] is set previously
+
+    # Transition rates (moving from S to I or I to R...):
+    # d == difference, such that dS == difference of the number of susceptibles given dt, 
+    # i.e. a difference/change in time...
+    dS = -beta*S[time-1]*I[time-1]/N  # rate of infection among the susceptible individuals; 
+                                      # negative beta since decrease of S is assumed due to infections...
+                                      # Note that the larger the value of -beta*S*I is (the interactions
+                                      # with infected, governed by beta, the number of contacts), the
+                                      # greater the number of S-to-I transitions of N will be happening...
+    
+    dI = beta*S[time-1]*I[time-1]/N - gamma*I[time-1] 
+    # rate of change in the infected population, which has a two sided dependency: 
+    # a) beta*S*I/N == - dSdt == + beta * S * I / N == from S to I
+    # => dI given dt is resulting in an increase of I when, people 
+    #    become infected... The loss of -beta*S*I is regained in
+    # the change of I increasing again inversely proportional.... 
+    # aaaand:
+    # b) - gamma*I == from I to R, which results in a decrease of I, therefore
+    #    the subtraction......
+    # ====> sooooo, dIdt is dependent of a change in S to I and I to R...
+    
+    dR = gamma*I[time-1]  # rate of recovery/immune/death of infected individuals; immunity
+                          # and death are treated the same, since immune individuals are also not
+                          # part of the spreading anymore, just as diseased individuals...
+    
+    # Calculates the next state from current state and weights in dt to keep
+    # the relation between x = time and y = the differences as function 
+    # (same method used for the Lorenz attractor example in the next chapter).  
+    S[time] = S[time-1] + dS * dt # weighting by dt for re-scaling
+    I[time] = I[time-1] + dI * dt
+    R[time] = R[time-1] + dR * dt
+    
+    # Basic Reproduction Number R_0:
+    # R_0, spoken R_zero, or R_naught; S[1] = S_0, i.e. the initial state in this case... 
+    # Ratio less than 1 means infection is decreasing in general... 
+    # Other tactic is vaccines that brings down the number of susceptible, which could have a changed
+    # S[1] and N...
+    R_0[time] = (beta*S[time])/(gamma*N)
+      
+    # When R_0 < 1, this means that each infected person is infecting less than one other
+    #               person on average each time period (e.g. days). 
+    #               This results in a decay of the infection in the long run.
+    #      R_0 = 1  Stable infections within the population; causes the infection to also stay endemic
+    #               instead of epidemic/pandemic...
+    #      R_0 > 1  This will lead to an spreading outbreak, potential epidemic/pandemic, new endemic etc.
+    #               The number of infections grows exponentially from here and which takes on a logistic 
+    #               form, when the number of susceptible reaches its minimum....
+    
+  } # End for day
+
+  
+  ######## SIR via GILLESPIE ALGORITHM (Stochastic Method):
+  
+  # This part is without any explanations; Code is based on: https://www.youtube.com/watch?v=ZQbf5QVxPB0 
+  
+  # Initialize tt, so the variable t can be used for plotting; also we use time for 
+  # tt_max (redundant code here, just that we know what variables are used below):
+  tt = c(1) # has to be 1, since we are using 1-indexing methods
+  #### Note that the output of tt will be a non-integer vector with e.g. 21.86 days as value...
+  time = length(seq(0,days,by = 1)) # is used as index variable of the for loop below, default = 500 days
+  steps = 2 # to keep track of the number of loops; can't use tt, since it will be changed below
+  # we will start with 2, such that we can use steps[-1] in the while loop (based on python code
+  # with 0 index variables...)
+  
+  # Gillespie algorithm for stochastic SIR:
+  while(tt[steps-1] < time && (Sp[steps-1]+Ip[steps-1]) > 1){ # Second condition is for the case that the algorithm runs out of susceptible and infected people...
+                                                              # without it, the output will sometimes result an error; 
+    # Propencities:
+    prop = c(((beta*Ip[steps-1]*Sp[steps-1])/N), gamma*Ip[steps-1])
+    # Sum of the propensities:
+    prop_sum = sum(prop)
+   
+    # For the case of running out of S or I before tt has reached its max, we set up an if 
+    # statement to break the loop to avoid errors...
+    # This can happen mid run, but also right at the beginning. 
+    # Here is some example output, where the only infectious person recovered right away, breaking the outbreak so to speak...
+    # test[[7]]   # Susceptibles for t1 and t2 only, since it stopped right after that
+    # [1] 499 499 # Only one person got infected, which was right at the beginning, before the while() loop
+    # test[[8]]   # Infectious
+    # [1] 1 0     # The only infectious person...
+    # test[[9]]   # Recovered
+    # [1] 0 1     # recovered right away... a break occured in this case...
+    if(prop_sum <= 0 || Ip[steps-1] == 0) {
+      cat(" Break in Gillespie Algorithm!!!","\n","The outbreak ran out of susceptibles or infected due to recovery.","\n", 
+          "Cutoff at the repective value of t =", round(tt[length(tt)]),"days.","\n",
+          "Number of S, I, R at cutoff = {", Sp[length(Sp)],",",Ip[length(Ip)],",",Rp[length(Rp)],"}","\n")
+      break # The algorithm will stop
+    } # End if
+    # 
+    # Randomly choose time point from an exponential function with the rate prop_sum.
+    # Formula: rate*e^(-rate*x) is the pdf function that we sample from:
+    tau = rexp(1,rate = prop_sum)
+    tt = append(tt, value = tt[steps-1] + tau) # after = 1 is default...
+    
+    # Sample from random uniform distribution
+    rand = runif(1, min = 0,max = 1)
+    
+    ######################### Susceptible becoming infected and infected that are recovering;
+    ######################### in the middle is the number of infected, which is governed by 
+    ######################### encounters with susceptible people and by infected recovering eventually: 
+    ######## ALSO NOTE that here we use the append() function, a function
+    # commonly used in a lot of programming languages. Note that an error I created before,
+    # since it was a major, but subtle difference between R and the python code from 
+    # the mentioned video I used as sort of pseudo-code basis, is the fact that
+    # append() would be enough to use in python, when mentioning the variable 
+    # beforehand the function via e.g. var.append(), given the variable is called var...
+    # In R ot has to be reassigned, but different to a for loop, it is enough to overwrite
+    # the whole variable, since the append() function delivers a completely new vector, i.e.
+    # it does not automatically change the respective variable content! This type of coding
+    # is usually not done this way in R, even though it works, but costs more computation,
+    # which is not that important for this simple educative example. However, the while loop 
+    # could also be written using a for loop structure...
+    
+    ##################### Susceptible becoming Infected:
+    if(rand*prop_sum <= prop[1]){
+      Sp = append(Sp,value = Sp[steps-1]-1) # Susceptible moving to become 
+      Ip = append(Ip,value = Ip[steps-1]+1) # an Infectious, and NO MOVEMENT
+      Rp = append(Rp,value = Rp[steps-1])   # in becoming a recovered....
+    } # End if
+    
+    ##################### Infected becoming Recovered:
+    #else if(rand*prop_sum > prop[1] && rand*prop_sum <= sum(prop[1:2])){ # optional for the case of several possible events (e.g. exposition factors for an SEIR model...)
+                                                                          # prop[1:2] would need to be adapted, 
+                                                                          # requiring to be a list with [[]] compared to the python example 
+    else{
+      Sp = append(Sp,value = Sp[steps-1])   # Here S remains constant, since now
+      Ip = append(Ip,value = Ip[steps-1]-1) # infected become...
+      Rp = append(Rp,value = Rp[steps-1]+1) # ... recovered people...
+    } # End else if / else
+    
+    # Update steps after each loop:
+    steps = steps + 1 # before we used days in a for loop, here we call it steps
+    
+  } ############################################ End while for Gillespie algorithm..
+  
+  
+  ##################### Plot S, I and R, as well as Sp, Ip, Rp:
+  plot(x=t,y=S, col = "skyblue", xlim = limit_x, type = "l", # includes limit_x, default c(0,60)
+       xlab = "Time in Days", ylab = "Number of S, I or R", 
+       main = paste("The SIR-Model (deterministic and stochastic)", "\n","beta =",beta,"; gamma =",gamma,"; Days =",days))
+  
+  # Add SIR from the stochastic model by default, or when stoch_algo == TRUE:
+  if(missing(stoch_algo)){ # in case missing, set to true
+    stoch_algo = TRUE
+  } # End if missing parameter, which is then set to be TRUE, such that the following works:
+  if(stoch_algo == TRUE){
+    lines(x=tt,y=Sp, col = "purple4") # we need to use tt in order to make it align with the precious plot!
+    lines(x=tt,y=Rp, col = "purple4")
+    lines(x=tt,y=Ip, col = "purple4")
+  } # End if
+  # NOTE that the reason the stochastic model of the SIR is placed here in the script is in order to keep
+  # the colorful deterministic SIR model on top / visible as reference (since it entails stable lines).
+  # This does nit hold for the plot of S via plot() above, but this is where I chose not 
+  # to further optimize this details, since it turns out that the stochastic model does not
+  # really cover the deterministic lines anyway, sooooo....
+  
+  # Add I and R from the SIR via Euler's method:
+  lines(x=t,y=I, col = "deeppink")
+  lines(x=t,y=R, col = "green")
+  
+  # Add legend or not (better not for multiple plots)
+  if(missing(legend) || legend == TRUE){
+    legend = TRUE # does nothing but is needed so a variable legend is set...
+    legend(30, 350, legend=c("S = Susceptible" , "I = Infected", "R = Recoverd", "SIR via Gillespie"),
+           col=c("skyblue", "deeppink","green","purple4"), lty=1, cex=0.6)
+  } # End if
+  
+  ################# Optional Plot of R_0 with additional y-axis on top of the SIR plot:
+  if(missing(plot_R_0)){
+    plot_R_0 = FALSE
+  } # End if missing parameter, which is then set to be TRUE, such that the following works:
+    # Note that for at least the default parameters, the plot of the R_0 does not
+    # show much... I did not go further in exploring this part so far... Feel free to add :)
+  else if(plot_R_0 != FALSE){
+    # First update legend:
+    legend(30, 350, legend=c("S = Susceptible" , "I = Infected", "R = Recovered", "R_0"),
+           col=c("skyblue", "deeppink","green", "black"), lty=1, cex=0.6)
+    
+    # The following makes sure the old plot remains:
+    par(new = TRUE)
+    
+    # Plot of R_0:
+    plot(t, R_0, col = "black", axes = FALSE, xlab = "", ylab = "", ylim = c(0,10), type = "l")
+    
+    # Add axes on the right:
+    axis(side = 4, ylab = "R_0")
+    
+    # Add text to second axis:
+    mtext("R_0", side = 4, line = 3) # not visible in the current plot range...  
+  } # End if
+  
+  
+  ############### Create an output list for potential further evaluation:
+  SIR = list()  # Set up empty list
+  SIR[[1]] = S  # Susceptibles Euler's method
+  SIR[[2]] = I  # Infectious      --||--
+  SIR[[3]] = R  # Recovered       --||--
+  SIR[[4]] = R_0 # Basic reproduction number for every time point
+  SIR[[5]] = t  # t for plotting (Euler's method case; for Gillespie tt is used with same outcome..)
+  SIR[[6]] = c(beta,D,N,Infected,days) # Mathematical relevant input parameters
+  SIR[[7]] = Sp # Susceptibles Gillespie algorithm
+  SIR[[8]] = Ip # Infectious         --||--
+  SIR[[9]] = Rp # Recovered          --||--
+  SIR[[10]] = list(Sp[length(Sp)],Ip[length(Ip)],Rp[length(Rp)], tt, tt[length(tt)]) # To evaluate cutoff, in case of running out of S or I...
+  
+  # Return list SIR without showing it in the console right away:
+  invisible(SIR)
+
+} ############################## End of function SIR_fun
+
+# Test with default parameters (i.e. without input arguments):
+SIR_fun()
+# Same result as:
+#SIR_fun(beta = 1, D = 10, N = 500, days = 500, Infected = 1, limit_x = c(0,60), legend = TRUE, plot_R_0 = FALSE, stoch_algo = TRUE)
+
+# Flattening the curve by lowering the submission rate beta:
+par(mfrow =c(2,3)) # sets up 2x3 row/col plot grid
+# Several SIR models given different beta:
+SIR_fun(beta =  1, D = 10, N = 500, days = 500, Infected = 1, limit_x = c(0,60), legend = FALSE, plot_R_0 = FALSE, stoch_algo = TRUE)
+SIR_fun(beta = .8, D = 10, N = 500, days = 500, Infected = 1, limit_x = c(0,60), legend = FALSE, plot_R_0 = FALSE, stoch_algo = TRUE)
+SIR_fun(beta = .7, D = 10, N = 500, days = 500, Infected = 1, limit_x = c(0,60), legend = FALSE, plot_R_0 = FALSE, stoch_algo = TRUE)
+SIR_fun(beta = .6, D = 10, N = 500, days = 500, Infected = 1, limit_x = c(0,60), legend = FALSE, plot_R_0 = FALSE, stoch_algo = TRUE)
+SIR_fun(beta = .5, D = 10, N = 500, days = 500, Infected = 1, limit_x = c(0,60), legend = FALSE, plot_R_0 = FALSE, stoch_algo = TRUE)
+SIR_fun(beta = .4, D = 10, N = 500, days = 500, Infected = 1, limit_x = c(0,60), legend = FALSE, plot_R_0 = FALSE, stoch_algo = TRUE)
+par(mfrow = c(1,1)) # reset plot window to a 1X1 grid
+
+
+####### SEIR - Model including the variable E = Exposed reflecting an infections' incubation time.
+
+# This is a lazy written version of the SEIR model without explanations and lazy in the 
+# sense that you have to set all the parameters within the function, re-execute the function code
+# and then you can use the function in its updated form... It spares me the time
+# of writing if/else and missing statements or other more abstract methods...
+ 
+# Materials:
+# https://medium.com/pythoneers/mastering-the-seir-model-a-comprehensive-guide-with-python-code-and-real-world-applications-da7584a4fb23
+
+SEIR_fun = function(){
+
+  ############ Default values, reset for your own demands
+  d_incub = 5
+  alpha = 1/d_incub # Incubation Rate 1/d_incub = .2 = 20% become infectious each day, 
+                    # with incubation period d_incub = 5 days
+  beta = 1          # Transmission rate in people per day, i.e. how contagious is a disease
+  d_inf = 10        # 10 days infectious, i.e. recovers after 10 days of being infectious
+  gamma = 1/d_inf   # given d_inf = 10, .1 = 10% of infectious recover each day.
+  N = 500           # Number of people in a population, i.e. S + E + I + R.
+  days = 500        # maximum value until the simulation stops
+  Infected = 1      # Number infected at the first day of the infection (makes it possible
+                    # to e.g. start in the middle of an infection, given N and the current number of E (testing),I (testing + obvious symptoms),R (...))
+  
+  
+  
+  # Variables associated to time:
+  dt   = .1  # for a reasonable resolution so to speak.
+  t = seq(0,days,by = dt) # is used later on for plotting; x-axis
+  time = length(seq(0,days,by = dt)) # is used as maximum value for the index variable of the for loop below
+  
+  # Initialize vectors for ODE variables and first infection:
+  S = rep(0,time)
+  S[1] = N-Infected
+  E = rep(0,time)
+  I = rep(0,time)
+  I[1] = 1
+  R = rep(0,time)
+  
+  # Variables associated to time:
+  dt   = .1  # for a reasonable resolution so to speak.
+  t = seq(0,days,by = dt) # is used later on for plotting; x-axis
+  time = length(seq(0,days,by = dt)) # is used as maximum value for the index variable of the for loop below
+  
+  # For plotting:
+  limit_x = c(0,100)
+  
+  for(time in 2:time){
+    
+    # Transition rates and weighting by dt for re-scaling:
+    dS = - (1/N) * beta * S[time-1] * I[time-1]
+    dE = (1/N) * beta *S[time-1] * I[time-1] - alpha * E[time-1]
+    dI = alpha * E[time-1] - gamma * I[time-1]
+    dR = gamma * I[time-1]
+    
+    S[time] = S[time-1] + dS * dt
+    E[time] = E[time-1] + dE * dt
+    I[time] = I[time-1] + dI * dt
+    R[time] = R[time-1] + dR * dt
+    
+  } # End for days
+  
+  # Plot S,E,I,R ofer time t:
+  plot(x=t,y=S, col = "skyblue", xlim = limit_x, type = "l", # includes limit_x, default c(0,60)
+       xlab = "Time in Days", ylab = "Number of S, E, I or R", 
+       main = paste("The SEIR-Model (deterministic)", "\n","alpha =",alpha,"; beta =",beta,"; gamma =",gamma,"; Days =",days))
+  lines(x=t,y=E, col = "#FF6500")
+  lines(x=t,y=I, col = "deeppink")
+  lines(x=t,y=R, col = "green")
+  
+  # Add Legend
+  legend = TRUE # does nothing but is needed so a variable legend is set...
+  legend("topright", legend=c("S = Susceptible","E = Exposed","I = Infected","R = Recoverd"),
+         col=c("skyblue", "#FF6500","deeppink","green"), lty=1, cex=0.6)
+  
+} ################################ End of SEIR_fun()
+  
+####### Test SEIR Function:
+SEIR_fun() # no input parameters needed, have to be adjusted within the function above...
+
+
+######################### Ahhhhh...!!!! Zombie Attack SZR Model!!!!!!!!!!!!!!  
+# based on this paper: WHEN ZOMBIES ATTACK!: MATHEMATICALMODELLING OF AN OUTBREAK OF ZOMBIE INFECTION)
+# https://math.uchicago.edu/~shmuel/Modeling/WHEN%20ZOMBIES%20ATTACK!-%20MATHEMATICAL%20MODELLING%20OF%20AN%20OUTBREAK%20OF%20ZOMBIE%20INFECTION.pdf 
+
+# Note that I did not run the Matlab code, so I do not know if it still works over 15 years later... 
+
+# The below is mostly a translation of the first part of the papers Matlab code:
+SZR_fun = function(){
+  
+  # Default parameters:
+  N = 500  # N is the population
+  time = 100 # Number of days
+  # NOTE values are represented as a decimal fraction due to the difference in implementation
+  # lacking the value 1/N; however, the below follows the mentioned paper and can e.g.
+  # be used to replicated more of the Matlab code.
+  alpha = .003 # killing zombies rate (not everyone minds the zombie outbreak rule number "#2 Douple tap!", right after "#1 Cardio!")
+  beta = .0095  # transmission rate
+  zeta = .0001  # dead humans that resurrect as zombie
+  delta = .0001 # background death rate
+  limit_x = c(0,7) # range of the x-axis for plotting
+  
+  
+  # Different approach to previous realizations of Euler#s method concerning dt:
+  dt = .01         # time steps resolution, important for smoother plotting
+  t = seq(0,time,by = dt)  # for plot further below
+  n = time/dt     # n for the for loop
+  
+  
+  # Initialize vectors for SZR:
+  s = rep(0,n+1) # Susceptibles
+  z = rep(0,n+1) # Zombies
+  r = rep(0,n+1) # Dead Zombies/Humans
+
+  
+  # Initialize Conditions with 0 Zombies:
+  s[1] = N-1
+  z[1] = 1
+  r[1] = 0
+  
+  
+  # Euler's method for deterministic SZR model:
+  for(i in 1:n){ # rules out non-zombie related death and life... i.e. birthrate = deathrate
+    s[i+1] = s[i] + dt * (- beta * s[i] * z[i])
+    z[i+1] = z[i] + dt * (beta * s[i] * z[i] - alpha * s[i] * z[i] + zeta * r[i])
+    r[i+1] = r[i] + dt * (delta * s[i] + alpha * s[i] * z[i] - zeta * r[i])
+    
+    # Used in the Matlab code but for the default use not necessary it appears...
+    # I did not further evaluate the use, but S being less than zero or greater than 
+    # N appears impossible to me in the R code example:
+    # if(s[i] < 0 || s[i] > N){ break } # End if
+    # if(z[i] > N || z[i] < 0){ break } # End if
+    # if(r[i] < 0 || r[i] > N){ break } # End if
+    # 
+    
+  } # End for i
+  
+  # Plot model:
+  # Plot S,E,I,R ofer time t:
+  plot(x=t,y=s, col = "skyblue", xlim = limit_x,, ylim =c(0,N) , type = "l", # includes limit_x, default c(0,60)
+       xlab = "Time in Days", ylab = "Number of S, Z, R", 
+       main = paste("The S-Zombie-R-Model (deterministic)", "\n","alpha =",alpha,"; beta =",beta,"; zeta =",zeta,"\n","; delta =",delta,"; Days =",time))
+  lines(x=t,y=z, col = "deeppink")
+  lines(x=t,y=r, col = "green")
+  
+  # Add Legend:
+  legend("topright", legend=c("S = Susceptible","Z = Ahh..!!! Zombies!","R = Killed (Double Tap)"),
+         col=c("skyblue","deeppink","green"), lty=1, cex=0.6)
+  
+} ########## End of SZR_fun
+
+################### Test Zombie Outbreak: 
+SZR_fun() # no input parameters needed, have to be adjusted within the function above...
+# The default parameters result in a plot where after around 4 days a steady state
+# builds itself where about 175 Zombies were killed, 325 Zombies remained and no humans...
+ 
+
+###################################################################################
+### 9.14 EXAMPLE FUNCTION XIV: Gillespie Algorithm to Simulate mRNA Transcription #
+###################################################################################
+
+####### =====> VERY SIMILAR ALGORITHM AS FOR THE SIR MODEL SIMULATION IN 9.14
+
+####### Gillespie Algorithm for simulating the amount of mRNA that has been transcribed from a Gene
+# k = production rate
+# gamma = degradation rate
+
+# Based on python version from: https://www.youtube.com/watch?v=Hgjh3YxC01o
+
+Gill_mRNA = function(){
+ 
+  # Default parameters: 
+  X = c(0) # amount of mRNA produced
+  k = 2
+  gamma = 0.1
+  # steady_state should be 20 via k/gamma
+  
+  t = c(1) # has to be 1, since we are using 1-indexing methods
+  #### Note that the output of tt will be a non-integer vector with e.g. 21.86 as value...
+  cycl = 1000
+  time = length(seq(0,cycl,by = 1)) # is used as index variable of the for loop below, default = 500 cycles
+  steps = 2 # to keep track of the number of loops; can't use tt, since it will be changed below
+  
+  # While loop performing the Gillespie logic:
+  while(t[steps-1] < cycl){
+    
+    # Rates
+    rates = c(k,gamma*X[steps-1])
+    rate_sum = sum(rates)
+    
+    # Choose timepoint of next event:
+    tau = rexp(1,rate = rate_sum)
+    t = append(t, value = t[steps-1] + tau) # append after = 1 is default...
+    
+    # Sample from random uniform distribution
+    rand = runif(1, min = 0,max = 1)
+    
+    # Production
+    if(rand * rate_sum > 0 && rand*rate_sum < rates[1]){ # rates[1] = k
+      X = append(X, values = X[steps-1] + 1)
+    } # End if
+    
+    # Decay
+    else if(rand * rate_sum > rates[1] && rand * rate_sum < rates[1] + rates[2]){ # the latter is rate_sum basically
+      X = append(X, values = X[steps-1] - 1)
+    }# End else if
+    
+    # Update steps after each loop:
+    steps = steps + 1 # before we used days in a for loop, here we call it steps
+    
+  } ##### End while()
+  
+  plot(t,X, xlab = "time", ylab = "mRNA Quantity", col = "deeppink", type = "l", 
+       main = paste("Gillespie Algorithm Simulating the Amount of","\n","Transcribed mRNA within Time (no unit used)"))
+  
+} # End of Gill_mRNA
+
+# Test function
+Gill_mRNA()
+
+# Possible Exercise: Try translating the following python code in this video: https://www.youtube.com/watch?v=VL5ki-II20o
+
+##########################################################################
+### 9.15 EXAMPLE FUNCTION XV: Lorenz Attractor incl. Interactive 3D Plot #
+##########################################################################
+
+# plot3d == TRUE relies on the package rgl!
+lorenz_attr = function(sigma, rho, beta, plot3d){
+  if(missing(plot3d)){
+    plot3d = FALSE
+  } # End if missing plot3d parameter
+  
+  # Time variable and n, x y and z:
+  dt = 0.01
+  n = 10000
+  x = rep(0,n) # or numeric(n), which also automatically creates a zero of 0
+  y = rep(0,n)
+  z = rep(0,n)
+  
+  # Starting conditions, e.g. all 1s (all 0s does not work!!):
+  x[1] = .1
+  y[1] = .1
+  z[1] = .1
+  
+  # Solve Equations via Euler's method for integration (simplest form of integration apparently):
+  for(index in 1:(n - 1)){ 
+    # Next state from current state will be calculated, therefor n-1, since we 
+    # can only start i = 1 creating i+1 as future i again from which the next state
+    # will be calculated... 
+    # Very direct representation of the Lorenz attractor formula:
+    dx = sigma * (y[index] - x[index])
+    dy = x[index] * (rho - z[index]) - y[index]
+    dz = x[index] * y[index] - beta * z[index]
+    
+    # Calcualte next state from current state...
+    x[index + 1] = x[index] + dt * dx
+    y[index + 1] = y[index] + dt * dy
+    z[index + 1] = z[index] + dt * dz
+  } # End for index
+  
+  if(plot3d == TRUE){
+    # Interactive 3D plot of the Lorenz attractor:
+    library(rgl)
+    plot3d(x,y,z, type = "l", col = "deeppink")
+  } # End if
+  
+  # Plot a 2D reduction of the three dimensions by plotting only two dimensions at a time,
+  # equivalent to looking from one perspective or "one side of the 3D coordinate-system cube":
+  par(mfrow = c(2,2))
+  plot(x, z,
+       type = "l",
+       col = "deeppink",
+       xlab = "x",
+       ylab = "z",
+       main = paste("Lorenz Attractor from Three","\n","Non-Linear Differential Equations"), asp = 1)
+  
+  # Different perspective via plotting x and y:
+  plot(x, y,
+       type = "l",
+       col = "deeppink",
+       xlab = "x",
+       ylab = "z",
+       main = paste("Lorenz Attractor from Three","\n","Non-Linear Differential Equations"), asp = 1)
+  
+  # Different perspective via plotting y and z:
+  plot(y, z,
+       type = "l",
+       col = "deeppink",
+       xlab = "x",
+       ylab = "z",
+       main = paste("Lorenz Attractor from Three","\n","Non-Linear Differential Equations"), asp = 1)
+  par(mfrow = c(1,1))
+  
+} # End of lorenz_attr
+
+# Standard Parameters (only the below leads to the popular butterfly like plot):
+sigma = 10
+rho = 28 # greek letter rho, looks like p in formulas but is called rho...
+beta = 8/3
+
+# 2D plot
+lorenz_attr(sigma, rho, beta)
+
+# 3D plot
+#lorenz_attr(sigma, rho, beta, plot3d = TRUE)
+
+# Just in case rest plot grid to 1,1, since I had issues before using the above function,
+# using par(mfrow=c(1,1)) inide a function, which somehow does not update...
+par(mfrow = c(1,1))
 
 ###################################################
 # ----------------------------------------------- #
 ###################################################
-###################################################
-# 10 Logical Operators and Mathematical Functions #
-###################################################
+#########################################################################
+# 10 Logical Operators, Mathematical Functions and Basic Plot Functions #
+#########################################################################
 
 ##### LOGICAL OPERATORS
 
@@ -2765,7 +4011,7 @@ fibonacci2(20)
 TRUE & TRUE  # [1] TRUE
 TRUE & FALSE # [1] FALSE
 
-# Either some & operatiorn AND (&&) another & operation
+# Either some & operation AND (&&) another & operation
 x = 4
 x > 1 & is.numeric(x) && x > 5 & is.numeric(x) # [1] FALSE
 
@@ -2949,6 +4195,15 @@ ppois(q = 0.2240418, lambda = 3) # [1] 0.04978707
 
 
 # and many more...
+
+##### Some Basic plot functions, apart from plot():
+# Histogram:
+x = seq(from = 0,to = 20,by = .01)
+y = rnorm(x, mean = mean(x), sd = sd(x))
+hist(y, col = "lightpink")
+
+# Boxplot:
+boxplot(y, col = "lightgreen")
 
 
 ###################################################
