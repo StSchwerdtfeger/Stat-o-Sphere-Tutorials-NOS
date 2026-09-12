@@ -4,7 +4,7 @@
 #         Tutorial Script        #
 #               by               #
 #     Steffen Schwerdtfeger      # 
-#       12.2023 - 05.2025        #
+#          2023 - 2026           #
 ##################################
 ##################################
 
@@ -28,7 +28,7 @@
 # also the solutions for the exercises of chapter 14 are not included in this script)):
 
 # UNCOMMENT FOLLOWING LINE AND EXECUTE TO INSTALL ALL OF THE BELOW PACKAGES:
-#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR", "rgl"))
+#install.packages(c("tidyverse","stringi","effsize","shiny","readxl","tidytuesdayR"))
 # Tidyverse entails among others the packages stringr, dplyr, ggplot, readr...
 library("tidyverse")    # filter(), select(), gather(), melt() group_by() summarize() 
 library("stringi")      # changing symbol patterns such as Ae to Ä
@@ -36,7 +36,11 @@ library("effsize")      # cohen.d() for the exercise
 library("shiny")        # create and run shiny apps
 library("readxl")       # read_excel()
 library("tidytuesdayR") # resource for plenty of free example data sets
-library("rgl")          # for creating interactive 3D plots 
+
+# For 3D plots; sometimes fails to install with macOS,
+# see this Stackoverflow thread for a solution (occured with R.6.1 and
+# RStudio 2026.06.0 Build 242):
+#library("rgl")          # for creating interactive 3D plots 
 
 # Needed for Rmarkdown example:
 #install.packages(c("gt","kableExtra", "gridExtra"))
@@ -98,11 +102,11 @@ parabola(x)
 
 #### Code benchmarks are mostly not of concern, except for ML/AI or 
 #### some forms of (f)MRI analysis and such:
-#x=c(rnorm(1000000,mean=22,sd=6))
-#y=c(rnorm(1000000,mean=35,sd=4))
+# x=c(rnorm(1000000,mean=22,sd=6))
+# y=c(rnorm(1000000,mean=35,sd=4))
 
 # linear regression with 1 Million data points:
-#lm(y~x) # instant result with my computer...
+# lm(y~x) # instant result with my computer...
 
 #y=c(rnorm(100000000,mean=35,sd=4))
 #x=c(rnorm(100000000,mean=22,sd=6))
@@ -174,6 +178,16 @@ test3 == test
 test = 2 + 4
 test == test3
 # [1] FALSE
+
+# You can also remove objects or the whole environment by command.
+# It is recommended to remove all variables and delete those that 
+# are not needed, since otherwise errors can be overlooked, e.g.
+# when renaming variables but not at every line in the code you
+# use and kept the original variable as well... The code works
+# in such a case, but good luck revisiting your code when you want
+# to correct or advance your code... it will be confusing...
+rm(test)
+rm(list = ls()) # for emptying the whole environment...
 
 
 # # # # # # # # # # # # # # # # # # # # # 
@@ -542,7 +556,6 @@ library("readr") # package also within "tidyverse"
 # write.csv()
 # write.csv2()
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # 
 #############################################
 # ----------------------------------------- #
@@ -620,7 +633,7 @@ measurement_sysRR = c(130,122,132,123,133,121,129,125,135,119,134,127,140,125)
 table = data.frame(patient_id,time,measurement_sysRR,fam)
 
 #install.packages("dplyr")  # install package
-library(dplyr)               # load/activate package
+library(dplyr)              # load/activate package
 # THE OUTPUT of library(dplyr) tells us that another function with in the stats package
 # that is automatically loaded (entailing functions such as lm() or mean() etc.) also
 # has a function called filter(), which is now masked, meaning it is "turned off". In python
@@ -652,10 +665,10 @@ plot(x = t1$patient_id, y = t1$measurement_sysRR,
      ylab = "sysRR")
 points(x=t2$patient_id,y=t2$measurement_sysRR, col = "darkgreen")
 
-
 # ... and perform a paired/dependent t-test):
 # Here using as.numeric() was necessary...
 result = t.test(t2$measurement_sysRR, t1$measurement_sysRR, paired  = TRUE)
+
 result$p.value
 # [1] 0.0008591109
 result$estimate
@@ -759,11 +772,12 @@ na = is.na(new_table$measurement_sysRRalt)
 na_lines = which(na == TRUE) # which numeric index position is na?
 # [1] 4 7 # Index of the lines with NA entry
 
+
 # Initialize vector:
 pat_id_na = c()
 
 # Determine which patient_id is in the lines from the list na_lines: 
-for(i in 1:length(na_lines)){
+for(i in 1:length(na_lines)){   
   pat_id_na[i] = new_table$patient_id[na_lines[i]]
 } # End for i
 pat_id_na
@@ -1887,7 +1901,7 @@ time_diff_days = difftime(dates_2, dates_1, units = "days")
 # Calculate the mean time difference and sd:
 mean(time_diff_days)
 # Time difference of 5365 days # Mean difference
-sd(time_diff_days)
+sd(time_diff_days) 
 # [1] 4177.1 # Quite high in this case...
 
 
@@ -2835,13 +2849,12 @@ fibonacci2(20)
 # see this paper: https://doi.org/10.48550/arXiv.1503.01104 
 
 # Percolation point/threshold for a 2D lattice (given left/right/up/down neighbors
-# can be infected and no diagonal infection is possible (as in a rather classic SIR model)!) 
+# can be infected and no diagonal infection is possible!) 
 # See Wikipedia for more details: https://en.wikipedia.org/wiki/Percolation_threshold  
 percentage = .592746050792
 
 # Zombie infection function, which is used within the zombie_outbreak function:
 infect = function(infected, t2){
-  
   # Additional frame is added via zombie_outbreak(), so no if statements needed 
   # for starting at margins or corners or handling the infection of corners and 
   # potential surroundings from there:
@@ -2859,7 +2872,7 @@ infect = function(infected, t2){
     # where percentage refers to the percentage of people over empty spaces, such 
     # that .6 means 60 % people and 40 % empty spaces:
     
-    # if (non-corner and non-boarder positions)
+    # if (non-corner and non-border positions)
     if(row > 1 & row < nrow(t2) && col > 1 & col < ncol(t2)){
       # Infection to the left, given that a human is at that position, i.e. 1 not 0!:
       if(t2[row,col-1] == 1){
@@ -2922,7 +2935,7 @@ zombie_outbreak = function(percentage){
   
   # Add Zombie 0, initializing infection on patient 0:
   infection0 = start
-  infection0[zombie0[1],zombie0[2]] = 2
+  infection0[zombie0[1],zombie0[2]] = 2 # 2 == Zombie!!! Ahhh..!!
   
   # Initialize the first t1 and t2 variables (for the initial difference calculated further below
   # which will then be repeatedly updated each loop cycle within the while() loop below):
@@ -2930,7 +2943,7 @@ zombie_outbreak = function(percentage){
   t2 = infection0 # first infection
   
   # Add redundant frame, in order to avoid writing multiple if statements in the infect() function
-  # for the case of borders and corners...
+  # for the case of borders and corners... This process is also known as "padding".
   t1 = cbind(c(0),t1,c(0))
   t1 = rbind(c(0),t1,c(0))
   t2 = cbind(c(0),t2,c(0))  
@@ -2964,9 +2977,11 @@ zombie_outbreak = function(percentage){
     
     # Stop while loop when the infection stops to spread:
     if(sum(diff) == length(t1)){ # indicating no change between t1 and t2, then...
+      
       # Add fancy ASCII-art text to console output, including a message from the government;
       # the ASCII-art has to be inserted as so called raw string via r"()" within cat(), otherwise
-      # cat understands certain patterns as functional code, such as "\_":
+      # cat understands certain patterns as functional code, such as "\_", similar to "\n" for "enter"
+      # in the sense of starting a new line:
       cat(r"(
                 _     _     _             ______               _     _           _ _ _
           /\   | |   | |   | |           |___  /              | |   (_)         | | | |
@@ -3037,7 +3052,7 @@ zombie_outbreak = function(percentage){
   output_list[[6]] = curve_infect # A list of the number of new infections per step/day
   
   # Plot Final State of Zombie Outbreak:
-  image(t2, col = c("white", "black", "deeppink"), axes = FALSE, main = "Ahhhh... Zombies!!")
+  image(t2, col = c("white", "black", "deeppink"), axes = FALSE, main = "Ahhhh... Zombies!!",asp = .9)
   invisible(output_list) # returns the list object, but does not show it in the console!
                          # the list however can be retrieved via using object names, or adding
                          # [[]] and the respective list number at the end of the function, 
@@ -3055,12 +3070,13 @@ zombie_outbreak(percentage = .5927)
 
 ######## ACTIVATE CODE BELOW TO SIMULATE A BUNCH OF OUTBREAKS:
 
-# Simulate a bunch of outbreaks an further evaluate the result:
-# multiple_outbreaks = list()
+# # Simulate a bunch of outbreaks an further evaluate the result:
+# # multiple_outbreaks = list()
 # n_sim = 100
 # multiple_outbreaks = list()
 # for(index in 1:n_sim){
 #   multiple_outbreaks[[index]] = zombie_outbreak(percentage = .592746050792) # .592746050792
+#   print(index)
 # } # End for index
 # 
 # # Extract number of steps and reach
@@ -3076,8 +3092,12 @@ zombie_outbreak(percentage = .5927)
 # 
 # # How often was a boarder reached:
 # hist(reach, col = "deeppink", breaks = 2)
+# 
+# # Sum reach:
+# sum(reach)
 
-
+# 1000 Simulations resulted in: [1] 792
+# 79.2 %
 
 ######################################################
 ### 9.12 EXAMPLE FUNCTION XII: Conway's Game of Life #
@@ -3324,6 +3344,8 @@ game_board[c((center_row-3),center_row+3),center_col] = 1
 # https://urbanpsychology.medium.com/understanding-the-sir-model-for-disease-spread-with-r-a7b9c1f666e3 
 # Zombie Paper that shows several modified versions of the SIR model:
 # https://doi.org/10.48550/arXiv.1503.01104 
+# Video with comprehensive analysis of the previous paper by Danny Phandom:
+# https://www.youtube.com/@dannyphandom/videos
 # Code for Gillespie algorithm is mostly based on Tutorial by Mike Saint-Antoine and the accompanied 
 # python code, I add some tweaks and more error control: 
 # https://www.youtube.com/watch?v=ZQbf5QVxPB0 
@@ -3691,8 +3713,6 @@ SEIR_fun = function(){
   Infected = 1      # Number infected at the first day of the infection (makes it possible
                     # to e.g. start in the middle of an infection, given N and the current number of E (testing),I (testing + obvious symptoms),R (...))
   
-  
-  
   # Variables associated to time:
   dt   = .1  # for a reasonable resolution so to speak.
   t = seq(0,days,by = dt) # is used later on for plotting; x-axis
@@ -3967,10 +3987,15 @@ sigma = 10
 rho = 28 # greek letter rho, looks like p in formulas but is called rho...
 beta = 8/3
 
-# 2D plot
+### 2D plot
 lorenz_attr(sigma, rho, beta)
 
-# 3D plot
+### 3D plot:
+# Installation of rgl sometimes fails with macOS Computers;
+# see this Stackoverflow thread for a solution (occurred with R.6.1 and
+# RStudio 2026.06.0 Build 242) in case you get an Error that says something 
+# about an rgl DLL path...
+#library("rgl") 
 #lorenz_attr(sigma, rho, beta, plot3d = TRUE)
 
 # Just in case rest plot grid to 1,1, since I had issues before using the above function,
@@ -4213,7 +4238,7 @@ boxplot(y, col = "lightgreen")
 # 11 Creating Apps with the Shiny App Package #
 ###############################################
 ###########################################################################################
-### 11.1 EXAMPLE APP I: Plotting Standardized Difference in Means for a One-Sample Z-Test #
+### 11.1 EXAMPLE APP I: Plotting Standardised Difference in Means for a One-Sample Z-Test #
 ###########################################################################################
 
 ### IMPORTANT!!!!!!!!!!! CLOSE APP AFTER USAGE, OTHERWISE OTHER CODE WONT BE PROCESSED!!!!!!
@@ -4273,7 +4298,12 @@ server = function(input, output) {
     
     # Effect size diff_mean/po_sd 
     # RECALL: INPUT NAMES WERE SET VIA numericInput() in code for UI!
-    effectsize = (input$sampmean-input$popmean)/input$popsd
+    if(input$popsd == input$sampsd){
+      effectsize = (input$sampmean-input$popmean)/input$popsd
+    } # End if 
+    else{ # using the average sd:
+      effectsize = (input$sampmean-input$popmean)/((input$popsd+input$sampsd)/2)
+    } # End else
     
     # Create sequence of numbers of x (sd's of the x-axis) which then run through
     # the prob_dens function above:
@@ -4290,7 +4320,7 @@ server = function(input, output) {
          type = "l",  # lines instead of points
          lty = 2,     # dotted line
          ylab = "Density",
-         xlab = "Difference in Means in Units of SD of the Population",
+         xlab = "Difference in Means in Units of SD",
          ylim = c(0,yuplim)) # Uplim adjusted, so it is not cu off for some cases
     
     # Adds standard normal distribution to plot:
@@ -4326,16 +4356,14 @@ server = function(input, output) {
 
 
 #### IMPORTANT!!!!!!!!!!! CLOSE APP AFTER USAGE, OTHERWISE OTHER CODE WONT BE PROCESSED!!!!!!
-# shinyApp(ui = ui, server = server)
+#shinyApp(ui = ui, server = server)
 
 
 # Consider the following cases:
-
 # Pop_mean = 130 		  Sample_mean = 120 	 Pop and Samp_SD = 5
 # Pop_mean = 130 		  Sample_mean = 120	   Pop and Samp_SD = 20
 # Pop_mean = 129.8  	Sample_mean = 130	   Pop and Samp_SD = 0.1 
-# Pop_mean = 130 		  Sample_mean = 120	   Pop_SD = 5	 	          Samp_SD = 20 (makes clear why CI of effect size is important)
-# Pop_mean = 130 		  Sample_mean = 20	   Pop_SD and Samp_SD = 20
+# Pop_mean = 130 		  Sample_mean = 120	   Pop_SD = 5	; Samp_SD = 20 (makes clear why CI of effect size is important)
 
 
 ###########################################################################################
